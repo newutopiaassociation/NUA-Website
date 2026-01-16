@@ -17,7 +17,7 @@
     <link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
 
-<body>
+<body class="moonlit-theme">
 
     <header id="main-header">
         <div class="container header-container">
@@ -33,9 +33,17 @@
                     <li><a href="#registration" class="glow-on-hover">Member Registration</a></li>
                     <li><a href="#contact" class="glow-on-hover">Contact NUA MC</a></li>
                     <li><a href="#newsletters" class="glow-on-hover">NUA Newsletters</a></li>
+                    <li class="mobile-only-controls">
+                        <div class="header-controls">
+                            <button id="theme-toggle-mobile" class="control-btn"
+                                title="Toggle Day/Night Mode">🌙</button>
+                            <button id="sound-toggle-mobile" class="control-btn"
+                                title="Toggle Ambient Sound">🔇</button>
+                        </div>
+                    </li>
                 </ul>
-                <div class="header-controls">
-                    <button id="theme-toggle" class="control-btn" title="Toggle Day/Night Mode">☀️</button>
+                <div class="header-controls desktop-only-controls">
+                    <button id="theme-toggle" class="control-btn" title="Toggle Day/Night Mode">🌙</button>
                     <button id="sound-toggle" class="control-btn" title="Toggle Ambient Sound">🔇</button>
                 </div>
                 <div class="menu-toggle" id="mobile-menu">
@@ -58,9 +66,9 @@
                     <a href="#registration" class="btn btn-primary">Join the Association</a>
                     <a href="#about" class="btn btn-secondary">Learn More</a>
                 </div>
-                <div class="scroll-indicator">
-                    <div class="mouse"></div>
-                </div>
+            </div>
+            <div class="scroll-indicator">
+                <div class="mouse"></div>
             </div>
         </section>
 
@@ -161,12 +169,12 @@
                     <img src="assets/leaf.svg" alt="" class="leaf-motif right">
                 </div>
                 <div class="principles-grid">
-                    <div class="card">
+                    <div class="card animate-slide-up" style="--delay: 0.1s">
                         <h3>Association Foundation</h3>
                         <p>NUA is formed by members with the shared commitment to foster a transparent, fair, and
                             harmonious framework for community welfare and governance.</p>
                     </div>
-                    <div class="card">
+                    <div class="card animate-slide-up" style="--delay: 0.2s">
                         <h3>Core Pillars</h3>
                         <ul>
                             <li><strong>Accountability</strong> in decision-making and financial management</li>
@@ -176,7 +184,7 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="card">
+                    <div class="card animate-slide-up" style="--delay: 0.3s">
                         <h3>Modernization Goals</h3>
                         <ul>
                             <li>Clear, agreed and enforceable rules and regulations</li>
@@ -184,7 +192,7 @@
                             <li>Participatory processes through open communication channels and discussion forums</li>
                         </ul>
                     </div>
-                    <div class="card">
+                    <div class="card animate-slide-up" style="--delay: 0.4s">
                         <h3>Our Vision</h3>
                         <p>A vision that prioritizes enforceable governance, member education, and dispute-free
                             administration through transparent and well-defined processes and procedures.</p>
@@ -203,13 +211,29 @@
                     <img src="assets/leaf.svg" alt="" class="leaf-motif right">
                 </div>
                 <div class="registration-content card mx-auto max-width-600">
-                    <ul class="registration-list">
-                        <li>Owner of UTOPIA layout</li>
-                        <li>Fill up the Membership registration form</li>
-                        <li>Not active member of other association</li>
-                    </ul>
-                    <a href="https://forms.gle/dummy-link" target="_blank" class="btn btn-primary">Registration Form
-                        (Google Form)</a>
+                    <div class="steps-container">
+                        <h3>Steps to join NUA</h3>
+                        <ol class="main-steps">
+                            <li>
+                                <strong>Requirements</strong>
+                                <ul class="sub-steps">
+                                    <li>Shall be owner in Utopia Layout</li>
+                                    <li>Move out of the existing association, if you are member</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <strong>Steps</strong>
+                                <ul class="sub-steps">
+                                    <li>Download the Membership form and fill-it with details</li>
+                                    <li>Send the filled, signed form with required attachments to <a
+                                            href="mailto:nua-managing-committee@googlegroups.com">nua-managing-committee@googlegroups.com</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                    <a href="https://drive.google.com/file/d/135IUB58b5I8zCcpXpfUutJdenmKrUmUL/view?usp=sharing"
+                        target="_blank" class="btn btn-primary">Download the Member Registration Form</a>
                 </div>
             </div>
         </section>
@@ -260,12 +284,45 @@
                 </div>
             </div>
         </section>
+        <section id="quicklinks" class="section bg-light">
+            <div class="container">
+                <div class="quicklinks-grid">
+                    <div class="quicklinks-col">
+                        <h3>Useful Links</h3>
+                        <ul class="quick-links-list">
+                            <li><a href="https://drive.google.com/file/d/135IUB58b5I8zCcpXpfUutJdenmKrUmUL/view?usp=sharing"
+                                    target="_blank">Member Registration Form</a></li>
+                            <li><a href="https://docs.google.com/document/d/1qA6sVK5DBse_uqC5i-_zqGZZMDQqsHiN/edit?usp=sharing&ouid=107963816068265631968&rtpof=true&sd=true"
+                                    target="_blank">Bye-laws (Restricted)</a></li>
+                        </ul>
+                    </div>
+                    <div class="quicklinks-col">
+                        <h3>Contact Us</h3>
+                        <p><strong>NUA MC Email ID:</strong><br>
+                            <a
+                                href="mailto:nua-managing-committee@googlegroups.com">nua-managing-committee@googlegroups.com</a>
+                        </p>
+                    </div>
+                    <div class="quicklinks-col">
+                        <h3>Site Navigation</h3>
+                        <ul class="quick-links-list">
+                            <li><a href="#about">About NUA</a></li>
+                            <li><a href="#principles">Guiding Principles</a></li>
+                            <li><a href="#registration">Member Registration</a></li>
+                            <li><a href="#contact">Contact NUA MC</a></li>
+                            <li><a href="#newsletters">NUA Newsletters</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <footer>
         <div class="container text-center">
             <p>&copy; 2026 New Utopia Association (NUA). All rights reserved.</p>
-            <p class="designer-credit">Designed By: R&R</p>
+            <p class="designer-credit">Designed By: R&R Consulting</p>
         </div>
     </footer>
 
