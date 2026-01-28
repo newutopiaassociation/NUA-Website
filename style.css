@@ -508,8 +508,8 @@ body.moonlit-theme .compact-highlight {
 /* Principles Grid */
 .principles-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
 }
 
 .principles-grid .card h3 {
@@ -538,47 +538,74 @@ body.moonlit-theme .compact-highlight {
 /* Registration */
 .steps-container {
     text-align: left;
-    margin-bottom: 30px;
 }
 
 .steps-container h3 {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
+    font-size: 1.8rem;
+    margin-bottom: 25px;
     text-align: center;
-}
-
-.main-steps {
-    padding-left: 20px;
-}
-
-.main-steps>li {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 20px;
     color: var(--brand-primary);
+}
+
+.process-group {
+    margin-bottom: 30px;
+}
+
+.process-group h4 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: var(--brand-primary);
+    border-bottom: 2px solid var(--bg-secondary);
+    padding-bottom: 5px;
 }
 
 .sub-steps {
-    list-style-type: lower-alpha;
-    padding-left: 25px;
-    margin-top: 10px;
+    list-style-type: none;
+    padding-left: 0;
 }
 
 .sub-steps li {
+    font-size: 1.05rem;
+    margin-bottom: 10px;
+    padding-left: 25px;
+    position: relative;
+}
+
+.sub-steps li::before {
+    content: '🌱';
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 0.9rem;
+}
+
+.process-list {
+    list-style-type: decimal;
+    padding-left: 20px;
+}
+
+.process-list li {
+    margin-bottom: 20px;
     font-size: 1rem;
-    font-weight: 400;
-    margin-bottom: 8px;
     color: var(--text-primary);
 }
 
-.sub-steps a {
+.process-list li strong {
+    display: block;
+    font-size: 1.1rem;
     color: var(--brand-primary);
-    text-decoration: underline;
-    transition: var(--transition-smooth);
+    margin-bottom: 5px;
 }
 
-.sub-steps a:hover {
-    color: var(--brand-secondary);
+.process-list p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.process-list a {
+    color: var(--brand-primary);
+    text-decoration: underline;
+    font-weight: 600;
 }
 
 .btn {
@@ -638,13 +665,41 @@ body.moonlit-theme .compact-highlight {
     color: var(--primary-forest);
 }
 
+.checkbox-group {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 5px;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    margin: 0;
+}
+
+.checkbox-group label {
+    margin-bottom: 0;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
 .form-group input,
 .form-group textarea {
     padding: 15px;
     border-radius: 10px;
-    border: 1px solid #ddd;
+    border: 1.5px solid var(--brand-secondary);
+    /* Darker and thicker border */
+    background-color: var(--bg-main);
+    color: var(--text-primary);
     font-family: inherit;
     transition: var(--transition-smooth);
+}
+
+body.moonlit-theme .form-group input,
+body.moonlit-theme .form-group textarea {
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .form-group input:focus,
@@ -775,7 +830,7 @@ footer {
 }
 
 .designer-credit {
-    font-size: 0.55rem;
+    font-size: 0.85rem;
     color: var(--text-secondary);
     margin-top: 10px;
     opacity: 0.8;
@@ -899,6 +954,16 @@ body.moonlit-theme footer {
 
     .nav-links li {
         margin: 20px 0;
+    }
+
+    .nav-links li a {
+        color: var(--brand-primary);
+        /* Force green in mobile menu for better visibility */
+        font-size: 1.2rem;
+    }
+
+    body.moonlit-theme .nav-links li a {
+        color: var(--text-inverse);
     }
 
     #hero h1 {

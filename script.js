@@ -69,6 +69,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const contactForm = document.getElementById('contact-form');
 
     if (contactForm) {
+        const membershipCheckbox = document.getElementById('membership-interest');
+        const queryTextarea = document.getElementById('query');
+        const membershipText = `Dear NUA Managing Committee,\nI am an owner in Utopia Layout and would like to express my interest in becoming a member of NUA. I value fairness, transparency, open communication, and cost optimization, and I believe in contributing to the community with these principles.\nKindly share the membership form and details of the process. I will complete the form and provide the required documents promptly.`;
+
+        if (membershipCheckbox && queryTextarea) {
+            membershipCheckbox.addEventListener('change', () => {
+                if (membershipCheckbox.checked) {
+                    queryTextarea.value = membershipText;
+                } else {
+                    if (queryTextarea.value.trim() === membershipText.trim()) {
+                        queryTextarea.value = '';
+                    }
+                }
+            });
+        }
+
         contactForm.addEventListener('submit', (e) => {
             e.preventDefault();
 
@@ -149,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isPlaying = false;
 
     if (ambientSound) {
-        ambientSound.volume = 0.1;
+        ambientSound.volume = 1.0; // Increased volume
         let playTimeout;
         let pauseTimeout;
 
@@ -192,6 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!isPlaying) {
                 isPlaying = true;
                 updateSoundIcons(true);
+                ambientSound.load(); // Ensure it's loaded
                 playIntermittent();
             } else {
                 stopIntermittent();
