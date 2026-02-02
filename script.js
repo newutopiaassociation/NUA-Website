@@ -86,23 +86,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         contactForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            // In a real scenario, you might send data to a server here.
-            // For now, we redirect to a dummy Google Form as requested.
-            const dummyGoogleFormUrl = 'https://forms.gle/dummy-contact-form'; // Replace with actual link later
-
-            console.log('Form submitted. Redirecting to Google Form...');
-
-            // Optional: Show a success message before redirecting
+            // Standard form submission to Google Forms
             const btn = contactForm.querySelector('button');
-            const originalText = btn.textContent;
-            btn.textContent = 'Redirecting...';
+            btn.textContent = 'Submitting...';
+            btn.style.opacity = '0.7';
             btn.disabled = true;
-
-            setTimeout(() => {
-                window.location.href = dummyGoogleFormUrl;
-            }, 1000);
         });
     }
 

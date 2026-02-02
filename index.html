@@ -151,7 +151,7 @@
                                             pre-calculated table is created and included in Bye-laws with staff
                                             requirements for easy understanding.</em></p>
                                 </div>
-                                <p class="small-text">Above is in line with recent Court Rulings.</p>
+                                <!-- <p class="small-text">Above is in line with recent Court Rulings.</p> -->
                             </div>
                         </div>
                     </div>
@@ -234,18 +234,18 @@
                                     <p>The NUA Managing Committee will send you the membership form.</p>
                                 </li>
                                 <li>
-                                    <strong>Complete the Form and Attach Documents</strong>
+                                    <strong>Complete and Submit the Form and Attach Documents</strong>
                                     <p>Fill out the membership form, attach the necessary supporting documents, and
                                         email them to <a
                                             href="mailto:nua-managing-committee@googlegroups.com">nua-managing-committee@googlegroups.com</a>.
                                     </p>
                                 </li>
-                                <li>
+                                <!-- <li>
                                     <strong>Submit Signed Form with Attachments</strong>
                                     <p>Send the completed and signed form along with all required attachments to <a
                                             href="mailto:nua-managing-committee@googlegroups.com">nua-managing-committee@googlegroups.com</a>.
                                     </p>
-                                </li>
+                                </li> -->
                             </ul>
                         </div>
                     </div>
@@ -261,22 +261,29 @@
                     <img src="assets/leaf.svg" alt="" class="leaf-motif right white-svg">
                 </div>
                 <div class="contact-card card">
-                    <form id="contact-form">
+                    <form id="contact-form"
+                        action="https://docs.google.com/forms/d/e/1FAIpQLScIJJcsdmssA9nEKMA5Tu0QBC0ychbbRT-6b5U0LxBLwr28iA/formResponse"
+                        method="POST">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="entry.2005620554" required placeholder="Your Name">
+                        </div>
                         <div class="form-group">
                             <label for="email">Email ID</label>
-                            <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+                            <input type="email" id="email" name="entry.1045781291" required
+                                placeholder="your.email@example.com">
                         </div>
                         <div class="form-group">
                             <label for="phone">Phone Number</label>
-                            <input type="tel" id="phone" name="phone" required placeholder="+91 00000 00000">
+                            <input type="tel" id="phone" name="entry.1166974658" required placeholder="+91 00000 00000">
                         </div>
                         <div class="form-group checkbox-group">
-                            <input type="checkbox" id="membership-interest" name="membership-interest">
+                            <input type="checkbox" id="membership-interest">
                             <label for="membership-interest">Express interest in NUA membership</label>
                         </div>
                         <div class="form-group">
                             <label for="query">Query Text</label>
-                            <textarea id="query" name="query" rows="5" required
+                            <textarea id="query" name="entry.839337160" rows="5" required
                                 placeholder="How can we help you?"></textarea>
                         </div>
                         <button type="submit" class="btn btn-secondary">Submit Inquiry</button>
