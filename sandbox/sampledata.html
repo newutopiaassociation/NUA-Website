@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NUA - Sample Data Viewer</title>
+    <meta name="description" content="NUA Sample Data Viewer - Dynamic Google Sheets Integration">
+
+    <!-- Existing Styles -->
+    <link rel="stylesheet" href="../style.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+
+    <style>
+        /* Custom Styles for Data Viewer */
+        .data-section {
+            padding: 160px 0 60px 0;
+            /* Clear space for the fixed header */
+            background-color: var(--bg-secondary);
+        }
+
+        .table-container {
+            background: var(--bg-main);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--brand-primary);
+            margin-top: 2rem;
+        }
+
+        /* Fixed height for table body scroll */
+        .dataTables_scrollBody {
+            max-height: 400px !important;
+            overflow-y: auto !important;
+        }
+
+        /* Sticky Header */
+        table.dataTable thead th {
+            position: sticky;
+            top: 0;
+            background-color: var(--brand-primary) !important;
+            color: var(--text-inverse) !important;
+            z-index: 2;
+        }
+
+        /* Responsive Controls */
+        .filter-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: var(--brand-primary);
+        }
+
+        .filter-select {
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            border: 2px solid var(--bg-secondary);
+            background: var(--bg-main);
+            color: var(--text-primary);
+            font-family: inherit;
+            min-width: 200px;
+        }
+
+        /* Row Highlighting */
+        .row-plot {
+            background-color: #d4edda !important;
+            /* Light green */
+        }
+
+        .row-residence {
+            background-color: #f8f1e7 !important;
+            /* Light brown/beige */
+        }
+
+        /* Dark Mode Adjustments */
+        body.moonlit-theme .table-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body.moonlit-theme .filter-select {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-inverse);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        body.moonlit-theme .row-plot {
+            background-color: rgba(40, 167, 69, 0.2) !important;
+        }
+
+        body.moonlit-theme .row-residence {
+            background-color: rgba(160, 82, 45, 0.2) !important;
+        }
+
+        /* Custom paging colors to match theme */
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: var(--brand-primary) !important;
+            border-color: var(--brand-primary) !important;
+            color: white !important;
+        }
+
+        .reset-btn {
+            background: var(--bg-dark);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            align-self: flex-end;
+            margin-bottom: 4px;
+        }
+
+        .reset-btn:hover {
+            opacity: 0.8;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body class="moonlit-theme">
+
+    <header id="main-header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="../index.html#hero">
+                    <img src="../assets/logo.png" alt="NUA Logo" id="header-logo">
+                </a>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="../index.html#about" class="glow-on-hover">About NUA</a></li>
+                    <li><a href="../index.html#principles" class="glow-on-hover">Guiding Principles</a></li>
+                    <li><a href="../index.html#registration" class="glow-on-hover">Member Registration</a></li>
+                    <li><a href="../index.html#contact" class="glow-on-hover">Contact NUA MC</a></li>
+                    <li><a href="../index.html#newsletters" class="glow-on-hover">NUA Newsletters</a></li>
+                    <li class="mobile-only-controls">
+                        <div class="header-controls">
+                            <button id="theme-toggle-mobile" class="control-btn"
+                                title="Toggle Day/Night Mode">🌙</button>
+                            <button id="sound-toggle-mobile" class="control-btn"
+                                title="Toggle Ambient Sound">🔇</button>
+                        </div>
+                    </li>
+                </ul>
+                <div class="header-controls desktop-only-controls">
+                    <button id="theme-toggle" class="control-btn" title="Toggle Day/Night Mode">🌙</button>
+                    <button id="sound-toggle" class="control-btn" title="Toggle Ambient Sound">🔇</button>
+                </div>
+                <div class="menu-toggle" id="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="data-section">
+            <div class="container">
+                <div class="section-header">
+                    <img src="../assets/leaf.svg" alt="" class="leaf-motif left">
+                    <h2>Member Data Viewer</h2>
+                    <img src="../assets/leaf.svg" alt="" class="leaf-motif right">
+                </div>
+
+                <div class="table-container">
+                    <!-- Filters -->
+                    <div class="filter-controls">
+                        <div class="filter-group">
+                            <label for="type-filter">Filter by Type:</label>
+                            <select id="type-filter" class="filter-select">
+                                <option value="">All Types</option>
+                            </select>
+                        </div>
+                        <button id="reset-filters" class="reset-btn">Reset All</button>
+                    </div>
+
+                    <!-- DataTable -->
+                    <table id="sample-table" class="display responsive nowrap w-100" style="width:100%">
+                        <thead>
+                            <tr id="table-head">
+                                <!-- Headers will be populated dynamically -->
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Data will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container text-center">
+            <p>&copy; 2026 New Utopia Association (NUA). All rights reserved.</p>
+            <p class="designer-credit">Designed By: R&R Consulting</p>
+        </div>
+    </footer>
+
+    <button id="back-to-top" title="Go to top">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5V19M12 5L6 11M12 5L18 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+        </svg>
+    </button>
+
+    <audio id="ambient-sound" loop>
+        <source src="https://www.soundjay.com/nature/birds-chirping-01.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Dependencies -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+    <!-- Main Script (for theme/nav) -->
+    <script src="../script.js"></script>
+
+    <!-- Data Loading & DataTable Logic -->
+    <script>
+        $(document).ready(function () {
+            const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR8nssRmsoKd-4M304qq8st5lmjQidbZycdWDt29tbSuUt0-cQHWPTgfQ8zJHXZEhTJPGKYUsLoMVE-/pub?gid=0&single=true&output=csv';
+
+            let dataTable;
+
+            // Step 1: Fetch and Parse CSV Data
+            Papa.parse(csvUrl, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function (results) {
+                    const data = results.data;
+                    const headers = results.meta.fields;
+
+                    if (!headers || headers.length === 0) {
+                        $('#table-container').html('<p style="color:red; text-align:center;">Empty or invalid data received.</p>');
+                        return;
+                    }
+
+                    try {
+                        // Step 2: Populate Table Headers
+                        const headRow = $('#table-head');
+                        headRow.empty();
+                        headers.forEach(header => {
+                            headRow.append(`<th>${header}</th>`);
+                        });
+
+                        // Step 3: Initialize DataTable
+                        dataTable = $('#sample-table').DataTable({
+                            data: data,
+                            columns: headers.map(h => ({ data: h, title: h })),
+                            pageLength: 10,
+                            responsive: true,
+                            scrollY: '400px',
+                            scrollCollapse: true,
+                            paging: true,
+                            ordering: true,
+                            autoWidth: false,
+                            order: [[0, 'asc']], // Default sort
+                            language: {
+                                search: "Global Search:",
+                                lengthMenu: "Show _MENU_ entries per page",
+                                zeroRecords: "No matching records found"
+                            },
+                            // Step 4: Conditional Cell Styling (Plot/Residence)
+                            createdRow: function (row, rowData) {
+                                if (rowData.Type === 'Plot') {
+                                    $(row).addClass('row-plot');
+                                } else if (rowData.Type === 'Residence') {
+                                    $(row).addClass('row-residence');
+                                }
+                            },
+                            initComplete: function () {
+                                // Step 5: Populate Type Filter Dropdown
+                                const typeIndex = headers.indexOf('Type');
+                                if (typeIndex !== -1) {
+                                    const uniqueTypes = [...new Set(data.map(item => item.Type))].filter(t => t);
+                                    const filterSelect = $('#type-filter');
+                                    filterSelect.empty();
+                                    filterSelect.append('<option value="">All Types</option>');
+                                    uniqueTypes.sort().forEach(type => {
+                                        filterSelect.append(`<option value="${type}">${type}</option>`);
+                                    });
+                                }
+                            }
+                        });
+
+                    } catch (dtError) {
+                        console.error("Error initializing DataTable:", dtError);
+                        $('#table-container').append(`<p style="color:red;">Error initializing table UI: ${dtError.message}</p>`);
+                    }
+
+                    // Step 6: Implement Type Filter Logic
+                    $('#type-filter').on('change', function () {
+                        const val = $(this).val();
+                        const typeIndex = headers.indexOf('Type');
+                        if (typeIndex !== -1) {
+                            dataTable.column(typeIndex).search(val ? `^${val}$` : '', true, false).draw();
+                        }
+                    });
+
+                    // Step 7: Reset Button Functionality
+                    $('#reset-filters').on('click', function () {
+                        $('#type-filter').val('');
+                        dataTable.search('').columns().search('').draw();
+                    });
+                },
+                error: function (err) {
+                    console.error("Error loading CSV:", err);
+                    $('#table-container').html(`<p style="color:red; text-align:center;">Failed to fetch data. Please check connection.</p>`);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
