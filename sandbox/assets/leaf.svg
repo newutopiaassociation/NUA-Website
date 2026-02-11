@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="leaf-motif">
+    <path d="M50,10 C60,30 90,40 90,60 C90,80 70,90 50,90 C30,90 10,80 10,60 C10,40 40,30 50,10" fill="#2D5A27" />
+    <path d="M50,10 C50,30 50,60 50,90" stroke="#8DA47E" stroke-width="2" fill="none" />
+</svg>
