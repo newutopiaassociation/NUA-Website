@@ -1,0 +1,64 @@
+{
+  "resources": {
+    "meetingPresentations": [
+      {
+        "title": "NUA Members Meeting 8-Feb-2026",
+        "type": "ppt",
+        "url": "https://drive.google.com/file/d/1vRWO5iw3DfsBQzUwg-8tWvFCPQWNjbKK/view?usp=drive_link",
+        "date": "2026-02-12"
+      }
+    ],
+    "meetingMinutes": [
+      {
+        "title": "Minutes - NUA Members Meeting 8-Feb-2026",
+        "type": "doc",
+        "url": "https://drive.google.com/file/d/1NzI8aUOu9nOPY0NONd5Vuv9riousLC18/view?usp=sharing",
+        "date": "2026-02-12"
+      },
+      {
+        "title": "Minutes - NUA MC Meeting 1-Feb-2026",
+        "type": "doc",
+        "url": "https://docs.google.com/document/d/1GDVMLU1BDCpOAWjbPDld6IOLwe9XV8mI/edit?usp=sharing&ouid=107963816068265631968&rtpof=true&sd=true",
+        "date": "2028-02-05"
+      },
+      {
+        "title": "Minutes - NUA MC Meeting 31-Jan-2026",
+        "type": "doc",
+        "url": "https://drive.google.com/file/d/1CJWUKN5KP5jAKtkWSyu3i7QT37kdb9kA/view?usp=drive_link",
+        "date": "2028-02-08"
+      },
+      {
+        "title": "Minutes - NUA MC Meeting 16-Jan-2026",
+        "type": "doc",
+        "url": "https://docs.google.com/document/d/1gR4Gq-g85GgockVzNTEUlONpUSaDkkr5/edit?usp=drive_link&ouid=107963816068265631968&rtpof=true&sd=true",
+        "date": "2028-01-18"
+      },
+      {
+        "title": "Minutes - NUA MC Meeting 11-Jan-2026",
+        "type": "doc",
+        "url": "https://docs.google.com/document/d/1P9SLbpIgjNykFKEauMiMEIABM23kOVS9/edit?usp=drive_link&ouid=107963816068265631968&rtpof=true&sd=true",
+        "date": "2028-01-11"
+      }
+    ],
+    "documents": [
+      {
+        "title": "Concise NUA BUY-LAWS - Reference Table",
+        "type": "pdf",
+        "url": "https://drive.google.com/file/d/1GmMXva9QP1nZ1WQL0ATShPFk-5TcJlms/view?usp=drive_link",
+        "date": "2026-03-04"
+      },
+      {
+        "title": "NUA Experience vs. Past Experience",
+        "type": "pdf",
+        "url": "https://drive.google.com/file/d/1lixM0tDui8RwxvFhGLhx0xt3oINRUMAo/view?usp=drive_link",
+        "date": "2026-02-21"
+      },
+      {
+        "title": "NUA Registered Bye-laws",
+        "type": "pdf",
+        "url": "https://drive.google.com/file/d/1k0vBNNoNK8jyPMcCnULDW9JPj7iyT5V_/view?usp=drive_link",
+        "date": "2026-02-21"
+      }
+    ]
+  }
+}

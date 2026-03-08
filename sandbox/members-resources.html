@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members Resources - New Utopia Association</title>
+    <meta name="description" content="Exclusive resources and documents for NUA members.">
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <script src="auth.js"></script>
+</head>
+
+<body class="moonlit-theme">
+
+    <header id="main-header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="index.html#hero">
+                    <img src="assets/logo.png" alt="NUA Logo" id="header-logo">
+                </a>
+            </div>
+            <nav>
+                <ul class="nav-links" id="main-nav-links">
+                    <li><a href="index.html#about" class="glow-on-hover">About NUA</a></li>
+                    <li><a href="index.html#principles" class="glow-on-hover">Guiding Principles</a></li>
+                    <li><a href="index.html#registration" class="glow-on-hover">Member Registration</a></li>
+                    <li><a href="index.html#timelines" class="glow-on-hover">NUA Timelines</a></li>
+                    <li><a href="byelaws.html" class="glow-on-hover">NUA Bye-laws</a></li>
+                    <li><a href="members-resources.html" class="glow-on-hover active">Members Resources</a></li>
+                    <li><a href="index.html#contact" class="glow-on-hover">Contact NUA MC</a></li>
+                    <li><a href="index.html#newsletters" class="glow-on-hover">NUA Newsletters</a></li>
+                    <li class="mobile-only-controls">
+                        <div class="header-controls">
+                            <button id="theme-toggle-mobile" class="control-btn" title="Toggle Day/Night Mode">🌙</button>
+                            <button id="sound-toggle-mobile" class="control-btn" title="Toggle Ambient Sound">🔇</button>
+                        </div>
+                    </li>
+                </ul>
+                <div class="header-controls desktop-only-controls">
+                    <button id="theme-toggle" class="control-btn" title="Toggle Day/Night Mode">🌙</button>
+                    <button id="sound-toggle" class="control-btn" title="Toggle Ambient Sound">🔇</button>
+                </div>
+                <div class="menu-toggle" id="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main style="padding-top: 80px;">
+        <section id="resources-area" class="section" style="padding-top: 30px;">
+            <div class="container">
+                <div class="section-header">
+                    <img src="assets/leaf.svg" alt="" class="leaf-motif left">
+                    <h2>Members Resources</h2>
+                    <img src="assets/leaf.svg" alt="" class="leaf-motif right">
+                </div>
+
+                <div class="resources-layout">
+                    <!-- Main Content Column -->
+                    <div class="resources-main card animate-slide-up">
+                        
+                        <!-- Search and Filter Bar -->
+                        <div class="search-filter-bar">
+                            <div class="search-box">
+                                <span class="search-icon">🔍</span>
+                                <input type="text" id="resource-search" placeholder="Search resources...">
+                            </div>
+                            <div class="filter-group">
+                                <select id="filter-year" class="nua-select">
+                                    <option value="">All Years</option>
+                                    <option value="2026">2026</option>
+                                    <option value="2025">2025</option>
+                                </select>
+                                <select id="filter-type" class="nua-select">
+                                    <option value="">All Types</option>
+                                    <option value="ppt">Presentations</option>
+                                    <option value="doc">Minutes</option>
+                                    <option value="pdf">Documents</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Recent Uploads Banner -->
+                        <div class="recent-uploads-banner">
+                            <h3 class="banner-title"><span class="icon">✨</span> Recent Uploads</h3>
+                            <div class="recent-cards-container" id="recent-resources-container">
+                                <!-- Populated via JS -->
+                            </div>
+                        </div>
+
+                        <!-- Resources Categories (Tabs/Accordion) -->
+                        <div class="resources-tabs">
+                            <div class="tab-headers">
+                                <button class="tab-btn active" data-tab="meetingPresentations">Meeting Presentations</button>
+                                <button class="tab-btn" data-tab="meetingMinutes">Meeting Minutes</button>
+                                <button class="tab-btn" data-tab="documents">Documents</button>
+                            </div>
+                            
+                            <div class="tab-contents">
+                                <!-- Presentations -->
+                                <div class="tab-content active" id="tab-meetingPresentations">
+                                    <h3 class="category-header">Presentations</h3>
+                                    <div class="resource-grid" id="grid-meetingPresentations">
+                                        <!-- Populated via JS -->
+                                    </div>
+                                </div>
+                                
+                                <!-- Minutes -->
+                                <div class="tab-content" id="tab-meetingMinutes">
+                                    <h3 class="category-header">Minutes</h3>
+                                    <div class="resource-grid" id="grid-meetingMinutes">
+                                        <!-- Populated via JS -->
+                                    </div>
+                                </div>
+
+                                <!-- Documents -->
+                                <div class="tab-content" id="tab-documents">
+                                    <h3 class="category-header">Documents</h3>
+                                    <div class="resource-grid" id="grid-documents">
+                                        <!-- Populated via JS -->
+                                    </div>
+                                </div>
+                                
+                                <div id="no-results-msg" class="hidden text-center" style="padding: 40px; opacity: 0.7;">
+                                    No resources match your search criteria.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Sidebar Quick Links (matching main site) -->
+                    <aside class="resources-sidebar card animate-slide-up" style="--delay: 0.2s">
+                        <h3>Quick Links</h3>
+                        <ul class="sidebar-links">
+                            <li><a href="index.html#about">About NUA</a></li>
+                            <li><a href="index.html#principles">Guiding Principles</a></li>
+                            <li><a href="index.html#registration">Member Registration</a></li>
+                            <li><a href="index.html#timelines">NUA Timelines</a></li>
+                            <li><a href="byelaws.html">NUA Bye-laws</a></li>
+                            <li><a href="index.html#contact">Contact NUA MC</a></li>
+                            <li><a href="index.html#newsletters">NUA Newsletters</a></li>
+                            <li><a href="mailmerge.html">Mail Merge</a></li>
+                        </ul>
+                    </aside>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container text-center">
+            <p>&copy; 2026 New Utopia Association (NUA). All rights reserved.</p>
+            <p class="designer-credit">Designed By: R&R Consulting</p>
+        </div>
+    </footer>
+
+    <button id="back-to-top" title="Go to top">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5V19M12 5L6 11M12 5L18 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+    </button>
+
+    <audio id="ambient-sound" loop>
+        <source src="https://www.soundjay.com/nature/birds-chirping-01.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script src="script.js"></script>
+    <script src="members-resources.js"></script>
+</body>
+
+</html>

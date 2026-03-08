@@ -284,6 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function initViewer() {
+        if (!document.getElementById('pdf-book-container')) return;
         if (!window.pdfjsLib) return;
         const pdfjsLib = window.pdfjsLib;
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';

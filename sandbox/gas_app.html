@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NUA Mail Merge</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+
+    <!-- INLINED CSS FROM style.css -->
+    <style>
+        :root {
+            /* Sunny Green Theme (Default) */
+            --bg-main: #FFFFFF;
+            --bg-secondary: #E8F5E9;
+            --bg-dark: #1B3F16;
+            --text-primary: #2C3E50;
+            --text-secondary: #5D4037;
+            --text-inverse: #F8F9FA;
+            --brand-primary: #2D5A27;
+            --brand-secondary: #8DA47E;
+            --accent-sky: #E1F5FE;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --accent-glow: rgba(45, 90, 39, 0.4);
+
+            /* Vine SVG stroke */
+            --vine-color: var(--brand-primary);
+        }
+
+        body.moonlit-theme {
+            /* Moonlit Garden Theme */
+            --bg-main: #0A1F08;
+            --bg-secondary: #0F250E;
+            --bg-dark: #051004;
+            --text-primary: #E0EADD;
+            --text-secondary: #A8BCA1;
+            --text-inverse: #FFFFFF;
+            --brand-primary: #66BB6A;
+            --brand-secondary: #81C784;
+            --accent-sky: #1A3A4A;
+            --glass-bg: rgba(10, 31, 8, 0.9);
+            --shadow-soft: 0 4px 25px rgba(0, 0, 0, 0.4);
+            --accent-glow: rgba(102, 187, 106, 0.5);
+            --vine-color: var(--brand-secondary);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--bg-main);
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--brand-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .max-width-600 {
+            max-width: 600px;
+        }
+
+        .max-width-800 {
+            max-width: 800px;
+        }
+
+        /* Header & Navigation */
+        #main-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            box-shadow: var(--shadow-soft);
+            padding: 10px 0;
+            transition: var(--transition-smooth);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+        }
+
+        #header-logo {
+            height: 100px;
+            transition: var(--transition-smooth);
+        }
+
+        #header-logo:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--brand-primary);
+            transition: var(--transition-smooth);
+        }
+
+        .nav-links a:hover {
+            color: var(--brand-primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .mobile-only-controls {
+            display: none;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            width: 100%;
+            text-align: center;
+        }
+
+        body.moonlit-theme .mobile-only-controls {
+            border-top-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .desktop-only-controls {
+            display: flex;
+        }
+
+        @media (max-width: 768px) {
+            #main-header .desktop-only-controls {
+                display: none !important;
+            }
+
+            .mobile-only-controls {
+                display: block;
+            }
+        }
+
+        /* App Specific Styles */
+        .app-container {
+            max-width: 800px;
+            margin: 120px auto 60px;
+            padding: 0 20px;
+        }
+
+        .step-card {
+            background: var(--bg-main);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(130, 160, 130, 0.1);
+            margin-bottom: 30px;
+            transition: var(--transition-smooth);
+        }
+
+        .step-card h2 {
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--bg-secondary);
+            padding-bottom: 10px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .preview-box {
+            background-color: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 1px dashed var(--brand-secondary);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: white;
+            font-size: 2rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: var(--transition-smooth);
+            border: 2px solid transparent;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--brand-primary);
+            color: var(--text-inverse);
+            border-color: var(--brand-primary);
+        }
+
+        .btn-primary:hover {
+            background: transparent;
+            color: var(--brand-primary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px var(--accent-glow);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-forest);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 15px;
+            border-radius: 10px;
+            border: 1.5px solid var(--brand-secondary);
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            font-family: inherit;
+            transition: var(--transition-smooth);
+        }
+
+        body.moonlit-theme .form-group input,
+        body.moonlit-theme .form-group textarea {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 50px;
+        }
+
+        .section-header h1 {
+            font-size: 2.5rem;
+            margin: 0 20px;
+        }
+
+        .leaf-motif {
+            width: 40px;
+            height: 40px;
+        }
+
+        .leaf-motif.right {
+            transform: rotate(180deg);
+        }
+
+        footer {
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        /* Leaf SVG for embedding */
+        /* Since we can't easily embed the SVG file content here without reading it first, 
+           we will use a simple emoji or encoded SVG if possible, 
+           but for now, we'll assume image broken links are acceptable or users will replace them.
+           Or we can use a CSS Leaf.
+        */
+    </style>
+</head>
+
+<body class="moonlit-theme">
+
+    <header id="main-header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="#">
+                    <h2 style="margin:0;">NUA</h2> <!-- Fallback Text Logo -->
+                </a>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#" class="glow-on-hover">About NUA</a></li>
+                    <li><a href="#" class="glow-on-hover active">Mail Merge</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="app-container">
+            <div class="section-header">
+                <h1>NUA Mail Merge System</h1>
+            </div>
+
+            <!-- Step 1: Configuration -->
+            <div id="step-config" class="step-card">
+                <h2>1. Connect Data Source</h2>
+                <div class="form-group">
+                    <label for="sheet-url">Google Sheet URL</label>
+                    <input type="text" id="sheet-url" placeholder="https://docs.google.com/spreadsheets/d/..." required>
+                    <small>Sheet must have columns: <strong>Email, First Name, Last Name</strong></small>
+                </div>
+                <button onclick="connectSheet()" class="btn btn-primary" style="margin-top: 20px;">Connect &
+                    Verify</button>
+            </div>
+
+            <!-- Step 2: Compose & Send (Hidden initially) -->
+            <div id="step-compose" class="step-card hidden">
+                <h2>2. Compose Email</h2>
+                <div id="connection-status" class="status-badge status-success">
+                    ✓ Connected to Sheet (<span id="recipient-count">0</span> recipients found)
+                </div>
+
+                <div class="form-group">
+                    <label for="email-subject">Subject</label>
+                    <input type="text" id="email-subject" placeholder="Important Update from NUA" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email-body">Message Body</label>
+                    <textarea id="email-body" rows="10" placeholder="Dear {{firstname}}, ..."></textarea>
+                    <small>Supported placeholders: <code>{{firstname}}</code>, <code>{{lastname}}</code></small>
+                </div>
+
+                <div class="preview-box">
+                    <h3>Preview (Row 1)</h3>
+                    <p><strong>To:</strong> <span id="preview-email">...</span></p>
+                    <p><strong>Subject:</strong> <span id="preview-subject">...</span></p>
+                    <hr>
+                    <div id="preview-content">...</div>
+                </div>
+
+                <button onclick="confirmSend()" class="btn btn-primary" style="margin-top: 20px; width: 100%;">Send
+                    Emails</button>
+            </div>
+        </div>
+    </main>
+
+    <div id="loading-overlay" class="hidden">
+        <div class="spinner">Processing...</div>
+    </div>
+
+    <footer>
+        <div class="container text-center">
+            <p>&copy; 2026 New Utopia Association (NUA). All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- INLINED SCRIPT FROM script.js (Simplified for SPA) -->
+    <script>
+        // Minimal script.js logic for theme
+        document.addEventListener('DOMContentLoaded', () => {
+            // Default to Moonlit theme as per CSS
+        });
+
+        // ------------- MAIL MERGE LOGIC -------------
+
+        const isLocal = typeof google === 'undefined' || !google.script;
+
+        const mockData = [
+            { email: 'john.doe@example.com', firstname: 'John', lastname: 'Doe' },
+            { email: 'jane.smith@example.com', firstname: 'Jane', lastname: 'Smith' },
+            { email: 'alice.jones@example.com', firstname: 'Alice', lastname: 'Jones' }
+        ];
+
+        let recipients = [];
+
+        function showLoading(show) {
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) {
+                overlay.classList.toggle('hidden', !show);
+            } else {
+                console.error('Loading overlay element not found!');
+            }
+        }
+
+        function connectSheet() {
+            const url = document.getElementById('sheet-url').value;
+            if (!url) {
+                alert('Please enter a valid Google Sheet URL');
+                return;
+            }
+
+            showLoading(true);
+
+            if (isLocal) {
+                console.log('Running in MOCK mode');
+                setTimeout(() => {
+                    recipients = mockData;
+                    onSheetConnected();
+                }, 1000);
+            } else {
+                console.log('Calling google.script.run.getSheetData...');
+                google.script.run
+                    .withSuccessHandler(data => {
+                        console.log('Success handler called', data);
+                        recipients = data;
+                        onSheetConnected();
+                    })
+                    .withFailureHandler(err => {
+                        console.error('Failure handler called', err);
+                        showLoading(false);
+                        alert('Error: ' + err.message);
+                    })
+                    .getSheetData(url);
+            }
+        }
+
+        function onSheetConnected() {
+            showLoading(false);
+            const configStep = document.getElementById('step-config');
+            const composeStep = document.getElementById('step-compose');
+
+            if (configStep) configStep.classList.add('hidden');
+            if (composeStep) composeStep.classList.remove('hidden');
+
+            const countSpan = document.getElementById('recipient-count');
+            if (countSpan) countSpan.innerText = recipients.length;
+
+            updatePreview();
+        }
+
+        function updatePreview() {
+            if (recipients.length === 0) return;
+
+            const subject = document.getElementById('email-subject').value || '(No Subject)';
+            let body = document.getElementById('email-body').value || '(No Content)';
+            const firstUser = recipients[0];
+
+            // Simple placeholder replacement
+            body = body.replace(/{{firstname}}/g, firstUser.firstname)
+                .replace(/{{lastname}}/g, firstUser.lastname);
+
+            const prevEmail = document.getElementById('preview-email');
+            const prevSub = document.getElementById('preview-subject');
+            const prevCont = document.getElementById('preview-content');
+
+            if (prevEmail) prevEmail.innerText = firstUser.email;
+            if (prevSub) prevSub.innerText = subject;
+            if (prevCont) prevCont.innerText = body;
+        }
+
+        // Live preview listeners
+        const subInput = document.getElementById('email-subject');
+        const bodyInput = document.getElementById('email-body');
+
+        if (subInput) subInput.addEventListener('input', updatePreview);
+        if (bodyInput) bodyInput.addEventListener('input', updatePreview);
+
+        function confirmSend() {
+            const subject = subInput.value;
+            const body = bodyInput.value;
+            const url = document.getElementById('sheet-url').value;
+
+            if (!subject || !body) {
+                alert('Please fill in both subject and body.');
+                return;
+            }
+
+            if (confirm(`Are you sure you want to send emails to ${recipients.length} recipients?`)) {
+                showLoading(true);
+
+                if (isLocal) {
+                    setTimeout(() => {
+                        console.log(`Sending to ${recipients.length} people:`, { subject, body });
+                        showLoading(false);
+                        alert(`Successfully sent ${recipients.length} emails (Mock)!`);
+                        location.reload();
+                    }, 1500);
+                } else {
+                    google.script.run
+                        .withSuccessHandler(res => {
+                            showLoading(false);
+                            alert(`Successfully sent ${res.sent} emails!`);
+                            if (res.errors.length > 0) {
+                                alert(`Failed to send to: ${res.errors.join(', ')}`);
+                            }
+                        })
+                        .withFailureHandler(err => {
+                            showLoading(false);
+                            alert('Error sending emails: ' + err.message);
+                        })
+                        .sendEmails(url, subject, body);
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
