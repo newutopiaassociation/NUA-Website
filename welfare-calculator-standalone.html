@@ -1,0 +1,3787 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welfare Charges Calculator - NUA</title>
+    <meta name="description"
+        content="Calculate your NUA Welfare and Maintenance charges easily comparing the old vs new mathematical models.">
+
+    <style>
+:root {
+    /* Sunny Green Theme (Default) */
+    --bg-main: #FFFFFF;
+    --bg-secondary: #E8F5E9;
+    --bg-dark: #1B3F16;
+    --text-primary: #2C3E50;
+    --text-secondary: #5D4037;
+    --text-inverse: #F8F9FA;
+    --brand-primary: #2D5A27;
+    --brand-secondary: #8DA47E;
+    --accent-sky: #E1F5FE;
+    --glass-bg: rgba(255, 255, 255, 0.95);
+
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --accent-glow: rgba(45, 90, 39, 0.4);
+
+    /* Vine SVG stroke */
+    --vine-color: var(--brand-primary);
+}
+
+body.moonlit-theme {
+    /* Moonlit Garden Theme */
+    --bg-main: #0A1F08;
+    --bg-secondary: #0F250E;
+    --bg-dark: #051004;
+    --text-primary: #E0EADD;
+    --text-secondary: #A8BCA1;
+    --text-inverse: #FFFFFF;
+    --brand-primary: #66BB6A;
+    --brand-secondary: #81C784;
+    --accent-sky: #1A3A4A;
+    --glass-bg: rgba(10, 31, 8, 0.9);
+    --shadow-soft: 0 4px 25px rgba(0, 0, 0, 0.4);
+    --accent-glow: rgba(102, 187, 106, 0.5);
+    --vine-color: var(--brand-secondary);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    color: var(--text-primary);
+    background-color: var(--bg-main);
+    overflow-x: hidden;
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+h1,
+h2,
+h3 {
+    font-family: 'Outfit', sans-serif;
+    color: var(--brand-primary);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.max-width-600 {
+    max-width: 600px;
+}
+
+.max-width-800 {
+    max-width: 800px;
+}
+
+/* Header & Navigation */
+#main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    box-shadow: var(--shadow-soft);
+    padding: 10px 0;
+    transition: var(--transition-smooth);
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+}
+
+#header-logo {
+    height: 100px;
+    transition: var(--transition-smooth);
+}
+
+#header-logo:hover {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    align-items: center;
+}
+
+.nav-links li {
+    margin-left: 30px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: var(--transition-smooth);
+    position: relative;
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--brand-primary);
+    transition: var(--transition-smooth);
+}
+
+.nav-links a:hover {
+    color: var(--brand-primary);
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+.mobile-only-controls {
+    display: none;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    width: 100%;
+    text-align: center;
+}
+
+body.moonlit-theme .mobile-only-controls {
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.desktop-only-controls {
+    display: flex;
+}
+
+@media (max-width: 768px) {
+    #main-header .desktop-only-controls {
+        display: none !important;
+    }
+
+    .mobile-only-controls {
+        display: block;
+    }
+}
+
+/* Hero Section */
+#hero {
+    height: 100vh;
+    background: url('assets/hero-bg.png') no-repeat center center/cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(45, 90, 39, 0.3), rgba(10, 31, 8, 0.6));
+}
+
+.hero-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    color: var(--text-inverse);
+}
+
+.hero-logo {
+    width: 180px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.4));
+    transition: transform 0.5s ease;
+}
+
+.hero-logo:hover {
+    transform: scale(1.05) rotate(2deg);
+}
+
+@media (max-width: 768px) {
+    .hero-logo {
+        width: 100px;
+        /* Reduced further to avoid crowding */
+    }
+}
+
+#hero h1 {
+    font-size: 4rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: var(--text-inverse);
+    letter-spacing: -1px;
+}
+
+#hero p {
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+.hero-btns {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+@media (max-width: 600px) {
+    .hero-btns {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-btns .btn {
+        width: 100%;
+    }
+}
+
+.scroll-indicator {
+    position: absolute;
+    bottom: 30px;
+    right: 40px;
+    transition: var(--transition-smooth);
+    z-index: 20;
+}
+
+.mouse {
+    width: 30px;
+    height: 50px;
+    border: 2px solid var(--text-inverse);
+    border-radius: 20px;
+    position: relative;
+}
+
+.mouse::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--text-inverse);
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    animation: scroll 2s infinite;
+}
+
+@keyframes scroll {
+    0% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+}
+
+/* Sections Base */
+.section {
+    padding: 100px 0;
+}
+
+@media (max-width: 768px) {
+    .section {
+        padding: 60px 0;
+    }
+
+    .container {
+        padding: 0 30px;
+        /* Increased breathing room on mobile */
+    }
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 50px;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    margin: 0 20px;
+}
+
+.leaf-motif {
+    width: 40px;
+    height: 40px;
+}
+
+.leaf-motif.right {
+    transform: rotate(180deg);
+}
+
+.card {
+    background: var(--bg-main);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid rgba(130, 160, 130, 0.1);
+    transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    border-color: var(--brand-secondary);
+}
+
+.card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--brand-primary), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.card:hover::after {
+    transform: translateX(100%);
+}
+
+.bg-light {
+    background-color: var(--bg-secondary);
+}
+
+.bg-dark {
+    background-color: var(--bg-dark);
+}
+
+.section-header.white h2 {
+    color: var(--text-inverse);
+}
+
+.white-svg {
+    filter: brightness(0) invert(1);
+}
+
+/* About Section Refinements */
+.about-main-container {
+    background-color: #EBF3FF;
+    /* Light blue-ish gray matching the PDF */
+    border: 4px solid var(--brand-primary);
+    /* Thick border */
+    border-radius: 12px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    line-height: 1.4;
+    /* Slightly tighter than default */
+    margin-top: 20px;
+}
+
+.inner-padding {
+    padding: 20px 30px;
+}
+
+.about-group {
+    border-bottom: 1px solid rgba(45, 90, 39, 0.1);
+}
+
+.about-group:last-child {
+    border-bottom: none;
+}
+
+.about-group h3 {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    color: var(--brand-primary);
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.about-group p {
+    margin-bottom: 8px;
+    /* Reduced spacing */
+}
+
+.about-group p:last-child {
+    margin-bottom: 0;
+}
+
+.compact-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.compact-list li {
+    margin-bottom: 6px;
+    /* Reduced spacing */
+    padding-left: 25px;
+    position: relative;
+}
+
+.compact-list li::before {
+    content: '🌱';
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.qa-section {
+    background-color: #f9fbfd;
+    /* Slightly lighter for the Q&A area */
+}
+
+.tight-grid {
+    display: grid;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.qa-item h4 {
+    margin-bottom: 4px;
+    font-size: 1.05rem;
+    color: var(--brand-primary);
+    font-weight: 700;
+}
+
+.compact-highlight {
+    background-color: #d4edda;
+    /* Light green for the example box matching PDF */
+    padding: 15px 20px;
+    border-radius: 4px;
+    margin: 10px 0;
+    font-size: 0.9rem;
+    color: #155724;
+}
+
+.compact-highlight p {
+    margin: 0;
+}
+
+.small-text {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+/* Theme Support for refined About section */
+body.moonlit-theme .about-main-container {
+    background-color: var(--bg-secondary);
+    border-color: var(--brand-secondary);
+}
+
+body.moonlit-theme .qa-section {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+body.moonlit-theme .compact-highlight {
+    background-color: rgba(76, 175, 80, 0.2);
+    color: var(--brand-secondary);
+}
+
+/* Principles Grid */
+.principles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+.principles-grid .card h3 {
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+
+.principles-grid ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.principles-grid li {
+    margin-bottom: 10px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.principles-grid li::before {
+    content: '🌱';
+    position: absolute;
+    left: 0;
+    font-size: 0.8rem;
+}
+
+/* Registration */
+.steps-container {
+    text-align: left;
+}
+
+.steps-container h3 {
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    text-align: center;
+    color: var(--brand-primary);
+}
+
+.process-group {
+    margin-bottom: 30px;
+}
+
+.process-group h4 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: var(--brand-primary);
+    border-bottom: 2px solid var(--bg-secondary);
+    padding-bottom: 5px;
+}
+
+.sub-steps {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.sub-steps li {
+    font-size: 1.05rem;
+    margin-bottom: 10px;
+    padding-left: 25px;
+    position: relative;
+}
+
+.sub-steps li::before {
+    content: '🌱';
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 0.9rem;
+}
+
+.process-list {
+    list-style-type: decimal;
+    padding-left: 20px;
+}
+
+.process-list li {
+    margin-bottom: 20px;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.process-list li strong {
+    display: block;
+    font-size: 1.1rem;
+    color: var(--brand-primary);
+    margin-bottom: 5px;
+}
+
+.process-list p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.process-list a {
+    color: var(--brand-primary);
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.btn {
+    display: inline-block;
+    padding: 15px 40px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: var(--transition-smooth);
+    border: 2px solid transparent;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+}
+
+.btn-primary {
+    background: var(--brand-primary);
+    color: var(--text-inverse);
+    border-color: var(--brand-primary);
+}
+
+.btn-primary:hover {
+    background: transparent;
+    color: var(--brand-primary);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px var(--accent-glow);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-inverse);
+    border-color: var(--text-inverse);
+}
+
+.btn-secondary:hover {
+    background: var(--text-inverse);
+    color: var(--brand-primary);
+    transform: translateY(-5px);
+}
+
+/* Contact Form */
+#contact-form {
+    display: grid;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.form-group label {
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--primary-forest);
+}
+
+.checkbox-group {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 5px;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    margin: 0;
+}
+
+.checkbox-group label {
+    margin-bottom: 0;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 15px;
+    border-radius: 10px;
+    border: 1.5px solid var(--brand-secondary);
+    /* Darker and thicker border */
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: inherit;
+    transition: var(--transition-smooth);
+}
+
+body.moonlit-theme .form-group input,
+body.moonlit-theme .form-group textarea {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.1);
+}
+
+/* Newsletter Section */
+.newsletter-placeholder {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    height: 400px;
+}
+
+.newsletter-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition-smooth);
+}
+
+.newsletter-placeholder:hover .newsletter-img {
+    transform: scale(1.05);
+}
+
+.newsletter-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 60px 40px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+    color: var(--text-inverse);
+    text-align: left;
+    backdrop-filter: blur(2px);
+}
+
+.newsletter-overlay h3 {
+    color: var(--brand-secondary);
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.newsletter-overlay p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Quicklinks Section */
+#quicklinks {
+    padding: 60px 0;
+    border-top: 1px solid rgba(45, 90, 39, 0.1);
+}
+
+@media (max-width: 600px) {
+    .registration-content .btn {
+        width: 100%;
+    }
+}
+
+.quicklinks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 40px;
+}
+
+.quicklinks-col h3 {
+    font-size: 1.25rem;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.quicklinks-col h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: var(--brand-primary);
+}
+
+.quick-links-list {
+    list-style: none;
+    padding: 0;
+}
+
+.quick-links-list li {
+    margin-bottom: 12px;
+}
+
+.quick-links-list a {
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: var(--transition-smooth);
+    display: inline-block;
+}
+
+.quick-links-list a:hover {
+    color: var(--brand-primary);
+    transform: translateX(5px);
+}
+
+.quicklinks-col p a {
+    color: var(--brand-primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.quicklinks-col p a:hover {
+    text-decoration: underline;
+}
+
+/* Horizontal Timeline Section */
+#timelines {
+    background-color: #F8F9FA;
+    /* Forced light background */
+}
+
+body.moonlit-theme #timelines {
+    background-color: #F0F4F0;
+    /* Slightly different light for dark theme but still light */
+}
+
+body.moonlit-theme #timelines .timeline-text,
+body.moonlit-theme #timelines .timeline-date,
+body.moonlit-theme #timelines .section-header h2 {
+    color: #1B3F16;
+    /* Dark text for light background in dark mode */
+}
+
+.timeline-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    padding: 60px 0;
+    /* Reduced padding from 100px */
+    scrollbar-width: thin;
+    scrollbar-color: var(--brand-primary) transparent;
+}
+
+.timeline-wrapper::-webkit-scrollbar {
+    height: 6px;
+}
+
+.timeline-wrapper::-webkit-scrollbar-thumb {
+    background-color: var(--brand-primary);
+    border-radius: 10px;
+}
+
+.timeline-container {
+    display: flex;
+    min-width: 1500px;
+    /* Reduced from 1800px to fit more in view */
+    position: relative;
+    padding: 0 40px;
+    height: 380px;
+    /* Reduced from 500px */
+    align-items: center;
+}
+
+.timeline-container::after {
+    content: '';
+    position: absolute;
+    height: 4px;
+    width: 100%;
+    background-color: var(--brand-primary);
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    border-radius: 10px;
+    opacity: 0.3;
+}
+
+.timeline-item {
+    flex: 1;
+    min-width: 220px;
+    /* Slightly narrower from 250px */
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 15px;
+}
+
+/* Marker on the line */
+.timeline-item::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    /* Slightly smaller marker */
+    height: 18px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #FFFFFF;
+    border: 3px solid var(--brand-primary);
+    border-radius: 50%;
+    z-index: 2;
+    box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* Alternating positions */
+.timeline-item:nth-child(odd) {
+    justify-content: flex-start;
+    padding-bottom: 30px;
+    /* Reduced padding */
+}
+
+.timeline-item:nth-child(even) {
+    justify-content: flex-end;
+    padding-top: 30px;
+    /* Reduced padding */
+}
+
+.timeline-content {
+    background-color: #FFFFFF;
+    /* Pure white content */
+    padding: 20px 15px;
+    /* Reduced padding from 30x20 */
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    /* Softer shadow */
+    border: 1.5px solid rgba(45, 90, 39, 0.1);
+    transition: var(--transition-smooth);
+    position: relative;
+    max-width: 260px;
+    /* Slightly narrower */
+    margin: 0 auto;
+}
+
+.timeline-item:nth-child(odd) .timeline-content {
+    margin-bottom: 15px;
+}
+
+.timeline-item:nth-child(even) .timeline-content {
+    margin-top: 15px;
+}
+
+/* Connecting lines to marker */
+.timeline-content::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    background: var(--brand-primary);
+    opacity: 0.3;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.timeline-item:nth-child(odd) .timeline-content::after {
+    top: 100%;
+    height: 30px;
+    /* Reduced from 40px */
+}
+
+.timeline-item:nth-child(even) .timeline-content::after {
+    bottom: 100%;
+    height: 30px;
+    /* Reduced from 40px */
+}
+
+.timeline-content:hover {
+    transform: translateY(5px) scale(1.02);
+    border-color: var(--brand-primary);
+}
+
+.timeline-item:nth-child(odd) .timeline-content:hover {
+    transform: translateY(-5px) scale(1.02);
+}
+
+.timeline-date-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.timeline-date {
+    font-weight: 800;
+    color: var(--brand-primary);
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.1rem;
+    /* Slightly smaller for compactness */
+    white-space: nowrap;
+}
+
+/* Reference image style: vertically rotated date */
+.date-vertical {
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--brand-primary);
+    opacity: 0.15;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%) rotate(180deg);
+    left: -35px;
+    pointer-events: none;
+}
+
+.timeline-icon-box {
+    width: 42px;
+    /* Increased by ~16% from 36px */
+    height: 42px;
+    background: #E8F5E9;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    /* Increased font size */
+    flex-shrink: 0;
+}
+
+.timeline-text {
+    font-size: 0.9rem;
+    color: #2C3E50;
+    /* Darker text for readability on white */
+    line-height: 1.4;
+}
+
+.timeline-status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 8px;
+    background: var(--brand-secondary);
+    color: var(--text-inverse);
+}
+
+@media screen and (max-width: 992px) {
+    #timelines {
+        background-color: inherit;
+        /* Revert on mobile if needed or keep light */
+    }
+
+    body.moonlit-theme #timelines {
+        background-color: var(--bg-main);
+        /* Revert dark theme on mobile */
+    }
+
+    body.moonlit-theme #timelines .timeline-text,
+    body.moonlit-theme #timelines .timeline-date,
+    body.moonlit-theme #timelines .section-header h2 {
+        color: inherit;
+    }
+
+    .timeline-wrapper {
+        padding: 50px 0;
+    }
+
+    .timeline-container {
+        display: block;
+        min-width: auto;
+        height: auto;
+        padding: 0 20px;
+    }
+
+    .timeline-container::after {
+        left: 31px;
+        width: 4px;
+        height: 100%;
+        top: 0;
+        transform: none;
+    }
+
+    .timeline-item {
+        width: 100%;
+        min-width: auto;
+        height: auto;
+        padding: 10px 0 10px 70px;
+        display: block;
+        margin-bottom: 20px;
+    }
+
+    .timeline-item:nth-child(odd),
+    .timeline-item:nth-child(even) {
+        justify-content: flex-start;
+        padding: 10px 0 10px 70px;
+    }
+
+    .timeline-item::after {
+        left: 31px;
+        top: 40px;
+        transform: translate(-50%, -50%);
+    }
+
+    .timeline-content {
+        max-width: 100%;
+        margin-left: 0;
+    }
+
+    .timeline-item:nth-child(odd) .timeline-content,
+    .timeline-item:nth-child(even) .timeline-content {
+        margin: 0;
+    }
+
+    .timeline-content::after {
+        display: none;
+    }
+
+    .date-vertical {
+        display: none;
+    }
+
+    .timeline-icon-box {
+        width: 36px;
+        height: 36px;
+        font-size: 1.2rem;
+    }
+}
+
+/* Theme Support for Timeline - Specific Overrides removed to favor forced light look unless on mobile */
+/* body.moonlit-theme .timeline-content {
+    background-color: var(--bg-secondary);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.moonlit-theme .timeline-item::after {
+    background-color: var(--bg-secondary);
+} */
+
+/* Footer */
+footer {
+    padding: 40px 0;
+    background: #f1f1f1;
+    border-top: 1px solid #ddd;
+}
+
+.designer-credit {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 10px;
+    opacity: 0.8;
+}
+
+body.moonlit-theme footer {
+    background: var(--bg-dark);
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Floating Button */
+#back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: var(--brand-primary);
+    color: var(--text-inverse);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition-smooth);
+    z-index: 999;
+}
+
+#back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+#back-to-top svg {
+    width: 24px;
+    height: 24px;
+}
+
+#back-to-top.show {
+    animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+    0% {
+        box-shadow: 0 0 0 0 var(--accent-glow);
+    }
+
+    70% {
+        box-shadow: 0 0 0 15px rgba(45, 90, 39, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(45, 90, 39, 0);
+    }
+}
+
+/* Entrance Animations */
+.animate-slide-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    transition-delay: var(--delay, 0s);
+}
+
+.animate-slide-up.animate-fade-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Mobile Menu */
+.menu-toggle {
+    display: none;
+    cursor: pointer;
+}
+
+.bar {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background: var(--brand-primary);
+    margin: 5px auto;
+    transition: var(--transition-smooth);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    #hero h1 {
+        font-size: 3rem;
+    }
+
+    .nav-links li {
+        margin-left: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block;
+    }
+
+    .nav-links {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - 70px);
+        background: var(--text-inverse);
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: 0.5s;
+        box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-links.active {
+        left: 0;
+    }
+
+    .nav-links li {
+        margin: 20px 0;
+    }
+
+    .nav-links li a {
+        color: var(--brand-primary);
+        /* Force green in mobile menu for better visibility */
+        font-size: 1.2rem;
+    }
+
+    body.moonlit-theme .nav-links li a {
+        color: var(--text-inverse);
+    }
+
+    #hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.8rem;
+    }
+
+}
+
+/* Vine Divider */
+.vine-divider {
+    height: 80px;
+    width: 100%;
+    margin: 40px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    color: var(--vine-color);
+}
+
+.vine-divider::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 100' preserveAspectRatio='none'%3E%3Cpath d='M0,50 Q100,20 200,50 T400,50 T600,50 T800,50 T1000,50' fill='none' stroke='currentColor' stroke-width='3'/%3E%3Cpath d='M150,40 Q160,30 170,40' fill='none' stroke='currentColor' stroke-width='1.5'/%3E%3Cpath d='M350,60 Q360,70 370,60' fill='none' stroke='currentColor' stroke-width='1.5'/%3E%3Cpath d='M550,40 Q560,30 570,40' fill='none' stroke='currentColor' stroke-width='1.5'/%3E%3Cpath d='M750,60 Q760,70 770,60' fill='none' stroke='currentColor' stroke-width='1.5'/%3E%3C/svg%3E");
+    background-size: 1000px 80px;
+    background-repeat: repeat-x;
+    filter: drop-shadow(0 0 5px var(--brand-secondary));
+    transition: var(--transition-smooth);
+    opacity: 0.6;
+}
+
+/* Hover Ripple Effect for Buttons */
+.btn {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+    z-index: -1;
+}
+
+.btn:hover::before {
+    width: 300%;
+    height: 300%;
+}
+
+/* Glow Highlight */
+.glow-on-hover:hover {
+    box-shadow: 0 0 20px var(--brand-primary);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+/* Header Controls */
+.header-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-left: 20px;
+}
+
+.control-btn {
+    background: none;
+    border: 1px solid var(--brand-secondary);
+    color: var(--brand-primary);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    font-size: 1.2rem;
+}
+
+.control-btn:hover {
+    background: var(--brand-primary);
+    color: var(--text-inverse);
+    transform: rotate(15deg);
+}
+
+/* Animations */
+.animate-fade-in {
+    opacity: 0;
+    animation: fadeIn 1s forwards;
+}
+
+.animate-slide-up {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: slideUp 1s 0.3s forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* PDF Viewer Section */
+.viewer-tagline {
+    text-align: center;
+    font-size: 1.2rem;
+    /* Slightly smaller */
+    font-family: 'Outfit', sans-serif;
+    color: var(--brand-primary);
+    margin-bottom: 10px;
+    /* Reduced from 30px */
+    font-weight: 600;
+    font-style: italic;
+    letter-spacing: 1px;
+}
+
+.pdf-viewer-wrapper {
+    position: relative;
+    overflow: visible;
+    /* CRITICAL: Allow Note box to be seen */
+    width: 100%;
+}
+
+.pdf-viewer-container {
+    display: flex;
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    overflow: hidden;
+    /* KEEP THIS for the viewer internal clipping */
+    box-shadow: var(--shadow-soft);
+    border: 1px solid rgba(45, 90, 39, 0.1);
+    height: 80vh;
+    min-height: 600px;
+    position: relative;
+    /* Context for Note box if needed, or just standard */
+}
+
+/* Sidebar */
+.pdf-sidebar {
+    width: 160px;
+    /* Brighter and narrower sidebars */
+    background: var(--bg-main);
+    border-right: 1px solid rgba(45, 90, 39, 0.1);
+    display: flex;
+    flex-direction: column;
+    transition: var(--transition-smooth);
+}
+
+.sidebar-header {
+    padding: 15px;
+    border-bottom: 1px solid rgba(45, 90, 39, 0.1);
+}
+
+.sidebar-tabs {
+    display: flex;
+    gap: 10px;
+    background: rgba(45, 90, 39, 0.05);
+    padding: 5px;
+    border-radius: 8px;
+}
+
+.tab-btn {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    transition: var(--transition-smooth);
+}
+
+.tab-btn.active {
+    background: var(--brand-primary);
+    color: white;
+}
+
+.sidebar-content {
+    flex: 1;
+    overflow: hidden;
+    /* Clips the inner results/thumbnails if they overflow horizontally */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.search-results {
+    height: 100%;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.search-result-item {
+    padding: 12px;
+    background: rgba(45, 90, 39, 0.03);
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: var(--transition-smooth);
+}
+
+.search-result-item:hover {
+    background: rgba(45, 90, 39, 0.08);
+    border-color: var(--brand-secondary);
+}
+
+.search-result-item .result-page {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--brand-primary);
+    margin-bottom: 4px;
+}
+
+.search-result-item .result-text {
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.search-result-item .result-text mark {
+    background: rgba(255, 255, 0, 0.4);
+    font-weight: 600;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.thumbnail-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    padding-right: 10px;
+    /* Room for scrollbar */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-height: 0;
+    /* Important for flex scrolling */
+    scrollbar-width: thin;
+    /* Firefox */
+    scrollbar-color: var(--brand-primary) rgba(45, 90, 39, 0.1);
+    /* Firefox */
+}
+
+.thumbnail-item {
+    cursor: pointer;
+    border: 1.5px solid rgba(45, 90, 39, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: var(--transition-smooth);
+    position: relative;
+    background: var(--bg-main);
+    /* Theme aware */
+    box-shadow: var(--shadow-soft);
+    width: 120px;
+    /* Explicitly narrower */
+    margin: 0 auto;
+    min-height: 160px;
+    /* Restored original height */
+    display: flex;
+    flex-direction: column;
+}
+
+.thumbnail-item:hover {
+    transform: scale(1.02);
+    border-color: var(--brand-secondary);
+}
+
+.thumbnail-item.active {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.thumbnail-item canvas {
+    width: 100%;
+    display: block;
+}
+
+.thumbnail-item .page-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 0.7rem;
+    text-align: center;
+    padding: 2px 0;
+}
+
+/* Viewer Wrapper & Container */
+.pdf-viewer-wrapper {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+    overflow: visible;
+    /* Crucial for floating Note box */
+}
+
+.pdf-viewer-container {
+    display: flex;
+    height: 90vh;
+    /* Increased for full page view */
+    min-height: 700px;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(45, 90, 39, 0.1);
+}
+
+/* Main Viewer Area */
+.pdf-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-secondary);
+    position: relative;
+    min-width: 0;
+    border-left: 1px solid rgba(45, 90, 39, 0.1);
+    border-right: 1px solid rgba(45, 90, 39, 0.1);
+}
+
+.pdf-toolbar {
+    padding: 10px 20px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(45, 90, 39, 0.1);
+    z-index: 5;
+}
+
+.toolbar-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: var(--transition-smooth);
+}
+
+.toolbar-btn:hover {
+    background: rgba(45, 90, 39, 0.1);
+    transform: scale(1.1);
+}
+
+#zoom-percent {
+    font-weight: 600;
+    min-width: 60px;
+    text-align: center;
+    color: var(--text-primary);
+}
+
+.pdf-viewport {
+    flex: 1;
+    position: relative;
+    padding: 10px;
+    /* Reduced padding */
+    background: #eaeee8;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow: auto;
+    min-height: 0;
+}
+
+#pdf-book-container {
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    background: white;
+    display: block;
+    margin: 10px auto;
+    /* Reduced margin */
+    width: 100%;
+    max-width: 600px !important;
+    transform-origin: top center;
+    transition: transform 0.3s ease;
+}
+
+.flip-book {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    display: none;
+    /* Initially hidden until first page renders */
+}
+
+.page-loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 600;
+    color: var(--brand-primary);
+}
+
+.security-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    cursor: default;
+}
+
+#pdf-render-canvas {
+    display: block;
+    max-width: 100%;
+}
+
+/* Controls */
+.pdf-controls {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    background: var(--glass-bg);
+    border-top: 1px solid rgba(45, 90, 39, 0.1);
+}
+
+/* Navigation Buttons (Bottom) */
+.pdf-controls {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    background: var(--glass-bg);
+    border-top: 1px solid rgba(45, 90, 39, 0.1);
+}
+
+.nav-btn {
+    background: #f8fdf6;
+    border: none;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: var(--transition-smooth);
+    font-size: 1.5rem;
+    color: var(--brand-primary);
+}
+
+.nav-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    background: white;
+}
+
+.page-indicator {
+    background: #f8fdf6;
+    padding: 10px 40px;
+    height: 60px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--brand-primary);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* Responsive PDF Viewer */
+@media (max-width: 900px) {
+    .pdf-sidebar {
+        width: 150px;
+    }
+}
+
+@media (max-width: 768px) {
+    .pdf-viewer-container {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .pdf-sidebar {
+        width: 100%;
+        height: 120px;
+        border-right: none;
+        border-bottom: 1px solid rgba(45, 90, 39, 0.1);
+    }
+
+    .thumbnail-list {
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .thumbnail-item {
+        width: 80px;
+        flex-shrink: 0;
+    }
+
+    .pdf-viewport {
+        padding: 10px;
+        min-height: 400px;
+    }
+
+    .leaf-btn {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+/* Security: Prevent printing & basic selection */
+@media print {
+
+    #byelaws,
+    .pdf-viewer-container,
+    .pdf-controls {
+        display: none !important;
+    }
+}
+
+.pdf-viewport canvas {
+    pointer-events: none;
+    /* Make interaction harder via direct canvas */
+}
+
+/* Dark Theme Adjustments */
+body.moonlit-theme .pdf-viewer-container {
+    background: var(--bg-secondary);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.moonlit-theme #pdf-canvas-wrapper {
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+body.moonlit-theme .thumbnail-item {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Custom Scrollbar for Thumbnails */
+.thumbnail-list::-webkit-scrollbar {
+    width: 10px;
+    /* Even wider */
+    display: block !important;
+}
+
+.thumbnail-list::-webkit-scrollbar-track {
+    background: rgba(45, 90, 39, 0.15);
+    border-radius: 10px;
+}
+
+.thumbnail-list::-webkit-scrollbar-thumb {
+    background: var(--brand-primary);
+    /* Use primary for more contrast */
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.thumbnail-list::-webkit-scrollbar-thumb:hover {
+    background: var(--brand-secondary);
+}
+
+.keyword-chips-bar {
+    padding: 10px 20px;
+    background: rgba(45, 90, 39, 0.03);
+    border-bottom: 1px solid rgba(45, 90, 39, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.chips-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--brand-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.chips-container {
+    display: flex;
+    gap: 8px;
+}
+
+.chip {
+    padding: 6px 14px;
+    background: white;
+    border: 1px solid var(--brand-secondary);
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: var(--brand-primary);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    font-weight: 600;
+}
+
+.chip:hover {
+    background: var(--brand-secondary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.chip.active {
+    background: var(--brand-primary);
+    color: white;
+    border-color: var(--brand-primary);
+}
+
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+#pdf-search-input {
+    border: none;
+    background: transparent;
+    padding: 5px;
+    color: var(--text-primary);
+    width: 150px;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.pdf-toolbar .toolbar-center {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#page-jump {
+    width: 60px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1.5px solid var(--brand-secondary);
+    background: var(--bg-main);
+    color: var(--text-primary);
+    text-align: center;
+    font-weight: 600;
+}
+
+.section-header {
+    margin-bottom: 20px;
+    /* Globally reduce section header margin */
+}
+
+#byelaws .section-header {
+    margin-bottom: 10px;
+}
+
+.byelaws-header-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+/* Note Box */
+.pdf-note-box.side-right {
+    position: absolute;
+    right: -200px;
+    /* Move closer to document */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 180px;
+    /* Narrower note box */
+    background: var(--accent-sky);
+    /* Use a themed accent background */
+    opacity: 0.95;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft);
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--text-primary);
+    z-index: 100;
+    border-left: 5px solid var(--brand-primary);
+    display: block !important;
+}
+
+body.moonlit-theme .pdf-note-box.side-right {
+    background: #1a2a1a;
+    /* Darker green-tinted background for dark mode */
+    color: #E0EADD;
+}
+
+/* Right Control Sidebar */
+.pdf-control-sidebar {
+    width: 220px;
+    /* Narrower control panel */
+    background: var(--bg-secondary);
+    border-left: 1px solid rgba(45, 90, 39, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.control-group h3 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--brand-primary);
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(45, 90, 39, 0.1);
+    padding-bottom: 5px;
+}
+
+.search-container-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.search-container-vertical .search-box {
+    background: var(--bg-main);
+    /* Theme aware background */
+    border: 1.5px solid var(--brand-primary);
+    border-radius: 8px;
+    padding: 5px 12px;
+    display: flex;
+    align-items: center;
+    box-shadow: var(--shadow-soft);
+}
+
+.search-container-vertical input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    /* Correct theme text color */
+    width: 100%;
+    padding: 8px 0;
+}
+
+.search-container-vertical input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+}
+
+.search-nav-vertical {
+    display: flex;
+    gap: 8px;
+}
+
+.search-nav-vertical .toolbar-btn {
+    flex: 1;
+    background: var(--bg-main);
+    border: 1px solid rgba(45, 90, 39, 0.2);
+    font-size: 0.55rem;
+    padding: 4px;
+    border-radius: 6px;
+    color: var(--brand-primary);
+    transition: var(--transition-smooth);
+}
+
+.search-nav-vertical .toolbar-btn:hover {
+    background: var(--brand-primary);
+    color: white;
+}
+
+.chips-container-vertical {
+    display: flex;
+    flex-direction: column;
+    /* FORCED SINGLE COLUMN */
+    gap: 6px;
+}
+
+.nav-controls-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: var(--bg-main);
+    /* Theme aware */
+    border: 1px solid rgba(45, 90, 39, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: var(--shadow-soft);
+    color: var(--text-primary);
+    /* Ensure correct text color */
+}
+
+.jump-to-row,
+.zoom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+.jump-to-row input {
+    width: 60px;
+    padding: 6px;
+    border: 1.5px solid var(--brand-secondary);
+    border-radius: 6px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    text-align: center;
+    font-weight: 600;
+}
+
+.zoom-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+@media (max-width: 1400px) {
+    .pdf-note-box.side-right {
+        display: none;
+    }
+}
+
+@media (max-width: 1200px) {
+    .pdf-viewer-container {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .pdf-sidebar,
+    .pdf-control-sidebar {
+        width: 100% !important;
+        height: auto;
+        border: none;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .thumbnail-list {
+        flex-direction: row !important;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .thumbnail-item {
+        min-width: 100px;
+        height: 130px;
+    }
+}
+
+/* Text Layer for highlighting */
+.textLayer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    opacity: 1.0;
+    line-height: 1.0;
+    pointer-events: none;
+}
+
+.textLayer span {
+    color: transparent;
+    position: absolute;
+    white-space: pre;
+    cursor: text;
+    transform-origin: 0% 0%;
+    pointer-events: auto;
+}
+
+/* Search Highlights */
+.highlight {
+    background-color: rgba(255, 255, 0, 0.4);
+    border-radius: 2px;
+}
+
+.highlight.selected {
+    background-color: rgba(255, 165, 0, 0.6);
+}
+
+/* --- Members Resources Specific Styles --- */
+.resources-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+@media (max-width: 992px) {
+    .resources-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.search-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 30px;
+    background: var(--bg-secondary);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(45, 90, 39, 0.1);
+}
+
+.search-box {
+    flex: 1;
+    min-width: 250px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 15px;
+    opacity: 0.6;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px 15px 12px 45px;
+    border: 1px solid var(--brand-secondary);
+    border-radius: 8px;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    font-family: inherit;
+    transition: var(--transition-smooth);
+}
+
+.filter-group {
+    display: flex;
+    gap: 10px;
+}
+
+.nua-select {
+    padding: 12px 15px;
+    border: 1px solid var(--brand-secondary);
+    border-radius: 8px;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.search-box input:focus, .nua-select:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.1);
+}
+
+.recent-uploads-banner {
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(45, 90, 39, 0.05) 100%);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 40px;
+    border-left: 4px solid var(--brand-primary);
+}
+
+.banner-title {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.recent-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.tab-headers {
+    display: flex;
+    border-bottom: 2px solid var(--bg-secondary);
+    margin-bottom: 25px;
+    overflow-x: auto;
+}
+
+.resources-tabs .tab-btn {
+    padding: 12px 25px;
+    background: none;
+    border: none;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    position: relative;
+    transition: var(--transition-smooth);
+    white-space: nowrap;
+}
+
+.resources-tabs .tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--brand-primary);
+    transform: scaleX(0);
+    transition: var(--transition-smooth);
+}
+
+.resources-tabs .tab-btn:hover {
+    color: var(--brand-primary);
+}
+
+.resources-tabs .tab-btn.active {
+    background: transparent;
+    color: var(--brand-primary);
+}
+
+.resources-tabs .tab-btn.active::after {
+    transform: scaleX(1);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.4s ease forwards;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.category-header {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: var(--brand-primary);
+}
+
+.resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.resource-card {
+    background: var(--bg-main);
+    border: 1px solid rgba(130, 160, 130, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.resource-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    border-color: var(--brand-secondary);
+}
+
+.resource-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+    opacity: 0;
+    transition: var(--transition-smooth);
+}
+
+.resource-card:hover::before {
+    opacity: 1;
+}
+
+.resource-icon {
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.resource-info h4 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.resource-date {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    opacity: 0.8;
+}
+
+.resource-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.resource-badge.pdf { background: #feebeb; color: #d32f2f; }
+.resource-badge.ppt { background: #fff3e0; color: #f57c00; }
+.resource-badge.doc, .resource-badge.docx { background: #e3f2fd; color: #1976d2; }
+
+.resource-actions {
+    margin-top: auto;
+    display: flex;
+    gap: 10px;
+}
+
+.res-btn {
+    flex: 1;
+    text-align: center;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition-smooth);
+    cursor: pointer;
+}
+
+.res-btn.outline {
+    background: transparent;
+    border: 1px solid var(--brand-primary);
+    color: var(--brand-primary);
+}
+
+.res-btn.outline:hover {
+    background: var(--bg-secondary);
+}
+
+.res-btn.solid {
+    background: var(--brand-primary);
+    border: 1px solid var(--brand-primary);
+    color: white;
+}
+
+.res-btn.solid:hover {
+    background: var(--brand-secondary);
+    border-color: var(--brand-secondary);
+}
+
+.sidebar-links {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.sidebar-links li {
+    margin-bottom: 10px;
+}
+
+.sidebar-links a {
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    transition: var(--transition-smooth);
+    border-left: 3px solid transparent;
+}
+
+.sidebar-links a:hover {
+    background: var(--bg-main);
+    border-left-color: var(--brand-primary);
+    color: var(--brand-primary);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* Theme Support */
+body.moonlit-theme .search-filter-bar {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.moonlit-theme .search-box input, 
+body.moonlit-theme .nua-select {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.moonlit-theme .recent-uploads-banner {
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+}
+
+body.moonlit-theme .resource-card {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.moonlit-theme .sidebar-links a {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.moonlit-theme .sidebar-links a:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.moonlit-theme .resource-badge.pdf { background: rgba(211, 47, 47, 0.2); color: #ff8a80; }
+body.moonlit-theme .resource-badge.ppt { background: rgba(245, 124, 0, 0.2); color: #ffd180; }
+body.moonlit-theme .resource-badge.doc, 
+body.moonlit-theme .resource-badge.docx { background: rgba(25, 118, 210, 0.2); color: #82b1ff; }
+</style>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Specific Styles for Calculator SPA */
+        .calculator-header {
+            margin-top: 100px;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--bg-secondary);
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition-smooth);
+            position: relative;
+            top: 2px;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .tab-btn:hover {
+            color: var(--brand-secondary);
+            background: rgba(45, 90, 39, 0.05);
+        }
+
+        .tab-btn.active {
+            color: var(--text-inverse);
+            background-color: var(--brand-primary);
+            border-bottom-color: var(--brand-primary);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .results-container {
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .results-card {
+            background: var(--bg-secondary);
+            border-color: var(--brand-secondary);
+        }
+
+        .result-box {
+            text-align: center;
+            padding: 20px 15px;
+            background: var(--bg-main);
+            border-radius: 12px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 15px;
+            border: 1px solid rgba(45, 90, 39, 0.1);
+        }
+
+        .result-box h4 {
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .result-box .amount {
+            font-size: 2.2rem;
+            color: var(--brand-primary);
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .result-box .strike {
+            text-decoration: line-through;
+            color: #d9534f;
+            font-size: 1.3rem;
+            margin-right: 10px;
+        }
+
+        .formula-text {
+            font-size: 0.85rem;
+            margin-top: 10px;
+            opacity: 0.8;
+            color: var(--text-primary);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+            margin-top: 20px;
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .range-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .range-slider-container input[type=range] {
+            flex-grow: 1;
+            cursor: pointer;
+        }
+
+        body.moonlit-theme .result-box,
+        body.moonlit-theme .chart-container {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body class="moonlit-theme">
+
+    <header id="main-header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="index.html#hero">
+                    <img src="assets/logo.png" alt="NUA Logo" id="header-logo">
+                </a>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li class="mobile-only-controls">
+                        <div class="header-controls">
+                            <button id="theme-toggle-mobile" class="control-btn"
+                                title="Toggle Day/Night Mode">🌙</button>
+                            <button id="sound-toggle-mobile" class="control-btn"
+                                title="Toggle Ambient Sound">🔇</button>
+                        </div>
+                    </li>
+                </ul>
+                <div class="header-controls desktop-only-controls">
+                    <button id="theme-toggle" class="control-btn" title="Toggle Day/Night Mode">🌙</button>
+                    <button id="sound-toggle" class="control-btn" title="Toggle Ambient Sound">🔇</button>
+                </div>
+                <div class="menu-toggle" id="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="section calculator-header">
+            <div class="container">
+                <div class="section-header">
+                    <img src="assets/leaf.svg" alt="" class="leaf-motif left">
+                    <h2>Welfare/Maintenance Charges</h2>
+                    <img src="assets/leaf.svg" alt="" class="leaf-motif right">
+                </div>
+
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('calculator', this)">Calculator</button>
+                    <button class="tab-btn" onclick="switchTab('scenario', this)">Scenario 2025-26</button>
+                    <button class="tab-btn" onclick="switchTab('model', this)">NUA Model</button>
+                </div>
+
+                <!-- Calculator Tab -->
+                <div id="calculator-tab" class="tab-content active text-left">
+                    <div class="calculator-grid">
+
+                        <!-- Form Section -->
+                        <div class="card contact-card form-section text-left" id="calc-form-container">
+                            <h3 style="margin-bottom: 20px;">Enter Details</h3>
+
+                            <div class="form-group">
+                                <label>Association</label>
+                                <div class="checkbox-group"
+                                    style="display: flex; gap: 15px; margin-top:5px; flex-wrap: wrap;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <input type="radio" id="asc-nua" name="association" value="NUA" checked
+                                            onclick="toggleDiscount()">
+                                        <label for="asc-nua" style="margin:0; font-weight:normal;">NUA</label>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <input type="radio" id="asc-old" name="association" value="Old"
+                                            onclick="toggleDiscount()">
+                                        <label for="asc-old" style="margin:0; font-weight:normal;">Old
+                                            Association</label>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <input type="radio" id="asc-both" name="association" value="Both"
+                                            onclick="toggleDiscount()">
+                                        <label for="asc-both" style="margin:0; font-weight:normal;">Both
+                                            (Compare)</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label for="size">Plot Size</label>
+                                <select id="size" onchange="hideResults()"
+                                    style="width: 100%; padding: 12px; border-radius: 10px; border: 1.5px solid var(--brand-secondary); background: var(--bg-main); color: var(--text-primary); font-family: inherit;">
+                                    <option value="2500">2500 Sq.ft.</option>
+                                    <option value="3500" selected>3500 Sq.ft.</option>
+                                    <option value="4000">4000 Sq.ft.</option>
+                                    <option value="5000">5000 Sq.ft.</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group checkbox-group" id="discount-group"
+                                style="margin-top: 15px; opacity: 0.5;">
+                                <input type="checkbox" id="discount" onchange="hideResults()" disabled>
+                                <label for="discount">Apply Annual Discount <small>(Old Association System
+                                        only)</small></label>
+                            </div>
+
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label for="additionalExp">Additional Expenditure (₹ / Year) <br><small
+                                        style="font-weight:normal; opacity:0.8;">Includes STPs, Street lights,
+                                        etc.</small></label>
+                                <div class="range-slider-container">
+                                    <input type="range" id="additionalExp" min="1500000" max="2000000" step="10000"
+                                        value="1550000" oninput="updateExpDisplay(); hideResults();">
+                                    <span id="expDisplay"
+                                        style="font-weight:bold; color:var(--brand-primary); font-family:'Outfit';">15,50,000</span>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                                <div class="form-group">
+                                    <label for="residences">Residences</label>
+                                    <input type="number" id="residences" value="50"
+                                        oninput="updatePlots(); hideResults();">
+                                </div>
+                                <div class="form-group">
+                                    <label for="plots">Plots</label>
+                                    <input type="number" id="plots" value="163"
+                                        oninput="updateResidences(); hideResults();">
+                                </div>
+                            </div>
+
+                            <button class="btn btn-secondary" onclick="calculateCharges()"
+                                style="margin-top:25px; width:100%;">Calculate Charges</button>
+                        </div>
+
+                        <!-- Results Section -->
+                        <div id="results" class="results-container text-left">
+                            <div class="card results-card" style="padding: 30px;">
+                                <h3 style="margin-bottom: 20px;">Computation Results</h3>
+                                <div id="results-content">
+                                    <!-- Populated via JS -->
+                                </div>
+
+                                <div id="chart-card" style="display:none; margin-top: 30px;">
+                                    <h4
+                                        style="color: var(--brand-primary); font-family: 'Outfit'; margin-bottom: 10px;">
+                                        Graphical Comparison</h4>
+                                    <div class="chart-container">
+                                        <canvas id="comparisonChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Scenario Tab -->
+                <div id="scenario-tab" class="tab-content card max-width-800 mx-auto text-left">
+                    <h3 style="font-size: 1.8rem; margin-bottom: 15px;">Scenario - 2025-26</h3>
+                    <p
+                        style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 25px; background: rgba(45, 90, 39, 0.1); padding: 15px; border-left: 4px solid var(--brand-primary); border-radius: 4px;">
+                        This is a scenario for 2025-26 where the old association spent around
+                        <strong>₹15,50,000</strong> for additional expenses.
+                        In this scenario, the charges of both associations are compared assuming that all <strong>213
+                            units</strong> (Residences & Plots) are registered and contributing, with a 3500 Sq.ft plot
+                        size as the baseline example.
+                    </p>
+
+                    <div id="scenario-results-content"></div>
+
+                    <div style="margin-top: 30px;">
+                        <h4 style="color: var(--brand-primary); font-family: 'Outfit'; margin-bottom: 10px;">Scenario
+                            Graphical Comparison</h4>
+                        <div class="chart-container">
+                            <canvas id="scenarioChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Model Tab -->
+                <div id="model-tab" class="tab-content card max-width-800 mx-auto text-left">
+                    <h3 style="font-size: 1.8rem; margin-bottom: 10px;">The NUA Mathematical Model</h3>
+                    <p style="font-size: 1.1rem; line-height: 1.8;">Unlike the old system which charged purely on
+                        <strong>Plot Size</strong> (Sq.ft. × 12), NUA enforces an equitable mathematical model
+                        prioritizing operational realistic costs and fairness between plot owners and residents.
+                    </p>
+
+                    <div class="about-main-container inner-padding" style="margin-top:25px; border-radius: 12px;">
+                        <h4 style="font-size: 1.3rem; margin-bottom: 15px; color: var(--brand-primary);">The Formula
+                        </h4>
+                        <div class="highlight-box compact-highlight"
+                            style="font-size: 1.1rem; padding: 20px; line-height: 1.6;">
+                            <strong>Base Contribution:</strong> ₹1,250 / Month per owner<br>
+                            <strong>Shared Maintenance Cost:</strong> Additional Expenditure ÷ ( (3 × Residences) +
+                            Plots )
+                        </div>
+                        <ul class="compact-list" style="margin-top:20px; font-size: 1.1rem;">
+                            <li style="margin-bottom: 10px;"><strong>Plot Charge Per Year:</strong> (Base Contribution ×
+                                12) + Shared Cost</li>
+                            <li><strong>Residence Charge Per Year:</strong> (Base Contribution × 12) + (3 × Shared Cost)
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="qa-grid tight-grid" style="margin-top: 35px; gap: 25px;">
+                        <div class="qa-item">
+                            <h4 style="font-size: 1.2rem;">Why is the Residence Weight 3x?</h4>
+                            <p>Residences utilize significantly more resources like STP, security coverage, regular
+                                waste disposal, and community water compared to empty vacant plots. The 1:3 ratio is
+                                considered an industry best practice among leading communities to ensure fairness.</p>
+                        </div>
+                        <div class="qa-item">
+                            <h4 style="font-size: 1.2rem;">Key Benefits & Improvements</h4>
+                            <ul class="sub-steps" style="margin-top: 10px;">
+                                <li>Eliminates hidden costs and unexplained overheads.</li>
+                                <li>Provides a completely transparent breakdown of charges.</li>
+                                <li><strong>Cost Optimization:</strong> The per-member cost structurally decreases as
+                                    more members construct homes and move in!</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container text-center">
+            <p>&copy; 2026 New Utopia Association (NUA). All rights reserved.</p>
+            <p class="designer-credit">Designed By: R&R Consulting</p>
+        </div>
+    </footer>
+
+    <button id="back-to-top" title="Go to top">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5V19M12 5L6 11M12 5L18 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+        </svg>
+    </button>
+
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Mobile Menu Toggle ---
+    const mobileMenu = document.getElementById('mobile-menu');
+    const navLinks = document.querySelector('.nav-links');
+
+    if (mobileMenu) {
+        mobileMenu.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            mobileMenu.classList.toggle('toggle');
+        });
+    }
+
+    // --- Smooth Scrolling for Navigation ---
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+
+            if (targetElement) {
+                // Close mobile menu if open
+                if (navLinks.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                    mobileMenu.classList.remove('toggle');
+                }
+
+                window.scrollTo({
+                    top: targetElement.offsetTop - 70, // Adjust for fixed header
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // --- Scroll Handling (Back to Top & Scroll Indicator) ---
+    const backToTopBtn = document.getElementById('back-to-top');
+    const scrollIndicator = document.querySelector('.scroll-indicator');
+
+    window.addEventListener('scroll', () => {
+        if (backToTopBtn) {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        }
+
+        // Scroll indicator visibility
+        if (scrollIndicator) {
+            if (window.pageYOffset > 50) {
+                scrollIndicator.style.opacity = '0';
+                scrollIndicator.style.pointerEvents = 'none';
+            } else {
+                scrollIndicator.style.opacity = '1';
+                scrollIndicator.style.pointerEvents = 'auto';
+            }
+        }
+    });
+
+    if (backToTopBtn) {
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+
+    // --- Contact Form Submission ---
+    const contactForm = document.getElementById('contact-form');
+
+    if (contactForm) {
+        const membershipCheckbox = document.getElementById('membership-interest');
+        const queryTextarea = document.getElementById('query');
+        const membershipText = `Dear NUA Managing Committee,
+I am an owner in Utopia Layout and would like to express my interest in becoming a member of NUA. I value fairness, transparency, open communication, and cost optimization, and I believe in contributing to the community with these principles.
+Kindly share the membership form and details of the process. I will complete the form and provide the required documents promptly.`;
+
+        if (membershipCheckbox && queryTextarea) {
+            membershipCheckbox.addEventListener('change', () => {
+                if (membershipCheckbox.checked) {
+                    queryTextarea.value = membershipText;
+                } else {
+                    if (queryTextarea.value.trim() === membershipText.trim()) {
+                        queryTextarea.value = '';
+                    }
+                }
+            });
+        }
+
+        contactForm.addEventListener('submit', (e) => {
+            // Standard form submission to Google Forms
+            const btn = contactForm.querySelector('button');
+            btn.textContent = 'Submitting...';
+            btn.style.opacity = '0.7';
+            btn.disabled = true;
+        });
+    }
+
+    // --- Theme Toggle ---
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeToggleMobile = document.getElementById('theme-toggle-mobile');
+    const body = document.body;
+    const header = document.getElementById('main-header');
+
+    // Default to moonlit if no theme is saved
+    const savedTheme = localStorage.getItem('theme') || 'moonlit';
+
+    if (savedTheme === 'moonlit') {
+        body.classList.add('moonlit-theme');
+    } else {
+        body.classList.remove('moonlit-theme');
+    }
+
+    function updateThemeIcons(isMoonlit) {
+        const icon = isMoonlit ? '🌙' : '☀️';
+        if (themeToggle) themeToggle.textContent = icon;
+        if (themeToggleMobile) themeToggleMobile.textContent = icon;
+    }
+
+    function updateHeaderStyle() {
+        if (!header) return;
+        const isMoonlit = body.classList.contains('moonlit-theme');
+        if (window.scrollY > 50) {
+            header.style.padding = '5px 0';
+            header.style.background = isMoonlit
+                ? 'rgba(10, 31, 8, 0.98)'
+                : 'rgba(255, 255, 255, 0.98)';
+        } else {
+            header.style.padding = '10px 0';
+            header.style.background = isMoonlit
+                ? 'rgba(10, 31, 8, 0.95)'
+                : 'rgba(255, 255, 255, 0.95)';
+        }
+    }
+
+    function toggleTheme() {
+        body.classList.toggle('moonlit-theme');
+        const isMoonlit = body.classList.contains('moonlit-theme');
+        localStorage.setItem('theme', isMoonlit ? 'moonlit' : 'sunny');
+        updateThemeIcons(isMoonlit);
+        updateHeaderStyle();
+    }
+
+    if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+    if (themeToggleMobile) themeToggleMobile.addEventListener('click', toggleTheme);
+
+    // Initial state
+    updateThemeIcons(body.classList.contains('moonlit-theme'));
+    updateHeaderStyle();
+
+    // --- Sound Toggle ---
+    const soundToggle = document.getElementById('sound-toggle');
+    const soundToggleMobile = document.getElementById('sound-toggle-mobile');
+    const ambientSound = document.getElementById('ambient-sound');
+    let isPlaying = false;
+
+    if (ambientSound) {
+        ambientSound.volume = 1.0; // Increased volume
+        let playTimeout;
+        let pauseTimeout;
+
+        function updateSoundIcons(playing) {
+            const icon = playing ? '🔊' : '🔇';
+            if (soundToggle) soundToggle.textContent = icon;
+            if (soundToggleMobile) soundToggleMobile.textContent = icon;
+        }
+
+        function playIntermittent() {
+            if (!isPlaying) return;
+
+            ambientSound.play()
+                .then(() => {
+                    const playDuration = 5000 + Math.random() * 3000;
+                    pauseTimeout = setTimeout(() => {
+                        if (isPlaying) {
+                            ambientSound.pause();
+                            const silenceDuration = 10000 + Math.random() * 5000;
+                            playTimeout = setTimeout(playIntermittent, silenceDuration);
+                        }
+                    }, playDuration);
+                })
+                .catch(err => {
+                    console.log("Audio play failed:", err);
+                    playTimeout = setTimeout(playIntermittent, 5000);
+                });
+        }
+
+        function stopIntermittent() {
+            isPlaying = false;
+            clearTimeout(playTimeout);
+            clearTimeout(pauseTimeout);
+            ambientSound.pause();
+            ambientSound.currentTime = 0;
+            updateSoundIcons(false);
+        }
+
+        function toggleSound() {
+            if (!isPlaying) {
+                isPlaying = true;
+                updateSoundIcons(true);
+                ambientSound.load(); // Ensure it's loaded
+                playIntermittent();
+            } else {
+                stopIntermittent();
+            }
+        }
+
+        if (soundToggle) soundToggle.addEventListener('click', toggleSound);
+        if (soundToggleMobile) soundToggleMobile.addEventListener('click', toggleSound);
+    }
+
+    // Update Header on Scroll
+    window.addEventListener('scroll', updateHeaderStyle);
+
+    // Initial header style
+    updateHeaderStyle();
+
+    // --- Intersection Observer for Animations ---
+    const animatedElements = document.querySelectorAll('.section, .animate-slide-up');
+    const observerOptions = {
+        threshold: 0.15,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const elementObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-fade-in');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    animatedElements.forEach(el => {
+        elementObserver.observe(el);
+    });
+
+    // --- PDF Viewer Logic with Page-Flip ---
+    const pdfUrl = 'assets/nua-byelaws.pdf';
+    let pdfDoc = null;
+    let pageNum = 1;
+    let scale = 1.1;
+    let pageFlip = null;
+    let allMatches = [];
+    let currentMatchIndex = -1;
+    let isSearching = false;
+
+    // Elements
+    const pageNumDisplay = document.getElementById('page-num');
+    const pageCountDisplay = document.getElementById('page-count');
+    const pageNumTop = document.getElementById('page-num-top');
+    const pageJumpInput = document.getElementById('page-jump');
+    const thumbnailList = document.getElementById('thumbnail-list');
+    const searchResults = document.getElementById('search-results');
+    const tabThumbnails = document.getElementById('tab-thumbnails');
+    const tabSearch = document.getElementById('tab-search');
+    const keywordChips = document.getElementById('keyword-chips');
+    const searchInput = document.getElementById('pdf-search-input');
+    const datalist = document.getElementById('keyword-suggestions');
+
+    const keywords = ["Name", "Objects", "Members", "Committee", "Quorum", "Meetings", "Voting", "Amendments", "Duties", "Powers"];
+
+    function initKeywords() {
+        if (!keywordChips || !datalist) return;
+
+        keywordChips.innerHTML = '';
+        datalist.innerHTML = '';
+
+        keywords.forEach(word => {
+            // Add Chip
+            const chip = document.createElement('div');
+            chip.className = 'chip';
+            chip.textContent = word;
+            chip.onclick = () => {
+                searchInput.value = word;
+                searchPdf(word);
+            };
+            keywordChips.appendChild(chip);
+
+            // Add Suggestion
+            const option = document.createElement('option');
+            option.value = word;
+            datalist.appendChild(option);
+        });
+    }
+
+    async function initViewer() {
+        if (!window.pdfjsLib) return;
+        const pdfjsLib = window.pdfjsLib;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        try {
+            const loadingTask = pdfjsLib.getDocument(pdfUrl);
+            pdfDoc = await loadingTask.promise;
+
+            if (pageCountDisplay) pageCountDisplay.textContent = pdfDoc.numPages;
+            if (pageNumTop) pageNumTop.textContent = `Page 1 of ${pdfDoc.numPages}`;
+
+            await renderBook();
+            generateThumbnails();
+            initKeywords();
+            updateZoom(); // Apply initial 1.1 scale
+
+            document.getElementById('page-loader')?.remove();
+            document.querySelector('.flip-book').style.display = 'block';
+
+        } catch (err) {
+            console.error('Error loading PDF:', err);
+            const loader = document.getElementById('page-loader');
+            if (loader) loader.textContent = 'Failed to load PDF. Ensure assets/nua-byelaws.pdf exists.';
+        }
+    }
+
+    async function renderBook() {
+        const bookContainer = document.getElementById('pdf-book-container');
+        if (!bookContainer) return;
+        bookContainer.innerHTML = '';
+
+        // Create PageFlip instance
+        pageFlip = new St.PageFlip(bookContainer, {
+            width: 550, // width of one page
+            height: 733, // height of one page
+            size: "stretch",
+            minWidth: 315,
+            maxWidth: 600, // STRICT SINGLE PAGE LIMIT
+            minHeight: 420,
+            maxHeight: 1200,
+            maxShadowOpacity: 0.5,
+            showCover: false,
+            mobileScrollSupport: false,
+            usePortrait: true, // FORCE SINGLE PAGE
+            startPage: 0,
+            flippingTime: 800,
+            useMouseEvents: true,
+            clickEventForward: true,
+            // Disable double page spread even if there is space
+            showPageCorners: false,
+            disableFlipByClick: false
+        });
+
+        // Add flip event for sound
+        pageFlip.on('flip', (e) => {
+            const sound = document.getElementById('page-flip-sound');
+            if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(err => console.log("Sound play prevented:", err));
+            }
+        });
+
+        const pageCanvases = [];
+
+        for (let i = 1; i <= pdfDoc.numPages; i++) {
+            const pageDiv = document.createElement('div');
+            pageDiv.className = 'page';
+
+            const canvas = document.createElement('canvas');
+            canvas.className = 'page-canvas';
+            pageDiv.appendChild(canvas);
+            bookContainer.appendChild(pageDiv);
+
+            const page = await pdfDoc.getPage(i);
+            const viewport = page.getViewport({ scale: 2 }); // Render at high quality for flipbook
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            await page.render({
+                canvasContext: canvas.getContext('2d'),
+                viewport: viewport
+            }).promise;
+        }
+
+        pageFlip.loadFromHTML(document.querySelectorAll(".page"));
+
+        // Subscribe to events
+        pageFlip.on('flip', (e) => {
+            pageNum = e.data + 1;
+            updateUIForPage(pageNum);
+        });
+    }
+
+    function updateUIForPage(num) {
+        if (pageNumDisplay) pageNumDisplay.textContent = num;
+        if (pageNumTop) pageNumTop.textContent = `Page ${num} of ${pdfDoc.numPages}`;
+        if (pageJumpInput) pageJumpInput.value = num;
+        updateThumbnailActiveState(num);
+    }
+
+    function onPrevPage() {
+        pageFlip?.flipPrev();
+    }
+
+    function onNextPage() {
+        pageFlip?.flipNext();
+    }
+
+    // Zoom Logic
+    function updateZoom() {
+        const bookContainer = document.getElementById('pdf-book-container');
+        const zoomPercent = document.getElementById('zoom-percent');
+        if (bookContainer) {
+            bookContainer.style.transform = `scale(${scale})`;
+        }
+        if (zoomPercent) {
+            zoomPercent.textContent = `${Math.round(scale * 100)}%`;
+        }
+    }
+
+    function onZoomIn() {
+        if (scale < 3.0) {
+            scale += 0.1;
+            updateZoom();
+        }
+    }
+
+    function onZoomOut() {
+        if (scale > 0.5) {
+            scale -= 0.1;
+            updateZoom();
+        }
+    }
+
+    function generateThumbnails() {
+        if (!pdfDoc || !thumbnailList) return;
+        thumbnailList.innerHTML = '';
+
+        for (let i = 1; i <= pdfDoc.numPages; i++) {
+            const thumbItem = document.createElement('div');
+            thumbItem.className = 'thumbnail-item';
+            thumbItem.dataset.page = i;
+            thumbItem.innerHTML = `<canvas id="thumb-${i}"></canvas><div class="page-label">${i}</div>`;
+            thumbnailList.appendChild(thumbItem);
+
+            pdfDoc.getPage(i).then(page => {
+                const thumbCanvas = document.getElementById(`thumb-${i}`);
+                if (!thumbCanvas) return;
+                const thumbCtx = thumbCanvas.getContext('2d');
+                const viewport = page.getViewport({ scale: 0.36 });
+                thumbCanvas.height = viewport.height;
+                thumbCanvas.width = viewport.width;
+
+                page.render({
+                    canvasContext: thumbCtx,
+                    viewport: viewport
+                });
+            });
+
+            thumbItem.addEventListener('click', () => {
+                pageFlip?.turnToPage(i - 1);
+            });
+        }
+        updateThumbnailActiveState(pageNum);
+    }
+
+    function updateThumbnailActiveState(num) {
+        if (!thumbnailList) return;
+        const items = thumbnailList.querySelectorAll('.thumbnail-item');
+        items.forEach(item => {
+            if (parseInt(item.dataset.page) === num) {
+                item.classList.add('active');
+                item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+
+    // Advanced Search Logic
+    async function searchPdf(query) {
+        if (!pdfDoc || !query || isSearching) return;
+        isSearching = true;
+        query = query.toLowerCase();
+
+        const searchBtn = document.getElementById('pdf-search-btn');
+        if (searchBtn) searchBtn.textContent = '⏳';
+
+        allMatches = [];
+        currentMatchIndex = -1;
+        if (searchResults) searchResults.innerHTML = '<div class="searching">Searching entire document...</div>';
+
+        tabSearch?.click();
+
+        try {
+            for (let i = 1; i <= pdfDoc.numPages; i++) {
+                const page = await pdfDoc.getPage(i);
+                const textContent = await page.getTextContent();
+                const textItems = textContent.items.map(item => item.str);
+                const fullText = textItems.join(' ');
+
+                let lastIdx = 0;
+                while (true) {
+                    const idx = fullText.toLowerCase().indexOf(query, lastIdx);
+                    if (idx === -1) break;
+
+                    const start = Math.max(0, idx - 40);
+                    const end = Math.min(fullText.length, idx + query.length + 40);
+                    let snippet = fullText.substring(start, end);
+
+                    const queryRegex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\]/g, '\$&')})`, 'gi');
+                    snippet = (start > 0 ? '...' : '') + snippet.replace(queryRegex, '<mark>$1</mark>') + (end < fullText.length ? '...' : '');
+
+                    allMatches.push({ page: i, snippet: snippet });
+                    lastIdx = idx + query.length;
+                }
+            }
+
+            displaySearchResults();
+
+            if (allMatches.length > 0) {
+                currentMatchIndex = 0;
+                jumpToMatch(currentMatchIndex);
+            } else {
+                if (searchResults) searchResults.innerHTML = '<div class="no-results">No matches found.</div>';
+            }
+        } catch (err) {
+            console.error('Search error:', err);
+        } finally {
+            isSearching = false;
+            if (searchBtn) searchBtn.textContent = '🔍';
+        }
+    }
+
+    function displaySearchResults() {
+        if (!searchResults) return;
+        searchResults.innerHTML = '';
+
+        allMatches.forEach((match, idx) => {
+            const item = document.createElement('div');
+            item.className = 'search-result-item';
+            item.innerHTML = `
+                <div class="result-page">Page ${match.page}</div>
+                <div class="result-text">${match.snippet}</div>
+            `;
+            item.onclick = () => {
+                currentMatchIndex = idx;
+                jumpToMatch(idx);
+            };
+            searchResults.appendChild(item);
+        });
+    }
+
+    function jumpToMatch(index) {
+        if (index < 0 || index >= allMatches.length) return;
+        const match = allMatches[index];
+
+        const items = searchResults?.querySelectorAll('.search-result-item');
+        items?.forEach((item, i) => {
+            item.classList.toggle('active', i === index);
+            if (i === index) item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+
+        pageFlip?.turnToPage(match.page - 1);
+    }
+
+    function onNextMatch() {
+        if (allMatches.length === 0) return;
+        currentMatchIndex = (currentMatchIndex + 1) % allMatches.length;
+        jumpToMatch(currentMatchIndex);
+    }
+
+    function onPrevMatch() {
+        if (allMatches.length === 0) return;
+        currentMatchIndex = (currentMatchIndex - 1 + allMatches.length) % allMatches.length;
+        jumpToMatch(currentMatchIndex);
+    }
+
+    // Security
+    const viewerSection = document.getElementById('byelaws');
+    if (viewerSection) {
+        viewerSection.addEventListener('contextmenu', e => e.preventDefault());
+        window.addEventListener('keydown', e => {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 's' || e.key === 'c' || e.key === 'u')) {
+                e.preventDefault();
+            }
+            // Arrow Keys for Page Flip
+            if (e.key === 'ArrowRight') onNextPage();
+            if (e.key === 'ArrowLeft') onPrevPage();
+        });
+    }
+
+    // Event Listeners
+    initViewer();
+
+    document.getElementById('search-prev')?.addEventListener('click', onPrevMatch);
+    document.getElementById('search-next')?.addEventListener('click', onNextMatch);
+    document.getElementById('prev-page')?.addEventListener('click', onPrevPage);
+    document.getElementById('next-page')?.addEventListener('click', onNextPage);
+    document.getElementById('zoom-in')?.addEventListener('click', onZoomIn);
+    document.getElementById('zoom-out')?.addEventListener('click', onZoomOut);
+
+    document.getElementById('pdf-search-btn')?.addEventListener('click', () => searchPdf(searchInput.value));
+    searchInput?.addEventListener('keyup', (e) => { if (e.key === 'Enter') searchPdf(searchInput.value); });
+
+    pageJumpInput?.addEventListener('change', (e) => {
+        const val = parseInt(e.target.value);
+        if (val >= 1 && val <= pdfDoc.numPages) pageFlip?.turnToPage(val - 1);
+    });
+
+    tabThumbnails?.addEventListener('click', () => {
+        tabThumbnails.classList.add('active');
+        tabSearch?.classList.remove('active');
+        thumbnailList?.classList.remove('hidden');
+        searchResults?.classList.add('hidden');
+    });
+
+    tabSearch?.addEventListener('click', () => {
+        tabSearch.classList.add('active');
+        tabThumbnails?.classList.remove('active');
+        searchResults?.classList.remove('hidden');
+        thumbnailList?.classList.add('hidden');
+    });
+});
+
+</script>
+    <script>
+        // Tab Switching Logic
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(tabId + '-tab').classList.add('active');
+            btnElement.classList.add('active');
+
+            if (tabId === 'scenario') {
+                renderScenario();
+            }
+        }
+
+        // Add event listeners to radio buttons to hide results
+        document.querySelectorAll('input[name="association"]').forEach(el => {
+            el.addEventListener('change', hideResults);
+        });
+
+        function hideResults() {
+            document.getElementById("results").style.display = "none";
+        }
+
+        function updateExpDisplay() {
+            const val = parseInt(document.getElementById("additionalExp").value);
+            document.getElementById("expDisplay").innerText = val.toLocaleString();
+        }
+
+        function updatePlots() {
+            const res = parseInt(document.getElementById("residences").value) || 0;
+            let plots = 213 - res;
+            if (plots < 0) plots = 0;
+            document.getElementById("plots").value = plots;
+        }
+
+        function updateResidences() {
+            const plots = parseInt(document.getElementById("plots").value) || 0;
+            let res = 213 - plots;
+            if (res < 0) res = 0;
+            document.getElementById("residences").value = res;
+        }
+
+        let myChart = null;
+        let scChart = null;
+
+        function toggleDiscount() {
+            const association = document.querySelector('input[name="association"]:checked').value;
+            const discountField = document.getElementById("discount");
+            const group = document.getElementById("discount-group");
+
+            if (association === "NUA") {
+                discountField.disabled = true;
+                discountField.checked = false;
+                group.style.opacity = '0.5';
+            } else {
+                discountField.disabled = false;
+                discountField.checked = true; // Automatically re-check for convenience
+                group.style.opacity = '1';
+            }
+        }
+
+        function getResultsHtml(association, size, discount, oldCharge, oldChargeDiscount, nuaPlotCharge, nuaResidenceCharge) {
+            let html = "";
+            let penaltyText = `<div style="font-size: 0.95rem; margin-top: 8px; font-weight: 600; color: #d9534f;">+18% fine for late payments</div>`;
+
+            if (association === "NUA" || association === "Both") {
+                html += `<div class="result-box">
+                            <h4>NUA Welfare Charges (Year)</h4>
+                            <div style="display:flex; justify-content: space-around; flex-wrap:wrap; margin-top:15px;">
+                                <div>
+                                    <div style="font-size: 0.95rem; color: var(--text-primary);">Plot</div>
+                                    <div class="amount">₹${Math.round(nuaPlotCharge).toLocaleString()}</div>
+                                </div>
+                                <div style="width: 1px; background: var(--brand-secondary); opacity: 0.3;"></div>
+                                <div>
+                                    <div style="font-size: 0.95rem; color: var(--text-primary);">Residence</div>
+                                    <div class="amount">₹${Math.round(nuaResidenceCharge).toLocaleString()}</div>
+                                </div>
+                            </div>
+                            <div class="formula-text">Formula: (Base * 12) + Shared Ratio</div>
+                        </div>`;
+            }
+
+            if (association === "Old" || association === "Both") {
+                let discountHtml = "";
+                if (discount && oldChargeDiscount !== null) {
+                    discountHtml = `<span class="strike">₹${oldCharge.toLocaleString()}</span> <span class="amount">₹${Math.round(oldChargeDiscount).toLocaleString()}</span>`;
+                } else {
+                    discountHtml = `<span class="amount">₹${oldCharge.toLocaleString()}</span>`;
+                }
+
+                html += `<div class="result-box">
+                            <h4>Old Association Maintenance Fee (Year)</h4>
+                            <div style="margin-top:15px;">
+                                ${discountHtml}
+                            </div>
+                            <div class="formula-text">Formula: Size (${size}) × 12${discount ? " (with 2 months discount)" : ""}</div>
+                            ${penaltyText}
+                        </div>`;
+            }
+            return html;
+        }
+
+        function calculateCharges() {
+            const association = document.querySelector('input[name="association"]:checked').value;
+            const size = parseInt(document.getElementById("size").value);
+            const discount = document.getElementById("discount").checked;
+            const additionalExp = parseInt(document.getElementById("additionalExp").value) || 0;
+            const residences = parseInt(document.getElementById("residences").value) || 0;
+            const plots = parseInt(document.getElementById("plots").value) || 0;
+
+            // Old calculation: sqft * 12
+            let oldCharge = size * 12;
+            let oldChargeDiscount = null;
+            if ((association === "Old" || association === "Both") && discount) {
+                oldChargeDiscount = oldCharge - (oldCharge / 6);
+            }
+
+            // NUA calculation
+            const basePrice = 1250;
+            const divisor = (3 * residences + plots);
+            let nuaPlotCharge = 0;
+            let nuaResidenceCharge = 0;
+
+            if (divisor > 0) {
+                nuaPlotCharge = (basePrice * 12) + (additionalExp / divisor);
+                nuaResidenceCharge = (basePrice * 12) + 3 * (additionalExp / divisor);
+            }
+
+            // Build Results UI
+            const html = getResultsHtml(association, size, discount, oldCharge, oldChargeDiscount, nuaPlotCharge, nuaResidenceCharge);
+            document.getElementById("results-content").innerHTML = html;
+            document.getElementById("results").style.display = "block";
+
+            // Render Chart if comparing
+            const chartCard = document.getElementById("chart-card");
+            if (association === "Both") {
+                chartCard.style.display = "block";
+                myChart = drawBarChart('comparisonChart', myChart, nuaPlotCharge, nuaResidenceCharge, oldCharge, oldChargeDiscount);
+            } else {
+                chartCard.style.display = "none";
+            }
+        }
+
+        function renderScenario() {
+            // Hardcoded Scenario Data
+            const size = 3500;
+            const discount = true;
+            const additionalExp = 1550000;
+            const residences = 50;
+            const plots = 163;
+
+            let oldCharge = size * 12;
+            let oldChargeDiscount = oldCharge - (oldCharge / 6);
+
+            const basePrice = 1250;
+            const divisor = (3 * residences + plots);
+            let nuaPlotCharge = (basePrice * 12) + (additionalExp / divisor);
+            let nuaResidenceCharge = (basePrice * 12) + 3 * (additionalExp / divisor);
+
+            const html = getResultsHtml("Both", size, discount, oldCharge, oldChargeDiscount, nuaPlotCharge, nuaResidenceCharge);
+            document.getElementById("scenario-results-content").innerHTML = html;
+
+            scChart = drawBarChart('scenarioChart', scChart, nuaPlotCharge, nuaResidenceCharge, oldCharge, oldChargeDiscount);
+        }
+
+        function drawBarChart(canvasId, chartInstance, nuaPlot, nuaResidence, oldNormal, oldDiscount) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+
+            const isDark = document.body.classList.contains('moonlit-theme');
+            const textColor = isDark ? '#E0EADD' : '#2C3E50';
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            let labels = ['Plot Owner', 'Residence Owner'];
+            let nuaData = [nuaPlot, nuaResidence];
+            // Old system charges the same regardless of property built state (purely on size)
+            let oldDataVal = oldDiscount ? oldDiscount : oldNormal;
+            let oldData = [oldDataVal, oldDataVal];
+
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'NUA Model Charges',
+                            backgroundColor: '#2D5A27',
+                            borderColor: '#8DA47E',
+                            borderWidth: 1,
+                            data: nuaData
+                        },
+                        {
+                            label: 'Old Routine Charges',
+                            backgroundColor: '#d9534f',
+                            borderColor: '#c9302c',
+                            borderWidth: 1,
+                            data: oldData
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: textColor,
+                                font: { family: "'Inter', sans-serif" }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: gridColor },
+                            ticks: { color: textColor },
+                            title: {
+                                display: true,
+                                text: 'Amount (₹) Per Year',
+                                color: textColor
+                            }
+                        },
+                        x: {
+                            grid: { color: gridColor },
+                            ticks: { color: textColor }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Listen for Theme Toggle to Refresh Chart Colors
+        function refreshCharts() {
+            setTimeout(() => {
+                if (myChart && document.getElementById("results").style.display === "block") calculateCharges();
+                if (document.getElementById('scenario-tab').classList.contains('active')) renderScenario();
+            }, 100);
+        }
+        document.getElementById("theme-toggle").addEventListener("click", refreshCharts);
+        document.getElementById("theme-toggle-mobile").addEventListener("click", refreshCharts);
+
+        // Initial setup
+        toggleDiscount();
+        updateExpDisplay();
+    </script>
+</body>
+
+</html>
