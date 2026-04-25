@@ -61,7 +61,10 @@
     <div class="mc-dashboard">
         <!-- Sidebar Navigation -->
         <aside class="mc-sidebar" id="mc-sidebar">
-            <div class="sidebar-toggle-container">
+            <div class="sidebar-toggle-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <button class="toggle-sidebar-btn" id="toggle-fullscreen" title="Minimize Top Navigation" style="background: var(--brand-secondary); display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 1.1rem; margin-right: 5px;">⛶</span> <span class="menu-text" style="font-size: 0.85rem;">Expand View</span>
+                </button>
                 <button class="toggle-sidebar-btn" id="toggle-sidebar" title="Toggle Menu">
                     ☰
                 </button>
@@ -163,6 +166,18 @@
             // Sidebar Toggle
             sidebarBtn.addEventListener('click', () => {
                 sidebar.classList.toggle('collapsed');
+            });
+
+            // Fullscreen / Hide Nav Toggle
+            const fullscreenBtn = document.getElementById('toggle-fullscreen');
+            fullscreenBtn.addEventListener('click', () => {
+                document.body.classList.toggle('dashboard-fullscreen');
+                const textSpan = fullscreenBtn.querySelector('.menu-text');
+                if (document.body.classList.contains('dashboard-fullscreen')) {
+                    textSpan.textContent = "Restore Nav";
+                } else {
+                    textSpan.textContent = "Expand View";
+                }
             });
 
             // Navigation Clicks

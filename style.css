@@ -2689,3 +2689,50 @@ html.is-embedded .section {
 .mc-sidebar.collapsed .sidebar-toggle-container {
     justify-content: center;
 }
+
+/* MC Dashboard Mobile Overrides & Fullscreen Mode */
+@media (max-width: 768px) {
+    .mc-dashboard {
+        flex-direction: column;
+    }
+    .mc-sidebar {
+        width: 100% !important;
+        height: auto;
+        border-right: none;
+        border-bottom: 2px solid rgba(45, 90, 39, 0.2);
+        padding: 15px;
+    }
+    .mc-sidebar.collapsed {
+        height: 60px;
+        width: 100% !important;
+        overflow: hidden;
+        padding: 10px 15px;
+    }
+    .mc-sidebar.collapsed .mc-menu-list {
+        display: none !important;
+    }
+    .mc-sidebar.collapsed h3 {
+        display: none !important;
+    }
+    .sidebar-toggle-container {
+        margin-bottom: 0;
+    }
+    .mc-content {
+        padding: 5px;
+        height: 800px;
+    }
+}
+
+/* Hide Nav Bar Feature */
+body.dashboard-fullscreen #main-header {
+    display: none !important;
+}
+
+body.dashboard-fullscreen .mc-dashboard {
+    margin-top: 0 !important;
+    min-height: 100vh !important;
+}
+
+body.dashboard-fullscreen .mc-content {
+    height: 100vh !important;
+}
