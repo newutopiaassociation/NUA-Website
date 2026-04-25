@@ -87,13 +87,13 @@ function renderAll(query = "", yearFilter = "", typeFilter = "") {
     // Sort by Date Descending
     filteredItems.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    // Render Recent (Top 3) - Only if no filters applied, or show matching top 3
-    renderGrid('recent-resources-container', filteredItems.slice(0, 3));
+    // Render Recent (Top 2) - Only if no filters applied, or show matching top 2
+    renderGrid('recent-resources-container', filteredItems.slice(0, 2));
 
     // Render Categories
     let hasResults = false;
     
-    const categories = ['meetingPresentations', 'meetingMinutes', 'documents'];
+    const categories = ['mcMeetingMinutes', 'nuaMeetingMinutes', 'meetingPresentations', 'documents'];
     categories.forEach(cat => {
         const items = filteredItems.filter(item => item.category === cat);
         const container = document.getElementById(`grid-${cat}`);

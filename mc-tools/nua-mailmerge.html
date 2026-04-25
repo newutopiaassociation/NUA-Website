@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NUA Mail Merge</title>
+    <!-- Updated relative path to style.css -->
+    <link rel="stylesheet" href="../style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <!-- Updated relative path to favicon -->
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    <style>
+        /* Specific styles for Mail Merge App */
+        .app-container {
+            max-width: 800px;
+            margin: 120px auto 60px;
+            padding: 0 20px;
+        }
+
+        .step-card {
+            background: var(--bg-main);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(130, 160, 130, 0.1);
+            margin-bottom: 30px;
+            transition: var(--transition-smooth);
+        }
+
+        .step-card h2 {
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--bg-secondary);
+            padding-bottom: 10px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .preview-box {
+            background-color: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 1px dashed var(--brand-secondary);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: white;
+            font-size: 2rem;
+            backdrop-filter: blur(5px);
+        }
+    </style>
+    <script>
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('is-embedded');
+        }
+
+        // Enforce Authentication
+        (function enforceAuth() {
+            try {
+                const sessionStr = sessionStorage.getItem('nua_auth');
+                if (!sessionStr) throw new Error("No session");
+                const session = JSON.parse(sessionStr);
+                if (session.expires < Date.now()) throw new Error("Session expired");
+            } catch (e) {
+                document.documentElement.innerHTML = `
+                    <div style="font-family: 'Outfit', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; background: #fdfdfd; color: #2C3E50;">
+                        <h2 style="color: #d32f2f; margin-bottom: 10px;">Unauthorized Access</h2>
+                        <p style="font-size: 1.1rem; margin-bottom: 20px;">You must log in through the MC Dashboard to view this tool.</p>
+                        <p style="font-size: 0.9rem; opacity: 0.7;">Redirecting to dashboard...</p>
+                    </div>
+                `;
+                setTimeout(() => {
+                    window.top.location.href = '../mc-members.html';
+                }, 2000);
+            }
+        })();
+    </script>
+</head>
+
+<body class="moonlit-theme">
+
+    <header id="main-header">
+        <div class="container header-container">
+            <div class="logo">
+                <!-- Updated relative path to index.html -->
+                <a href="../index.html">
+                    <!-- Updated relative path to logo -->
+                    <img src="../assets/logo.png" alt="NUA Logo" id="header-logo">
+                </a>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <!-- Updated relative paths to anchors -->
+                    <li><a href="../index.html#about" class="glow-on-hover">About NUA</a></li>
+                    <li><a href="../index.html#registration" class="glow-on-hover">Member Registration</a></li>
+                    <li><a href="members-resources.html" class="glow-on-hover">Members Resources</a></li>
+                    <li><a href="mailmerge.html" class="glow-on-hover active">Mail Merge</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="app-container">
+            <div class="section-header">
+                <!-- Updated relative path to leaf.svg -->
+                <img src="../assets/leaf.svg" alt="" class="leaf-motif left">
+                <h1>NUA Mail Merge System</h1>
+                <img src="../assets/leaf.svg" alt="" class="leaf-motif right">
+            </div>
+
+            <!-- Step 1: Configuration -->
+            <div id="step-config" class="step-card">
+                <h2>1. Connect Data Source</h2>
+                <div class="form-group">
+                    <label for="sheet-url">Google Sheet URL</label>
+                    <input type="text" id="sheet-url" placeholder="https://docs.google.com/spreadsheets/d/..." required>
+                    <small>Sheet must have columns: <strong>Email, First Name, Last Name</strong></small>
+                </div>
+                <button onclick="connectSheet()" class="btn btn-primary" style="margin-top: 20px;">Connect &
+                    Verify</button>
+            </div>
+
+            <!-- Step 2: Compose & Send (Hidden initially) -->
+            <div id="step-compose" class="step-card hidden">
+                <h2>2. Compose Email</h2>
+                <div id="connection-status" class="status-badge status-success">
+                    ✓ Connected to Sheet (<span id="recipient-count">0</span> recipients found)
+                </div>
+
+                <div class="form-group">
+                    <label for="email-subject">Subject</label>
+                    <input type="text" id="email-subject" placeholder="Important Update from NUA" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email-body">Message Body</label>
+                    <textarea id="email-body" rows="10" placeholder="Dear {{firstname}}, ..."></textarea>
+                    <small>Supported placeholders: <code>{{firstname}}</code>, <code>{{lastname}}</code></small>
+                </div>
+
+                <div class="preview-box">
+                    <h3>Preview (Row 1)</h3>
+                    <p><strong>To:</strong> <span id="preview-email">...</span></p>
+                    <p><strong>Subject:</strong> <span id="preview-subject">...</span></p>
+                    <hr>
+                    <div id="preview-content">...</div>
+                </div>
+
+                <button onclick="confirmSend()" class="btn btn-primary" style="margin-top: 20px; width: 100%;">Send
+                    Emails</button>
+            </div>
+        </div>
+    </main>
+
+    <div id="loading-overlay" class="hidden">
+        <div class="spinner">Processing...</div>
+    </div>
+
+    <footer>
+        <div class="container text-center">
+            <p>&copy; 2026 New Utopia Association (NUA). All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Updated relative path to script.js -->
+    <script src="../script.js"></script>
+    <script>
+        // MOCK DATA FOR LOCAL DEVELOPMENT
+        const isLocal = typeof google === 'undefined' || !google.script;
+
+        const mockData = [
+            { email: 'john.doe@example.com', firstname: 'John', lastname: 'Doe' },
+            { email: 'jane.smith@example.com', firstname: 'Jane', lastname: 'Smith' },
+            { email: 'alice.jones@example.com', firstname: 'Alice', lastname: 'Jones' }
+        ];
+
+        let recipients = [];
+
+        function showLoading(show) {
+            document.getElementById('loading-overlay').classList.toggle('hidden', !show);
+        }
+
+        function connectSheet() {
+            const url = document.getElementById('sheet-url').value;
+            if (!url) {
+                alert('Please enter a valid Google Sheet URL');
+                return;
+            }
+
+            showLoading(true);
+
+            if (isLocal) {
+                console.log('Running in MOCK mode');
+                setTimeout(() => {
+                    recipients = mockData;
+                    onSheetConnected();
+                }, 1000);
+            } else {
+                google.script.run
+                    .withSuccessHandler(data => {
+                        recipients = data;
+                        onSheetConnected();
+                    })
+                    .withFailureHandler(err => {
+                        showLoading(false);
+                        alert('Error: ' + err.message);
+                    })
+                    .getSheetData(url);
+            }
+        }
+
+        function onSheetConnected() {
+            showLoading(false);
+            document.getElementById('step-config').classList.add('hidden');
+            document.getElementById('step-compose').classList.remove('hidden');
+            document.getElementById('recipient-count').innerText = recipients.length;
+            updatePreview();
+        }
+
+        function updatePreview() {
+            if (recipients.length === 0) return;
+
+            const subject = document.getElementById('email-subject').value || '(No Subject)';
+            let body = document.getElementById('email-body').value || '(No Content)';
+            const firstUser = recipients[0];
+
+            // Simple placeholder replacement
+            body = body.replace(/{{firstname}}/g, firstUser.firstname)
+                .replace(/{{lastname}}/g, firstUser.lastname);
+
+            document.getElementById('preview-email').innerText = firstUser.email;
+            document.getElementById('preview-subject').innerText = subject;
+            document.getElementById('preview-content').innerText = body;
+        }
+
+        // Live preview listeners
+        document.getElementById('email-subject').addEventListener('input', updatePreview);
+        document.getElementById('email-body').addEventListener('input', updatePreview);
+
+        function confirmSend() {
+            const subject = document.getElementById('email-subject').value;
+            const body = document.getElementById('email-body').value;
+            const url = document.getElementById('sheet-url').value;
+
+            if (!subject || !body) {
+                alert('Please fill in both subject and body.');
+                return;
+            }
+
+            if (confirm(`Are you sure you want to send emails to ${recipients.length} recipients?`)) {
+                showLoading(true);
+
+                if (isLocal) {
+                    setTimeout(() => {
+                        console.log(`Sending to ${recipients.length} people:`, { subject, body });
+                        showLoading(false);
+                        alert(`Successfully sent ${recipients.length} emails (Mock)!`);
+                        location.reload();
+                    }, 1500);
+                } else {
+                    google.script.run
+                        .withSuccessHandler(res => {
+                            showLoading(false);
+                            alert(`Successfully sent ${res.sent} emails!`);
+                            if (res.errors.length > 0) {
+                                alert(`Failed to send to: ${res.errors.join(', ')}`);
+                            }
+                        })
+                        .withFailureHandler(err => {
+                            showLoading(false);
+                            alert('Error sending emails: ' + err.message);
+                        })
+                        .sendEmails(url, subject, body);
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

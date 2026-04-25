@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welfare Collection</title>
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <script>
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('is-embedded');
+        }
+
+        // Enforce Authentication
+        (function enforceAuth() {
+            try {
+                const sessionStr = sessionStorage.getItem('nua_auth');
+                if (!sessionStr) throw new Error("No session");
+                const session = JSON.parse(sessionStr);
+                if (session.expires < Date.now()) throw new Error("Session expired");
+            } catch (e) {
+                document.documentElement.innerHTML = `
+                    <div style="font-family: 'Outfit', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; background: #fdfdfd; color: #2C3E50;">
+                        <h2 style="color: #d32f2f; margin-bottom: 10px;">Unauthorized Access</h2>
+                        <p style="font-size: 1.1rem; margin-bottom: 20px;">You must log in through the MC Dashboard to view this tool.</p>
+                        <p style="font-size: 0.9rem; opacity: 0.7;">Redirecting to dashboard...</p>
+                    </div>
+                `;
+                setTimeout(() => {
+                    window.top.location.href = '../mc-members.html';
+                }, 2000);
+            }
+        })();
+    </script>
+    <style>
+        body { background: transparent; padding: 20px; }
+        .mc-tool-container { max-width: 1000px; margin: 0 auto; }
+        .iframe-container {
+            width: 100%;
+            height: 700px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid rgba(45, 90, 39, 0.1);
+            background: white; /* In case the sheet has a transparent background */
+            position: relative;
+        }
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            transform-origin: top left;
+            transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease;
+        }
+        
+        /* Zoom controls styling */
+        .zoom-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 5px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 10;
+        }
+        .zoom-btn {
+            background: var(--bg-main);
+            color: var(--brand-primary);
+            border: 1px solid var(--brand-secondary);
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .zoom-btn:hover {
+            background: var(--brand-primary);
+            color: white;
+        }
+        .zoom-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 0 8px;
+            color: #2C3E50; /* Hardcoded dark text since controls are on white background */
+            min-width: 50px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="moonlit-theme">
+    
+    <div class="mc-tool-container">
+        <div class="section-header" style="margin-bottom: 20px;">
+             <img src="../assets/leaf.svg" alt="" class="leaf-motif left">
+             <h2>Welfare Collection Status</h2>
+             <img src="../assets/leaf.svg" alt="" class="leaf-motif right">
+        </div>
+
+        <div class="year-selector" style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
+            <label for="welfare-year" style="font-family: 'Outfit', sans-serif; font-weight: 600; color: var(--brand-primary); margin-right: 12px; font-size: 1.1rem;">Select Year:</label>
+            <select id="welfare-year" onchange="changeWelfareYear()" style="padding: 8px 15px; border-radius: 8px; border: 2px solid var(--brand-secondary); font-family: 'Inter', sans-serif; font-weight: 600; color: var(--text-primary); background: var(--bg-main); outline: none; cursor: pointer; text-align: center; min-width: 120px;">
+                <option value="https://docs.google.com/spreadsheets/d/e/2PACX-1vQwX1urkgrPk6giH9yY-9vyeaxk_pjUOQ5ZmwqFATEFSscyy1uXz9FW6SIQ6UIA0dQqcS_AR5We-_DD/pubhtml?gid=1254898113&amp;single=true&amp;widget=true&amp;headers=false">2025-26</option>
+                <option value="https://docs.google.com/spreadsheets/d/e/2PACX-1vS0rzKfNU1N_K8zMFV4t5e4CIvr4wDkBBS5OoyWb6WvxBgpjcThk4Mxp9TcAAD_UT_GyLif-tDWVidv/pubhtml?gid=1254898113&amp;single=true&amp;widget=true&amp;headers=false" selected>2026-27</option>
+            </select>
+        </div>
+
+        <div class="card animate-slide-up" style="padding: 0; overflow: hidden; position: relative;">
+            <div class="iframe-container" id="iframe-wrapper">
+                <iframe id="welfare-iframe" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vS0rzKfNU1N_K8zMFV4t5e4CIvr4wDkBBS5OoyWb6WvxBgpjcThk4Mxp9TcAAD_UT_GyLif-tDWVidv/pubhtml?gid=1254898113&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
+                
+                <div class="zoom-controls">
+                    <button class="zoom-btn" onclick="zoomOut()" title="Zoom Out">-</button>
+                    <span class="zoom-text" id="zoom-level">90%</span>
+                    <button class="zoom-btn" onclick="zoomIn()" title="Zoom In">+</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentZoom = 0.9;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            setZoom(0.9);
+        });
+        
+        function changeWelfareYear() {
+            const select = document.getElementById('welfare-year');
+            const iframe = document.getElementById('welfare-iframe');
+            
+            iframe.src = select.value;
+            setZoom(0.9); // Reset zoom when switching documents
+        }
+
+        function setZoom(factor) {
+            currentZoom = factor;
+            const iframe = document.getElementById('welfare-iframe');
+            const zoomText = document.getElementById('zoom-level');
+            
+            // Adjust the transform and size to keep it within the container bounds
+            const invScale = 1 / currentZoom;
+            iframe.style.transform = `scale(${currentZoom})`;
+            iframe.style.width = `${invScale * 100}%`;
+            iframe.style.height = `${invScale * 100}%`;
+            
+            zoomText.innerText = Math.round(currentZoom * 100) + '%';
+        }
+        
+        function zoomIn() {
+            if(currentZoom < 2.0) setZoom(Math.round((currentZoom + 0.1) * 10) / 10);
+        }
+        
+        function zoomOut() {
+            if(currentZoom > 0.5) setZoom(Math.round((currentZoom - 0.1) * 10) / 10);
+        }
+    </script>
+</body>
+</html>

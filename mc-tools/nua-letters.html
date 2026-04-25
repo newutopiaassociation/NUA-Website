@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sent Letters</title>
+    <link rel="stylesheet" href="../style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <script>
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('is-embedded');
+        }
+
+        // Enforce Authentication
+        (function enforceAuth() {
+            try {
+                const sessionStr = sessionStorage.getItem('nua_auth');
+                if (!sessionStr) throw new Error("No session");
+                const session = JSON.parse(sessionStr);
+                if (session.expires < Date.now()) throw new Error("Session expired");
+            } catch (e) {
+                document.documentElement.innerHTML = `
+                    <div style="font-family: 'Outfit', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; background: #fdfdfd; color: #2C3E50;">
+                        <h2 style="color: #d32f2f; margin-bottom: 10px;">Unauthorized Access</h2>
+                        <p style="font-size: 1.1rem; margin-bottom: 20px;">You must log in through the MC Dashboard to view this tool.</p>
+                        <p style="font-size: 0.9rem; opacity: 0.7;">Redirecting to dashboard...</p>
+                    </div>
+                `;
+                setTimeout(() => {
+                    window.top.location.href = '../mc-members.html';
+                }, 2000);
+            }
+        })();
+    </script>
+    <style>
+        body {
+            background: transparent;
+            padding: 20px;
+        }
+
+        .mc-tool-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .nua-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .nua-table th,
+        .nua-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(45, 90, 39, 0.1);
+        }
+
+        .nua-table th {
+            background: rgba(45, 90, 39, 0.05);
+            color: var(--brand-primary);
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .nua-table tr:hover td {
+            background: rgba(45, 90, 39, 0.02);
+        }
+
+        .nua-table .btn-action {
+            display: inline-block;
+            padding: 6px 15px;
+            background: var(--brand-primary);
+            color: white;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 0 5px;
+        }
+
+        .nua-table .btn-action:hover {
+            background: var(--brand-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nua-table .btn-action.secondary {
+            background: var(--brand-secondary);
+        }
+
+        .nua-table .btn-action.secondary:hover {
+            background: var(--brand-primary);
+        }
+
+        .loader-container {
+            padding: 40px;
+            text-align: center;
+            color: var(--brand-primary);
+            font-weight: 600;
+        }
+
+        .empty-state {
+            padding: 40px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body class="moonlit-theme">
+
+    <div class="mc-tool-container">
+        <div class="section-header" style="margin-bottom: 20px;">
+            <img src="../assets/leaf.svg" alt="" class="leaf-motif left">
+            <h2>Sent Letters</h2>
+            <img src="../assets/leaf.svg" alt="" class="leaf-motif right">
+        </div>
+
+        <div class="card animate-slide-up">
+            <div class="table-responsive">
+                <table id="docTable" class="nua-table">
+                    <thead>
+                        <tr>
+                            <th>Document Name</th>
+                            <th style="width: 200px; text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- JS fills this -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxctRpRHXbcwx4AFqQ5qrOZtSXOvrgoHdRDQfKXfL1WOBBqnEIFJ_cqcp1l0SzPHUk6rg/exec";
+
+        async function loadFolder(folderKey) {
+            const tbody = document.querySelector("#docTable tbody");
+            tbody.innerHTML = `<tr><td colspan="2"><div class="loader-container">Fetching documents...</div></td></tr>`;
+
+            try {
+                const response = await fetch(`${GAS_URL}?folder=${folderKey}`);
+                const files = await response.json();
+
+                tbody.innerHTML = ""; // clear old rows
+
+                if (!files || files.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="2"><div class="empty-state">No documents found in this folder.</div></td></tr>`;
+                    return;
+                }
+
+                files.forEach(file => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td><strong>${file.name}</strong></td>
+                        <td style="text-align: center; white-space: nowrap;">
+                            <a href="${file.url}" target="_blank" class="btn-action">View</a>
+                            <a href="${file.url}" target="_blank" download class="btn-action secondary">Download</a>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                console.error("Error loading folder:", err);
+                tbody.innerHTML = `<tr><td colspan="2"><div class="empty-state" style="color: red;">Error loading documents. Please try again.</div></td></tr>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFolder("letters");
+        });
+    </script>
+</body>
+
+</html>

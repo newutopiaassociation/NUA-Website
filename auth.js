@@ -138,6 +138,12 @@ const handleCredentialResponse = (response) => {
         picture: payload.picture
     };
 
+    // Save session
+    sessionStorage.setItem('nua_auth', JSON.stringify({
+        profile: userProfile,
+        expires: Date.now() + 1000 * 60 * 60 * 0.5 // 30 Minutes
+    }));
+
     // Hide Overlay
     const overlay = document.getElementById('auth-overlay');
     if (overlay) {
@@ -184,11 +190,31 @@ const updateUserAvatar = () => {
 const handleSignOut = () => {
     isAuthenticated = false;
     userProfile = null;
+    sessionStorage.removeItem('nua_auth');
     // Reload page to reset state (which will show the auth overlay again)
     window.location.reload();
 };
 
 const initAuth = () => {
+    // 0. Check cached session
+    const savedSessionString = sessionStorage.getItem('nua_auth');
+    if (savedSessionString) {
+        try {
+            const savedSession = JSON.parse(savedSessionString);
+            if (savedSession && savedSession.expires > Date.now()) {
+                isAuthenticated = true;
+                userProfile = savedSession.profile;
+                document.dispatchEvent(new CustomEvent('nua-auth-success', { detail: userProfile }));
+                updateUserAvatar();
+                return; // Skip rendering auth overlay completely
+            } else {
+                sessionStorage.removeItem('nua_auth');
+            }
+        } catch (e) {
+            sessionStorage.removeItem('nua_auth');
+        }
+    }
+
     // 1. Prevent interacting with page behind
     document.body.style.overflow = 'hidden';
 

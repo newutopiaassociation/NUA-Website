@@ -29,9 +29,8 @@
                     <li><a href="index.html#about" class="glow-on-hover">About NUA</a></li>
                     <li><a href="index.html#principles" class="glow-on-hover">Guiding Principles</a></li>
                     <li><a href="index.html#registration" class="glow-on-hover">Member Registration</a></li>
-                    <li><a href="index.html#timelines" class="glow-on-hover">NUA Timelines</a></li>
-                    <li><a href="byelaws.html" class="glow-on-hover">NUA Bye-laws</a></li>
-                    <li><a href="members-resources.html" class="glow-on-hover active">Members Resources</a></li>
+                    <li><a href="members-resources.html" class="glow-on-hover active">NUA Docs</a></li>
+                    <li><a href="mc-members.html" class="glow-on-hover">MC Resources</a></li>
                     <li><a href="index.html#contact" class="glow-on-hover">Contact NUA MC</a></li>
                     <li><a href="index.html#newsletters" class="glow-on-hover">NUA Newsletters</a></li>
                     <li class="mobile-only-controls">
@@ -99,28 +98,37 @@
                         <!-- Resources Categories (Tabs/Accordion) -->
                         <div class="resources-tabs">
                             <div class="tab-headers">
-                                <button class="tab-btn active" data-tab="meetingPresentations">Meeting Presentations</button>
-                                <button class="tab-btn" data-tab="meetingMinutes">Meeting Minutes</button>
+                                <button class="tab-btn active" data-tab="mcMeetingMinutes">MCMeetingMinutes</button>
+                                <button class="tab-btn" data-tab="nuaMeetingMinutes">NUA Meeting</button>
+                                <button class="tab-btn" data-tab="meetingPresentations">meetingPresentations</button>
                                 <button class="tab-btn" data-tab="documents">Documents</button>
                             </div>
                             
                             <div class="tab-contents">
+                                <!-- MC Meetings -->
+                                <div class="tab-content active" id="tab-mcMeetingMinutes">
+                                    <h3 class="category-header">MC Meeting Minutes</h3>
+                                    <div class="resource-grid" id="grid-mcMeetingMinutes">
+                                        <!-- Populated via JS -->
+                                    </div>
+                                </div>
+                                
+                                <!-- NUA Meetings -->
+                                <div class="tab-content" id="tab-nuaMeetingMinutes">
+                                    <h3 class="category-header">NUA Meeting Minutes</h3>
+                                    <div class="resource-grid" id="grid-nuaMeetingMinutes">
+                                        <!-- Populated via JS -->
+                                    </div>
+                                </div>
+
                                 <!-- Presentations -->
-                                <div class="tab-content active" id="tab-meetingPresentations">
+                                <div class="tab-content" id="tab-meetingPresentations">
                                     <h3 class="category-header">Presentations</h3>
                                     <div class="resource-grid" id="grid-meetingPresentations">
                                         <!-- Populated via JS -->
                                     </div>
                                 </div>
                                 
-                                <!-- Minutes -->
-                                <div class="tab-content" id="tab-meetingMinutes">
-                                    <h3 class="category-header">Minutes</h3>
-                                    <div class="resource-grid" id="grid-meetingMinutes">
-                                        <!-- Populated via JS -->
-                                    </div>
-                                </div>
-
                                 <!-- Documents -->
                                 <div class="tab-content" id="tab-documents">
                                     <h3 class="category-header">Documents</h3>
@@ -136,22 +144,38 @@
                         </div>
 
                     </div>
+                </div>
+            </div>
+        </section>
 
-                    <!-- Sidebar Quick Links (matching main site) -->
-                    <aside class="resources-sidebar card animate-slide-up" style="--delay: 0.2s">
-                        <h3>Quick Links</h3>
-                        <ul class="sidebar-links">
+        <section id="quicklinks" class="section bg-light">
+            <div class="container">
+                <div class="quicklinks-grid">
+                    <div class="quicklinks-col">
+                        <h3>Useful Links</h3>
+                        <ul class="quick-links-list">
+                            <li><a href="kya.html">KYA (Know Your Association)</a></li>
+                            <li><a href="byelaws.html">NUA Bye-laws</a></li>
+                        </ul>
+                    </div>
+                    <div class="quicklinks-col">
+                        <h3>Contact Us</h3>
+                        <p><strong>NUA MC Email ID:</strong><br>
+                            <a href="mailto:nua-managing-committee@googlegroups.com">nua-managing-committee@googlegroups.com</a>
+                        </p>
+                    </div>
+                    <div class="quicklinks-col">
+                        <h3>Site Navigation</h3>
+                        <ul class="quick-links-list">
                             <li><a href="index.html#about">About NUA</a></li>
                             <li><a href="index.html#principles">Guiding Principles</a></li>
                             <li><a href="index.html#registration">Member Registration</a></li>
-                            <li><a href="index.html#timelines">NUA Timelines</a></li>
-                            <li><a href="byelaws.html">NUA Bye-laws</a></li>
+                            <li><a href="members-resources.html">NUA Docs</a></li>
+                            <li><a href="mc-members.html">MC Resources</a></li>
                             <li><a href="index.html#contact">Contact NUA MC</a></li>
                             <li><a href="index.html#newsletters">NUA Newsletters</a></li>
-                            <li><a href="kya.html">KYA (Know Your Association)</a></li>
-                            <li><a href="mailmerge.html">Mail Merge</a></li>
                         </ul>
-                    </aside>
+                    </div>
                 </div>
             </div>
         </section>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MC Members - New Utopia Association</title>
+    <meta name="description" content="Exclusive resources and tools for NUA MC members.">
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <script src="auth.js"></script>
+</head>
+
+<body class="moonlit-theme">
+
+    <header id="main-header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="index.html#hero">
+                    <img src="assets/logo.png" alt="NUA Logo" id="header-logo">
+                </a>
+            </div>
+            <nav>
+                <ul class="nav-links" id="main-nav-links">
+                    <li><a href="index.html#about" class="glow-on-hover">About NUA</a></li>
+                    <li><a href="index.html#principles" class="glow-on-hover">Guiding Principles</a></li>
+                    <li><a href="index.html#registration" class="glow-on-hover">Member Registration</a></li>
+                    <li><a href="members-resources.html" class="glow-on-hover">NUA Docs</a></li>
+                    <li><a href="mc-members.html" class="glow-on-hover active">MC Resources</a></li>
+                    <li><a href="index.html#contact" class="glow-on-hover">Contact NUA MC</a></li>
+                    <li><a href="index.html#newsletters" class="glow-on-hover">NUA Newsletters</a></li>
+                    <li class="mobile-only-controls">
+                        <div class="header-controls">
+                            <button id="theme-toggle-mobile" class="control-btn"
+                                title="Toggle Day/Night Mode">🌙</button>
+                            <button id="sound-toggle-mobile" class="control-btn"
+                                title="Toggle Ambient Sound">🔇</button>
+                        </div>
+                    </li>
+                </ul>
+                <div class="header-controls desktop-only-controls">
+                    <button id="theme-toggle" class="control-btn" title="Toggle Day/Night Mode">🌙</button>
+                    <button id="sound-toggle" class="control-btn" title="Toggle Ambient Sound">🔇</button>
+                </div>
+                <div class="menu-toggle" id="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- SPA Dashboard Container -->
+    <div class="mc-dashboard">
+        <!-- Sidebar Navigation -->
+        <aside class="mc-sidebar" id="mc-sidebar">
+            <div class="sidebar-toggle-container">
+                <button class="toggle-sidebar-btn" id="toggle-sidebar" title="Toggle Menu">
+                    ☰
+                </button>
+            </div>
+            <h3
+                style="margin-bottom: 20px; font-family: 'Outfit'; color: var(--brand-primary); font-size: 1.2rem; border-bottom: 2px solid var(--brand-secondary); padding-bottom: 10px;">
+                MC Tools</h3>
+            <ul class="mc-menu-list">
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-meetings.html"><span
+                            class="menu-icon">📅</span> <span class="menu-text">Members Meeting</span></a></li>
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/mc-meetings.html"><span
+                            class="menu-icon">🏛️</span> <span class="menu-text">MC Members Meeting</span></a></li>
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-documents.html"><span
+                            class="menu-icon">📁</span> <span class="menu-text">Documents</span></a></li>
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-letters.html"><span
+                            class="menu-icon">📤</span> <span class="menu-text">Letters Sent</span></a></li>
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-welfare.html"><span
+                            class="menu-icon">💰</span> <span class="menu-text">Welfare Collection Status</span></a></li>
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-onboard.html"><span
+                            class="menu-icon">🤝</span> <span class="menu-text">Onboard New Member</span></a></li>
+                <li><a href="#" class="mc-nav-link" data-target="byelaws.html"><span class="menu-icon">📜</span>
+                        <span class="menu-text">NUA Bye-laws</span></a></li>
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-mailmerge.html"><span
+                            class="menu-icon">✉️</span> <span class="menu-text">Mail Merge</span></a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="mc-content">
+            <!-- Starting with an empty iframe as requested -->
+            <iframe id="mc-viewer" class="mc-iframe" src="" title="MC Content Viewer"></iframe>
+        </main>
+    </div>
+
+    <!-- Quicklinks and Footer -->
+    <section id="quicklinks" class="section bg-light">
+        <div class="container">
+            <div class="quicklinks-grid">
+                <div class="quicklinks-col">
+                    <h3>Useful Links</h3>
+                    <ul class="quick-links-list">
+                        <li><a href="kya.html">KYA (Know Your Association)</a></li>
+                        <li><a href="byelaws.html">NUA Bye-laws</a></li>
+                        <!-- <li><a href="https://drive.google.com/file/d/135IUB58b5I8zCcpXpfUutJdenmKrUmUL/view?usp=sharing" target="_blank">Member Registration Form</a></li>
+                        <li><a href="https://docs.google.com/document/d/1qA6sVK5DBse_uqC5i-_zqGZZMDQqsHiN/edit?usp=sharing&ouid=107963816068265631968&rtpof=true&sd=true" target="_blank">Bye-laws (Restricted)</a></li> -->
+                    </ul>
+                </div>
+                <div class="quicklinks-col">
+                    <h3>Contact Us</h3>
+                    <p><strong>NUA MC Email ID:</strong><br>
+                        <a
+                            href="mailto:nua-managing-committee@googlegroups.com">nua-managing-committee@googlegroups.com</a>
+                    </p>
+                </div>
+                <div class="quicklinks-col">
+                    <h3>Site Navigation</h3>
+                    <ul class="quick-links-list">
+                        <li><a href="index.html#about">About NUA</a></li>
+                        <li><a href="index.html#principles">Guiding Principles</a></li>
+                        <li><a href="index.html#registration">Member Registration</a></li>
+                        <li><a href="members-resources.html">NUA Docs</a></li>
+                        <li><a href="mc-members.html">MC Resources</a></li>
+                        <li><a href="index.html#contact">Contact NUA MC</a></li>
+                        <li><a href="index.html#newsletters">NUA Newsletters</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container text-center">
+            <p>&copy; 2026 New Utopia Association (NUA). All rights reserved.</p>
+            <p class="designer-credit">Designed By: R&R Consulting</p>
+        </div>
+    </footer>
+
+    <button id="back-to-top" title="Go to top">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5V19M12 5L6 11M12 5L18 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+        </svg>
+    </button>
+
+    <!-- Hidden audio elements since they are required by script.js -->
+    <audio id="ambient-sound" loop style="display:none">
+        <source src="https://www.soundjay.com/nature/birds-chirping-01.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="script.js"></script>
+    <script>
+        // SPA Routing Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.mc-nav-link');
+            const viewer = document.getElementById('mc-viewer');
+            const sidebarBtn = document.getElementById('toggle-sidebar');
+            const sidebar = document.getElementById('mc-sidebar');
+
+            // Sidebar Toggle
+            sidebarBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+            });
+
+            // Navigation Clicks
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+
+                    // Update active state
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+
+                    // Load content in iframe
+                    const target = link.getAttribute('data-target');
+                    if (target) {
+                        viewer.src = target;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
