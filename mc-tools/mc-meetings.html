@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>MC Meeting Minutes</title>
     <link rel="stylesheet" href="../style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
     <script>
         if (window.self !== window.top) {
             document.documentElement.classList.add('is-embedded');
@@ -32,29 +35,91 @@
         })();
     </script>
     <style>
-        body { background: transparent; padding: 20px; }
-        .mc-tool-container { max-width: 1000px; margin: 0 auto; }
-        
-        .nua-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .nua-table th, .nua-table td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(45, 90, 39, 0.1); }
-        .nua-table th { background: rgba(45, 90, 39, 0.05); color: var(--brand-primary); font-weight: 700; font-family: 'Outfit', sans-serif; }
-        .nua-table tr:hover td { background: rgba(45, 90, 39, 0.02); }
-        .nua-table .btn-action { display: inline-block; padding: 6px 15px; background: var(--brand-primary); color: white; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: all 0.3s; margin: 0 5px; }
-        .nua-table .btn-action:hover { background: var(--brand-secondary); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .nua-table .btn-action.secondary { background: var(--brand-secondary); }
-        .nua-table .btn-action.secondary:hover { background: var(--brand-primary); }
-        
-        .loader-container { padding: 40px; text-align: center; color: var(--brand-primary); font-weight: 600; }
-        .empty-state { padding: 40px; text-align: center; color: var(--text-secondary); font-style: italic; opacity: 0.7; }
+        body {
+            background: transparent;
+            padding: 20px;
+        }
+
+        .mc-tool-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .nua-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .nua-table th,
+        .nua-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(45, 90, 39, 0.1);
+        }
+
+        .nua-table th {
+            background: rgba(45, 90, 39, 0.05);
+            color: var(--brand-primary);
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .nua-table tr:hover td {
+            background: rgba(45, 90, 39, 0.02);
+        }
+
+        .nua-table .btn-action {
+            display: inline-block;
+            padding: 6px 15px;
+            background: var(--brand-primary);
+            color: white;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 0 5px;
+        }
+
+        .nua-table .btn-action:hover {
+            background: var(--brand-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nua-table .btn-action.secondary {
+            background: var(--brand-secondary);
+        }
+
+        .nua-table .btn-action.secondary:hover {
+            background: var(--brand-primary);
+        }
+
+        .loader-container {
+            padding: 40px;
+            text-align: center;
+            color: var(--brand-primary);
+            font-weight: 600;
+        }
+
+        .empty-state {
+            padding: 40px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            opacity: 0.7;
+        }
     </style>
 </head>
+
 <body class="moonlit-theme">
-    
+
     <div class="mc-tool-container">
         <div class="section-header" style="margin-bottom: 20px;">
-             <img src="../assets/leaf.svg" alt="" class="leaf-motif left">
-             <h2>MC Meeting Minutes</h2>
-             <img src="../assets/leaf.svg" alt="" class="leaf-motif right">
+            <img src="../assets/leaf.svg" alt="" class="leaf-motif left">
+            <h2>MC Meeting Minutes</h2>
+            <img src="../assets/leaf.svg" alt="" class="leaf-motif right">
         </div>
 
         <div class="card animate-slide-up">
@@ -114,4 +179,5 @@
         });
     </script>
 </body>
+
 </html>

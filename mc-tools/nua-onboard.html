@@ -31,14 +31,185 @@
         })();
     </script>
     <style>
-        body { background: transparent; padding: 20px; text-align: center; }
-        .under-dev { margin-top: 100px; padding: 40px; background: var(--bg-main); border-radius: 12px; border: 2px dashed var(--brand-secondary); display: inline-block; }
+        body { 
+            background: transparent; 
+            padding: 20px; 
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            min-height: 100vh;
+            align-items: center;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h2 {
+            color: var(--brand-primary);
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+        }
+        
+        /* Gatekeeper Styles */
+        .gatekeeper-card {
+            background: var(--bg-main);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(45, 90, 39, 0.1);
+            max-width: 600px;
+            width: 100%;
+            transition: var(--transition-smooth);
+        }
+        .thumbnail-container {
+            position: relative;
+            margin: 20px auto 30px;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 500px;
+        }
+        .thumbnail-container img {
+            width: 100%;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+        .thumbnail-container:hover img {
+            transform: scale(1.05);
+        }
+        .thumbnail-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .thumbnail-container:hover .thumbnail-overlay {
+            opacity: 1;
+        }
+        .restriction-msg {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        .access-btn {
+            background: var(--brand-primary);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            letter-spacing: 1px;
+        }
+        .access-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px var(--accent-glow);
+        }
+
+        .iframe-container {
+            width: 100%;
+            height: 850px;
+            background: var(--bg-main);
+            border-radius: 12px;
+            border: 1px solid var(--brand-secondary);
+            overflow: auto;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 30px;
+            display: none; /* Hidden by default */
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        .error-modal {
+            display: none;
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-weight: 600;
+            border: 1px solid #ffcdd2;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .shake {
+            animation: shake 0.2s ease-in-out 0s 2;
+        }
     </style>
 </head>
 <body class="moonlit-theme">
-    <div class="under-dev">
-        <h2 style="color: var(--brand-primary); font-family: Outfit;">Onboard New Member</h2>
-        <p>This module is currently Under Development.</p>
+    <div class="header">
+        <h2>Onboard New Member</h2>
     </div>
+
+    <!-- Gatekeeper View -->
+    <div id="gatekeeper-view" class="gatekeeper-card">
+        <div class="thumbnail-container" onclick="attemptAccess()">
+            <img src="../assets/onboarding-thumbnail.png" alt="Onboarding Form Preview">
+            <div class="thumbnail-overlay">
+                <span style="color:white; font-weight:800; font-size:1.2rem;">ENTER TOOL</span>
+            </div>
+        </div>
+        <p class="restriction-msg">
+            Only the <strong>Secretary</strong> or <strong>Admin</strong> can add new members to the register.<br>
+            <span style="font-size: 0.9rem; opacity: 0.8;">Click the thumbnail to open the official register.</span>
+        </p>
+        <button class="access-btn" onclick="attemptAccess()">Open Register</button>
+        <div id="access-error" class="error-modal">
+            Access Denied: Please contact the Secretary or Admin to add new members.
+        </div>
+    </div>
+
+    <!-- Spreadsheet View (Initially Hidden) -->
+    <div id="spreadsheet-view" class="iframe-container">
+        <iframe src="https://docs.google.com/spreadsheets/d/1O-bw0cwWGghf6azMQVuNLPgLogPewPafi_Wx9hvJNXA/edit?rm=minimal&range=A1:O28" title="Onboard New Member Form">Loading...</iframe>
+    </div>
+
+    <script>
+        const admins = ['newutopiaassociation@gmail.com', 'ecirams@gmail.com'];
+
+        function attemptAccess() {
+            const error = document.getElementById('access-error');
+            error.style.display = 'none';
+
+            try {
+                const sessionStr = sessionStorage.getItem('nua_auth');
+                if (!sessionStr) throw new Error("No session");
+                
+                const session = JSON.parse(sessionStr);
+                const userEmail = session.profile ? session.profile.email : null;
+
+                if (userEmail && admins.includes(userEmail)) {
+                    document.getElementById('gatekeeper-view').style.display = 'none';
+                    document.getElementById('spreadsheet-view').style.display = 'block';
+                } else {
+                    error.style.display = 'block';
+                    error.classList.add('shake');
+                    setTimeout(() => error.classList.remove('shake'), 500);
+                }
+            } catch (e) {
+                console.error("Access check error:", e);
+                alert("Authentication required. Please refresh the dashboard.");
+            }
+        }
+    </script>
 </body>
 </html>

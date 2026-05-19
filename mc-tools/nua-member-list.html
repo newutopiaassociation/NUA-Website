@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NUA Member Directory</title>
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <script>
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('is-embedded');
+        }
+
+        // Enforce Authentication
+        (function enforceAuth() {
+            try {
+                const sessionStr = sessionStorage.getItem('nua_auth');
+                if (!sessionStr) throw new Error("No session");
+                const session = JSON.parse(sessionStr);
+                if (session.expires < Date.now()) throw new Error("Session expired");
+            } catch (e) {
+                document.documentElement.innerHTML = `
+                    <div style="font-family: 'Outfit', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; background: #fdfdfd; color: #2C3E50;">
+                        <h2 style="color: #d32f2f; margin-bottom: 10px;">Unauthorized Access</h2>
+                        <p style="font-size: 1.1rem; margin-bottom: 20px;">You must log in through the MC Dashboard to view this tool.</p>
+                        <p style="font-size: 0.9rem; opacity: 0.7;">Redirecting to dashboard...</p>
+                    </div>
+                `;
+                setTimeout(() => {
+                    window.top.location.href = '../mc-members.html';
+                }, 2000);
+            }
+        })();
+    </script>
+    <style>
+        body {
+            background: transparent;
+            padding: 20px;
+            color: var(--text-primary);
+        }
+
+        .mc-tool-container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .controls-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nua-select {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color, rgba(45, 90, 39, 0.2));
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            min-width: 250px;
+            outline: none;
+            background: #ffffff;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+        }
+        
+        .nua-select:focus {
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 2px rgba(45, 90, 39, 0.1);
+        }
+        
+        .nua-select option {
+            background: #ffffff;
+            color: #2c3e50;
+        }
+
+        .btn-action {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--brand-primary);
+            color: white;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .btn-action:hover {
+            background: var(--brand-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nua-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            white-space: nowrap;
+        }
+
+        .nua-table th,
+        .nua-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color, rgba(45, 90, 39, 0.1));
+            color: var(--text-primary);
+        }
+
+        .nua-table th {
+            background: rgba(45, 90, 39, 0.05);
+            color: var(--brand-primary);
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .nua-table tr:hover td {
+            background: rgba(45, 90, 39, 0.05);
+        }
+
+        .profile-card {
+            padding: 25px;
+            background: var(--bg-secondary, white);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color, rgba(45, 90, 39, 0.1));
+            color: var(--text-primary);
+        }
+
+        .profile-card h2 {
+            margin-top: 0;
+            color: var(--brand-primary);
+            border-bottom: 2px solid var(--border-color, rgba(45, 90, 39, 0.1));
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .profile-item {
+            margin-bottom: 10px;
+        }
+
+        .profile-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .profile-value {
+            color: var(--text-primary);
+            font-size: 1.05rem;
+            word-break: break-word;
+        }
+
+        .loader-container {
+            padding: 40px;
+            text-align: center;
+            color: var(--brand-primary);
+            font-weight: 600;
+        }
+        
+        .empty-state {
+            padding: 40px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            opacity: 0.7;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color, rgba(45, 90, 39, 0.1));
+        }
+    </style>
+</head>
+
+<body class="moonlit-theme">
+
+    <div class="mc-tool-container">
+        <div class="section-header" style="margin-bottom: 20px;">
+            <img src="../assets/leaf.svg" alt="" class="leaf-motif left">
+            <h2>NUA Member Directory</h2>
+            <img src="../assets/leaf.svg" alt="" class="leaf-motif right">
+        </div>
+
+        <div class="controls-section animate-slide-up">
+            <select id="memberDropdown" class="nua-select" onchange="handleMemberSelect(this.value)">
+                <option value="">Select a Member Name</option>
+            </select>
+            <span style="font-weight: 600; color: var(--text-secondary);">OR</span>
+            <select id="plotDropdown" class="nua-select" onchange="handlePlotSelect(this.value)">
+                <option value="">Select a Plot Number</option>
+            </select>
+            <button class="btn-action" onclick="loadMemberList()">Show All Members</button>
+        </div>
+
+        <!-- Profile Display -->
+        <div id="profile" class="animate-slide-up" style="display: none;"></div>
+
+        <!-- List Display -->
+        <div id="list" class="card animate-slide-up" style="display: none;"></div>
+    </div>
+
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyisykWsmM75CMCmX4GXa7QfHjDTVJLV-XSCvgJku5VY0mIg-p-0O6aW6mhBXU4a9D16g/exec";
+
+        let globalMembersList = [];
+
+        // Load member names and plots into dropdowns
+        async function loadMembers() {
+            try {
+                // Fetch listAll to get both names and plot numbers efficiently
+                const response = await fetch(`${GAS_URL}?action=listAll`);
+                const rows = await response.json();
+                
+                globalMembersList = rows; // Cache for dropdown mapping
+
+                const nameDropdown = document.getElementById("memberDropdown");
+                const plotDropdown = document.getElementById("plotDropdown");
+                
+                let plots = [];
+                let names = [];
+                
+                rows.forEach(row => {
+                    const name = row.MemberName || row["Primary Member Name"] || row["Member (Primary Owner - First named Owner as per Sale deed) Name: "];
+                    const plot = row["Plot Number / house number : [Enter Number]"];
+                    
+                    if (name && !names.includes(name)) {
+                        names.push(name);
+                    }
+                    
+                    if (plot && !plots.includes(plot)) {
+                        plots.push(plot);
+                    }
+                });
+                
+                // Sort names alphabetically
+                names.sort((a, b) => String(a).localeCompare(String(b)));
+                names.forEach(name => {
+                    const option = document.createElement("option");
+                    option.value = name;
+                    option.textContent = name;
+                    nameDropdown.appendChild(option);
+                });
+                
+                // Sort plots numerically
+                plots.sort((a, b) => {
+                    const numA = parseInt(a, 10);
+                    const numB = parseInt(b, 10);
+                    if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+                    return String(a).localeCompare(String(b));
+                });
+                
+                plots.forEach(plot => {
+                    const option = document.createElement("option");
+                    option.value = plot;
+                    option.textContent = plot;
+                    plotDropdown.appendChild(option);
+                });
+                
+            } catch (err) {
+                console.error("Error loading members:", err);
+            }
+        }
+        
+        function handleMemberSelect(name) {
+            document.getElementById("plotDropdown").value = ""; // Reset plot dropdown
+            loadMemberProfile(name);
+        }
+        
+        function handlePlotSelect(plot) {
+            document.getElementById("memberDropdown").value = ""; // Reset name dropdown
+            if (!plot) {
+                loadMemberProfile("");
+                return;
+            }
+            
+            // Find the member name for this plot
+            const member = globalMembersList.find(row => String(row["Plot Number / house number : [Enter Number]"]) === String(plot));
+            if (member) {
+                const name = member.MemberName || member["Primary Member Name"] || member["Member (Primary Owner - First named Owner as per Sale deed) Name: "];
+                loadMemberProfile(name);
+            }
+        }
+
+        // Load single member profile
+        async function loadMemberProfile(name) {
+            const profileDiv = document.getElementById("profile");
+            const listDiv = document.getElementById("list");
+            
+            listDiv.style.display = "none";
+            
+            if (!name) {
+                profileDiv.style.display = "none";
+                return;
+            }
+            
+            profileDiv.style.display = "block";
+            profileDiv.innerHTML = `<div class="loader-container">Loading profile details...</div>`;
+            
+            try {
+                const response = await fetch(`${GAS_URL}?action=getMember&name=${encodeURIComponent(name)}`);
+                const data = await response.json();
+
+                const formatDate = (isoString) => {
+                    if (!isoString) return '';
+                    try {
+                        const date = new Date(isoString);
+                        if (isNaN(date.getTime())) return isoString;
+                        return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                    } catch (e) {
+                        return isoString;
+                    }
+                };
+
+                const renderCard = (title, items, data) => {
+                    let html = `
+                        <div class="profile-card">
+                            <h3 style="color: var(--brand-secondary); border-bottom: 1px solid var(--border-color, rgba(45, 90, 39, 0.1)); padding-bottom: 8px; margin-top: 0; margin-bottom: 15px;">${title}</h3>
+                            <div class="profile-grid">
+                    `;
+                    items.forEach(item => {
+                        const val = data[item.key];
+                        let displayVal = val;
+                        
+                        // Handle empty values
+                        if (val === undefined || val === "" || val === null) {
+                            displayVal = `<span style="opacity: 0.5; font-style: italic;">Not Provided</span>`;
+                        } else {
+                            if (typeof val === 'string' && val.startsWith('http')) {
+                                displayVal = `<a href="${val}" target="_blank" style="color: var(--brand-primary); text-decoration: underline;">View Document</a>`;
+                            } else if (item.isDate) {
+                                displayVal = formatDate(val);
+                            }
+                        }
+                        
+                        html += `
+                            <div class="profile-item">
+                                <span class="profile-label">${item.label}</span>
+                                <span class="profile-value">${displayVal}</span>
+                            </div>
+                        `;
+                    });
+                    html += `</div></div>`;
+                    return html;
+                };
+
+                const groups = [
+                    {
+                        title: "Member Info",
+                        items: [
+                            { label: "Member (Primary Owner - First named Owner as per Sale deed) Name:", key: "Member (Primary Owner - First named Owner as per Sale deed) Name: " },
+                            { label: "Primary Owner(s) Name:", key: "Primary Owner(s) Name:" },
+                            { label: "Contact Email-Id", key: "Contact Email-Id" },
+                            { label: "Contact Phone Number", key: "Contact Phone Number" },
+                            { label: "ID", key: "ID Proof" }
+                        ]
+                    },
+                    {
+                        title: "Application Details",
+                        items: [
+                            { label: "Application No:", key: "Request #" },
+                            { label: "Date of Submission", key: "Date of Submission of NUA Membership Form (Select date) ", isDate: true },
+                            { label: "Application Overall Status", key: "Overall Status" }
+                        ]
+                    },
+                    {
+                        title: "Plot Details",
+                        items: [
+                            { label: "Plot Number", key: "Plot Number / house number : [Enter Number]" },
+                            { label: "Property Type", key: "Property type" },
+                            { label: "Property Proof", key: "Copy of Sale Deed (for plots & houses)" }
+                        ]
+                    },
+                    {
+                        title: "Emergency Contact",
+                        items: [
+                            { label: "Emergency Contact Name", key: "Emergency Contact Name" },
+                            { label: "Relationship with the Primary Owner(s)", key: "Relationship with the Primary Owner(s)" },
+                            { label: "Emergency Contact Phone Number", key: "Emergency Contact Phone Number" },
+                            { label: "Emergency Contact Email-ID", key: "Emergency Contact Email-ID" }
+                        ]
+                    },
+                    {
+                        title: "Consent",
+                        items: [
+                            { label: "I consent to receive official communication via WhatsApp", key: "I consent to receive official communication via WhatsApp" },
+                            { label: "I consent to receive updates via email.", key: "I consent to receive updates via email." },
+                            { label: "I agree to the terms outlined in the Association Bye-laws", key: "I agree to the terms outlined in the Association Bye-laws" },
+                            { label: "Declaration", key: "Declaration [Declaration]" }
+                        ]
+                    }
+                ];
+
+                const displayName = data["Primary Member Name"] 
+                    || data["Member (Primary Owner - First named Owner as per Sale deed) Name: "] 
+                    || data.MemberName 
+                    || name;
+
+                let profileHtml = `<h2 style="color: var(--brand-primary); margin-bottom: 20px;">${displayName}</h2>`;
+
+                groups.forEach(group => {
+                    profileHtml += renderCard(group.title, group.items, data);
+                });
+
+                profileDiv.innerHTML = profileHtml;
+            } catch (err) {
+                console.error("Error loading profile:", err);
+                profileDiv.innerHTML = `<div class="empty-state" style="color: red;">Error loading profile. Please try again.</div>`;
+            }
+        }
+
+        // Load full member list
+        async function loadMemberList() {
+            const profileDiv = document.getElementById("profile");
+            const listDiv = document.getElementById("list");
+            
+            profileDiv.style.display = "none";
+            document.getElementById("memberDropdown").value = "";
+            document.getElementById("plotDropdown").value = "";
+            
+            listDiv.style.display = "block";
+            listDiv.innerHTML = `<div class="loader-container">Fetching all members...</div>`;
+            
+            try {
+                const response = await fetch(`${GAS_URL}?action=listAll`);
+                const rows = await response.json();
+
+                let html = `
+                    <div class="table-responsive">
+                        <table class="nua-table">
+                            <thead>
+                                <tr>
+                `;
+                
+                if (rows && rows.length > 0) {
+                    // Extract all keys dynamically from the first valid object
+                    const skipKeys = ["Timestamp", "Column 37", "Column 38"];
+                    const allKeys = Object.keys(rows[0]).filter(k => !skipKeys.includes(k));
+                    
+                    allKeys.forEach(k => {
+                        html += `<th>${k}</th>`;
+                    });
+                    
+                    html += `</tr></thead><tbody>`;
+                    
+                    rows.forEach(row => {
+                        html += `<tr>`;
+                        allKeys.forEach(k => {
+                            html += `<td>${row[k] !== undefined && row[k] !== "" ? row[k] : 'N/A'}</td>`;
+                        });
+                        html += `</tr>`;
+                    });
+                } else {
+                    html += `<tr><td><div class="empty-state">No members found.</div></td></tr>`;
+                }
+                
+                html += "</tbody></table></div>";
+                listDiv.innerHTML = html;
+            } catch (err) {
+                console.error("Error loading list:", err);
+                listDiv.innerHTML = `<div class="empty-state" style="color: red;">Error loading members list. Please try again.</div>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMembers();
+        });
+    </script>
+</body>
+</html>

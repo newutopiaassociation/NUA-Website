@@ -15,6 +15,58 @@
         rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/favicon.png">
     <script src="auth.js"></script>
+    <style>
+        .menu-category {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--brand-primary);
+            margin: 20px 0 10px 15px;
+            letter-spacing: 1px;
+            opacity: 0.8;
+            font-weight: 700;
+        }
+
+        .mc-sidebar.collapsed .menu-category {
+            display: none;
+        }
+
+        .collapsible-category {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-right: 15px;
+            user-select: none;
+            transition: color 0.3s ease;
+        }
+
+        .collapsible-category:hover {
+            color: var(--brand-secondary);
+        }
+
+        .collapsible-category .chevron {
+            font-size: 0.7rem;
+            transition: transform 0.3s ease;
+        }
+
+        .collapsible-category.closed .chevron {
+            transform: rotate(-90deg);
+        }
+
+        .mc-menu-list {
+            transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+            max-height: 500px;
+            opacity: 1;
+            overflow: hidden;
+            transform-origin: top;
+        }
+
+        .mc-menu-list.closed {
+            max-height: 0;
+            opacity: 0;
+            margin-bottom: 0;
+        }
+    </style>
 </head>
 
 <body class="moonlit-theme">
@@ -61,9 +113,12 @@
     <div class="mc-dashboard">
         <!-- Sidebar Navigation -->
         <aside class="mc-sidebar" id="mc-sidebar">
-            <div class="sidebar-toggle-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                <button class="toggle-sidebar-btn" id="toggle-fullscreen" title="Minimize Top Navigation" style="background: var(--brand-secondary); display: flex; align-items: center; justify-content: center;">
-                    <span style="font-size: 1.1rem; margin-right: 5px;">⛶</span> <span class="menu-text" style="font-size: 0.85rem;">Expand View</span>
+            <div class="sidebar-toggle-container"
+                style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <button class="toggle-sidebar-btn" id="toggle-fullscreen" title="Minimize Top Navigation"
+                    style="background: var(--brand-secondary); display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 1.1rem; margin-right: 5px;">⛶</span> <span class="menu-text"
+                        style="font-size: 0.85rem;">Expand View</span>
                 </button>
                 <button class="toggle-sidebar-btn" id="toggle-sidebar" title="Toggle Menu">
                     ☰
@@ -72,30 +127,70 @@
             <h3
                 style="margin-bottom: 20px; font-family: 'Outfit'; color: var(--brand-primary); font-size: 1.2rem; border-bottom: 2px solid var(--brand-secondary); padding-bottom: 10px;">
                 MC Tools</h3>
-            <ul class="mc-menu-list">
+            <ul class="mc-menu-list" style="margin-bottom: 10px; opacity: 1; max-height: none;">
+                <li><a href="#" class="mc-nav-link active" data-target="mc-tools/dashboard-home.html"><span
+                            class="menu-icon">🏠</span> <span class="menu-text">MC Tools Home</span></a></li>
+            </ul>
+            <div class="menu-category collapsible-category closed"><span>Member Module</span><span
+                    class="chevron">▼</span></div>
+            <ul class="mc-menu-list closed">
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-member-list.html"><span
+                            class="menu-icon">👥</span> <span class="menu-text">Members List</span></a></li>
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-onboard.html"><span
+                            class="menu-icon">🤝</span> <span class="menu-text">Onboard New Member</span></a></li>
+            </ul>
+
+            <div class="menu-category collapsible-category closed"><span>Document Module</span><span
+                    class="chevron">▼</span></div>
+            <ul class="mc-menu-list closed">
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-documents.html"><span
+                            class="menu-icon">📁</span> <span class="menu-text">Documents</span></a></li>
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-upload.html"><span
+                            class="menu-icon">📤</span> <span class="menu-text">Upload Document</span></a></li>
+                <li><a href="#" class="mc-nav-link" data-target="byelaws.html"><span class="menu-icon">📜</span> <span
+                            class="menu-text">NUA Bye-laws</span></a></li>
+            </ul>
+
+            <div class="menu-category collapsible-category closed"><span>Communication & Meetings</span><span
+                    class="chevron">▼</span></div>
+            <ul class="mc-menu-list closed">
                 <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-meetings.html"><span
                             class="menu-icon">📅</span> <span class="menu-text">Members Meeting</span></a></li>
                 <li><a href="#" class="mc-nav-link" data-target="mc-tools/mc-meetings.html"><span
                             class="menu-icon">🏛️</span> <span class="menu-text">MC Members Meeting</span></a></li>
-                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-documents.html"><span
-                            class="menu-icon">📁</span> <span class="menu-text">Documents</span></a></li>
                 <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-letters.html"><span
-                            class="menu-icon">📤</span> <span class="menu-text">Letters Sent</span></a></li>
-                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-welfare.html"><span
-                            class="menu-icon">💰</span> <span class="menu-text">Welfare Collection Status</span></a></li>
-                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-onboard.html"><span
-                            class="menu-icon">🤝</span> <span class="menu-text">Onboard New Member</span></a></li>
-                <li><a href="#" class="mc-nav-link" data-target="byelaws.html"><span class="menu-icon">📜</span>
-                        <span class="menu-text">NUA Bye-laws</span></a></li>
+                            class="menu-icon">✉️</span> <span class="menu-text">Letters Sent</span></a></li>
                 <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-mailmerge.html"><span
-                            class="menu-icon">✉️</span> <span class="menu-text">Mail Merge</span></a></li>
+                            class="menu-icon">🖃</span> <span class="menu-text">Mail Merge</span></a></li>
+            </ul>
+
+            <div class="menu-category collapsible-category closed"><span>Invoice Module</span><span
+                    class="chevron">▼</span></div>
+            <ul class="mc-menu-list closed">
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/coming-soon.html"><span
+                            class="menu-icon">🧾</span> <span class="menu-text">Raise Invoice ⏳</span></a></li>
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/coming-soon.html"><span
+                            class="menu-icon">📨</span> <span class="menu-text">Sent Receipt ⏳</span></a></li>
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-welfare.html"><span
+                            class="menu-icon">💰</span> <span class="menu-text">Welfare Collection Status</span></a>
+                </li>
+            </ul>
+
+            <div class="menu-category collapsible-category closed"><span>Vendor Payment Module</span><span
+                    class="chevron">▼</span></div>
+            <ul class="mc-menu-list closed">
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-voucher-submit.html"><span
+                            class="menu-icon">📝</span> <span class="menu-text">Submit Voucher </span></a></li>
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-voucher-list.html"><span
+                            class="menu-icon">📋</span> <span class="menu-text">View List </span></a></li>
             </ul>
         </aside>
 
         <!-- Main Content Area -->
         <main class="mc-content">
             <!-- Starting with an empty iframe as requested -->
-            <iframe id="mc-viewer" class="mc-iframe" src="" title="MC Content Viewer"></iframe>
+            <iframe id="mc-viewer" class="mc-iframe" src="mc-tools/dashboard-home.html"
+                title="MC Content Viewer"></iframe>
         </main>
     </div>
 
@@ -180,6 +275,32 @@
                 }
             });
 
+            // Collapsible Menu Categories
+            const categories = document.querySelectorAll('.collapsible-category');
+            categories.forEach(category => {
+                category.addEventListener('click', () => {
+                    const isClosed = category.classList.contains('closed');
+
+                    // Collapse all categories first (Accordion behavior)
+                    categories.forEach(c => {
+                        c.classList.add('closed');
+                        const list = c.nextElementSibling;
+                        if (list && list.classList.contains('mc-menu-list')) {
+                            list.classList.add('closed');
+                        }
+                    });
+
+                    // If the clicked one was closed, open it
+                    if (isClosed) {
+                        category.classList.remove('closed');
+                        const menuList = category.nextElementSibling;
+                        if (menuList && menuList.classList.contains('mc-menu-list')) {
+                            menuList.classList.remove('closed');
+                        }
+                    }
+                });
+            });
+
             // Navigation Clicks
             navLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
@@ -193,6 +314,24 @@
                     const target = link.getAttribute('data-target');
                     if (target) {
                         viewer.src = target;
+                    }
+
+                    // If clicking Home, collapse all categories
+                    if (target === 'mc-tools/dashboard-home.html') {
+                        categories.forEach(c => {
+                            c.classList.add('closed');
+                            const list = c.nextElementSibling;
+                            if (list && list.classList.contains('mc-menu-list')) {
+                                list.classList.add('closed');
+                            }
+                        });
+                    }
+
+                    // On mobile, auto-collapse sidebar to show the content immediately
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.add('collapsed');
+                        // Scroll to top to ensure iframe is fully visible
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
                 });
             });

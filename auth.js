@@ -6,6 +6,7 @@ const GOOGLE_CLIENT_ID = "772239537570-70m35m5h0190abucrk4b4lggqn45jtgc.apps.goo
 // State
 let isAuthenticated = false;
 let userProfile = null;
+let authTimeout = null;
 
 const createAuthOverlay = () => {
     const overlay = document.createElement('div');
@@ -39,15 +40,17 @@ const createAuthOverlay = () => {
             color: ${textColor}
         ">
             <img src="assets/logo.png" alt="NUA Logo" style="width: 120px; margin-bottom: 20px;">
-            <h2 style="font-family: 'Outfit', sans-serif; color: var(--brand-primary, #2D5A27); margin-bottom: 10px;">Members Area</h2>
-            <p style="margin-bottom: 25px;">Please sign in with your Google account to access NUA resources.</p>
+            <h2 style="font-family: 'Outfit', sans-serif; color: var(--brand-primary, #2D5A27); margin-bottom: 10px;">MC Members Area</h2>
+            <p style="margin-bottom: 25px;">Please sign in with your Google account to access NUA MC resources.</p>
             
             <div id="google-signin-btn-container" style="display: flex; justify-content: center; min-height: 40px;">
                 <!-- Google Sign-In button will render here -->
             </div>
             
-            <div style="margin-top: 20px; font-size: 0.85rem; opacity: 0.7;">
-                <p>Only verified NUA members are authorized to view these documents.</p>
+            <div style="margin-top: 20px; font-size: 0.85rem; opacity: 0.9; line-height: 1.5;">
+                <p style="margin-bottom: 8px;"><strong>Only verified NUA MC members are authorized to view these documents.</strong></p>
+                <p style="margin-bottom: 15px;">If you are an MC member and need access, contact <a href="mailto:nua-managing-committee@googlegroups.com" style="color: var(--brand-primary, #2D5A27); text-decoration: underline;">nua-managing-committee@googlegroups.com</a></p>
+                <a href="#" onclick="window.history.length > 1 ? window.history.back() : window.location.href='index.html'; return false;" style="display: inline-block; padding: 8px 16px; background: rgba(0,0,0,0.05); border-radius: 6px; color: ${textColor}; text-decoration: none; font-weight: 600; transition: background 0.3s; border: 1px solid rgba(0,0,0,0.1);">&larr; Back to previous page</a>
             </div>
 
         </div>
@@ -131,6 +134,7 @@ const handleCredentialResponse = (response) => {
     }
 
     // Authentication and Authorization successful
+    if (authTimeout) clearTimeout(authTimeout);
     isAuthenticated = true;
     userProfile = {
         name: payload.name,
@@ -220,6 +224,13 @@ const initAuth = () => {
 
     // 2. Create Overlay
     createAuthOverlay();
+
+    // Set timeout to redirect to home page if inactive for 2 minutes
+    authTimeout = setTimeout(() => {
+        if (!isAuthenticated) {
+            window.location.href = 'index.html';
+        }
+    }, 120000);
 
     // 3. Load Google Identity Services Script
     const script = document.createElement('script');
