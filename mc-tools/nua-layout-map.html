@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <script>
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('is-embedded');
+        }
+
+        // Enforce Authentication
+        (function enforceAuth() {
+            try {
+                const sessionStr = sessionStorage.getItem('nua_auth');
+                if (!sessionStr) throw new Error("No session");
+                const session = JSON.parse(sessionStr);
+                if (session.expires < Date.now()) throw new Error("Session expired");
+            } catch (e) {
+                document.documentElement.innerHTML = `
+                    <div style="font-family: 'Outfit', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; background: #0A1F08; color: #E0EADD;">
+                        <h2 style="color: #66BB6A; margin-bottom: 10px;">Unauthorized Access</h2>
+                        <p style="font-size: 1.1rem; margin-bottom: 20px;">You must log in through the MC Dashboard to view this tool.</p>
+                        <p style="font-size: 0.9rem; opacity: 0.7;">Redirecting to dashboard...</p>
+                    </div>
+                `;
+                setTimeout(() => {
+                    window.top.location.href = '../mc-members.html';
+                }, 2000);
+            }
+        })();
+    </script>
+    <style>
+        body {
+            background: transparent;
+            padding: 20px;
+            text-align: center;
+            font-family: 'Outfit', 'Inter', sans-serif;
+            color: var(--text-primary);
+        }
+
+        .map-btn {
+            padding: 8px 16px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        body.moonlit-theme .map-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: var(--text-primary);
+        }
+
+        .map-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--brand-secondary);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .map-btn.primary {
+            background: var(--brand-primary);
+            color: var(--text-inverse);
+            border-color: var(--brand-primary);
+        }
+
+        .map-btn.primary:hover {
+            background: var(--brand-secondary);
+            border-color: var(--brand-secondary);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        /* Search Container & Autocomplete Styles */
+        .search-container {
+            position: relative;
+            flex: 1.5;
+            min-width: 320px;
+            max-width: 480px;
+            display: flex;
+            align-items: center;
+        }
+
+        #mapSearchInput {
+            width: 100%;
+            padding: 8px 16px 8px 36px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1.5px solid var(--brand-secondary);
+            border-radius: 6px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        #mapSearchInput:focus {
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .search-results {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            max-height: 240px;
+            overflow-y: auto;
+            background: rgba(18, 38, 15, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1.5px solid var(--brand-secondary);
+            border-radius: 6px;
+            z-index: 10000;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            padding: 4px 0;
+        }
+
+        /* Sleek custom scrollbars to prevent narrow visual crowding */
+        .search-results::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .search-results::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 6px;
+        }
+
+        .search-results::-webkit-scrollbar-thumb {
+            background: var(--brand-secondary);
+            border-radius: 6px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .search-results::-webkit-scrollbar-thumb:hover {
+            background: var(--brand-primary);
+        }
+
+        .search-result-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.2s ease, color 0.2s ease;
+            text-align: left;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-item:hover, .search-result-item.active {
+            background: var(--brand-primary);
+            color: var(--text-inverse);
+        }
+
+        #closeModal {
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        #closeModal:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
+            color: var(--brand-secondary) !important;
+            transform: rotate(90deg);
+        }
+
+        /* Tooltip styling */
+        .map-tooltip {
+            position: fixed;
+            padding: 6px 12px;
+            background: rgba(10, 31, 8, 0.95);
+            backdrop-filter: blur(4px);
+            color: var(--text-inverse);
+            border: 1px solid var(--brand-secondary);
+            border-radius: 6px;
+            pointer-events: none;
+            font-size: 0.85rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            box-shadow: var(--shadow-soft);
+            z-index: 10000;
+            display: none;
+        }
+
+        /* Navigation Radar Container */
+        .navigation-radar {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            width: 120px;
+            height: 120px;
+            background: rgba(10, 31, 8, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1.5px solid var(--brand-secondary);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+        }
+
+        /* Viewport bounding frame indicator */
+        .radar-viewport {
+            position: absolute;
+            border: 1.5px solid #ff5722;
+            background: rgba(255, 87, 34, 0.15);
+            box-shadow: 0 0 4px rgba(255, 87, 34, 0.5);
+            pointer-events: none;
+            box-sizing: border-box;
+            transition: all 0.1s ease-out;
+        }
+
+        /* Heatmap Panel Style */
+        .heatmap-panel {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 10px 16px;
+            margin-bottom: 16px;
+            font-family: 'Outfit', sans-serif;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        /* Toggle switch styling */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .3s ease;
+            border-radius: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-primary);
+            transition: .3s ease;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        input:checked + .slider {
+            background-color: var(--brand-primary);
+            border-color: var(--brand-primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+    </style>
+</head>
+
+<body class="moonlit-theme">
+    <button id="viewMapBtn" class="map-btn primary"
+        style="padding: 12px 24px; font-size: 1.1rem; border-radius: 8px; margin-top: 40px;">
+        🗺️ View Layout Map
+    </button>
+
+    <!-- Modal Overlay -->
+    <div id="mapModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+                          background:rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center;">
+        <div
+            style="position:relative; width:95%; height:95%; background:var(--bg-main); padding:20px; border-radius:12px; border:1px solid var(--brand-secondary); display:flex; flex-direction:column; box-shadow:var(--shadow-soft);">
+
+            <!-- Header with search and controls -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:12px;">
+                <div class="search-container">
+                    <input type="text" id="mapSearchInput" placeholder="🔍 Search plot by number or owner's name..." autocomplete="off">
+                    <input type="hidden" id="mapSearch" value="">
+                    <div id="mapSearchResults" class="search-results" style="display: none;"></div>
+                </div>
+                <button id="zoomInBtn" class="map-btn">
+                    Zoom In
+                </button>
+                <button id="zoomOutBtn" class="map-btn">
+                    Zoom Out
+                </button>
+                <button id="resetBtn" class="map-btn">
+                    Reset View
+                </button>
+                <button id="fullscreenBtn" class="map-btn primary">
+                    Fullscreen
+                </button>
+                <span id="closeModal">&times;</span>
+            </div>
+
+
+            <!-- Help text -->
+            <div
+                style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:12px; font-family:Outfit; text-align:left; display:flex; align-items:center; gap:8px;">
+                💡 <span><strong>Tip:</strong> Click and drag to pan the map. Scroll the mouse wheel to zoom. Hover over
+                    regions to see their ID. Select a region from the dropdown or click directly on the map to zoom and
+                    highlight.</span>
+            </div>
+
+            <!-- Heatmap Control Panel & Legend -->
+            <div class="heatmap-panel">
+                <label class="switch-container" style="display: inline-flex; align-items: center; gap: 10px; cursor: pointer; user-select: none;">
+                    <span class="switch">
+                        <input type="checkbox" id="heatmapToggle">
+                        <span class="slider"></span>
+                    </span>
+                    <span style="font-family: 'Outfit', sans-serif; font-weight: 600; color: var(--text-primary); font-size: 0.95rem;">📊 Enable Welfare Status Heatmap (Mock Data)</span>
+                </label>
+                
+                <div id="heatmapLegend" style="display: none; align-items: center; gap: 16px; font-size: 0.85rem; font-weight: 600; font-family: 'Outfit', sans-serif; flex-wrap: wrap;">
+                    <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; border-radius: 3px; background: rgba(102, 187, 106, 0.45); border: 1.5px solid #66BB6A;"></span> Paid</span>
+                    <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; border-radius: 3px; background: rgba(255, 167, 38, 0.45); border: 1.5px solid #ffa726;"></span> Grace Period</span>
+                    <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; border-radius: 3px; background: rgba(239, 83, 80, 0.45); border: 1.5px solid #ef5350;"></span> Overdue</span>
+                    <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; border-radius: 3px; background: rgba(255, 255, 255, 0.1); border: 1.5px solid rgba(255, 255, 255, 0.25);"></span> Unregistered</span>
+                </div>
+            </div>
+
+            <!-- Map container -->
+            <div id="mapWrapper"
+                style="flex:1; overflow:hidden; position:relative; cursor:grab; background:var(--bg-secondary); border-radius:8px; border:1.5px dashed var(--brand-secondary); box-shadow:inset 0 0 20px rgba(0,0,0,0.4);">
+                <object id="layoutMap" type="image/svg+xml" data="../assets/Utopia Layout Map SVG.svg"
+                    style="width:100%; height:100%;"></object>
+
+                <!-- Navigation Radar (Mini-Map) -->
+                <div id="navigationRadar" class="navigation-radar">
+                    <img src="../assets/Utopia Layout Map SVG.svg" alt="Mini Map" style="width:100%; height:100%; object-fit:contain; opacity:0.6; pointer-events:none;">
+                    <div id="radarViewport" class="radar-viewport"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const resetBtn = document.getElementById('resetBtn');
+        const searchDropdown = document.getElementById('mapSearch');
+        const mapObj = document.getElementById('layoutMap');
+        const wrapper = document.getElementById('mapWrapper');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const closeBtn = document.getElementById('closeModal');
+        const modal = document.getElementById('mapModal');
+        const btn = document.getElementById('viewMapBtn');
+        const zoomInBtn = document.getElementById('zoomInBtn');
+        const zoomOutBtn = document.getElementById('zoomOutBtn');
+
+        let scale = 1, posX = 0, posY = 0, isDragging = false;
+        let startClientX, startClientY;
+        let startPosX, startPosY;
+
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyisykWsmM75CMCmX4GXa7QfHjDTVJLV-XSCvgJku5VY0mIg-p-0O6aW6mhBXU4a9D16g/exec";
+
+        const MOCK_WELFARE_DATA = {
+            "NUAPlot133_Vadhiraj": { status: "Paid", amount: 15000, lastPaymentDate: "2026-03-31", fiscalYear: "2026" },
+            "NUAPlot195_Rams": { status: "Pending", amount: 0, lastPaymentDate: "N/A", fiscalYear: "2026" },
+            "NUAPlot71_LakshmanMN": { status: "GracePeriod", amount: 7500, lastPaymentDate: "2026-04-15", fiscalYear: "2026" },
+            "NUAPlot52_RRaju": { status: "Paid", amount: 15000, lastPaymentDate: "2026-02-28", fiscalYear: "2026" },
+            "NUAPlot149_PrasadMysore": { status: "Paid", amount: 15000, lastPaymentDate: "2026-03-10", fiscalYear: "2026" },
+            "NUAPlot161_ManjunathTN": { status: "Pending", amount: 0, lastPaymentDate: "N/A", fiscalYear: "2026" },
+            "NUAPlot173_Chacko": { status: "Paid", amount: 15000, lastPaymentDate: "2026-03-15", fiscalYear: "2026" },
+            "NUAPlot174_Chacko": { status: "Paid", amount: 15000, lastPaymentDate: "2026-03-15", fiscalYear: "2026" },
+            "NUAPlot184_LoraineFernandez": { status: "GracePeriod", amount: 5000, lastPaymentDate: "2026-04-20", fiscalYear: "2026" },
+            "NUAPlot185__LoraineFernandez": { status: "Paid", amount: 15000, lastPaymentDate: "2026-03-05", fiscalYear: "2026" },
+            "NUAPlot324_CaptainVKJanardhan": { status: "Paid", amount: 15000, lastPaymentDate: "2026-01-20", fiscalYear: "2026" },
+            "NUAPlot43_AkshaySubbaramu": { status: "Pending", amount: 0, lastPaymentDate: "N/A", fiscalYear: "2026" },
+            "NUAPlot78_GeorgeJoseph": { status: "Paid", amount: 15000, lastPaymentDate: "2026-03-25", fiscalYear: "2026" },
+            "NUAPlot95_VKNayar": { status: "Paid", amount: 15000, lastPaymentDate: "2026-02-14", fiscalYear: "2026" },
+            "NUAPlot100_Ravinderkumar_Ahuja": { status: "Pending", amount: 0, lastPaymentDate: "N/A", fiscalYear: "2026" },
+            "NUAPlot148_RaghuHS": { status: "Paid", amount: 15000, lastPaymentDate: "2026-03-18", fiscalYear: "2026" },
+            "NUAPlot162_AravindPadmanabhan": { status: "Paid", amount: 15000, lastPaymentDate: "2026-03-22", fiscalYear: "2026" },
+            "NUAPlot163_KavithaDevarapali": { status: "GracePeriod", amount: 10000, lastPaymentDate: "2026-05-01", fiscalYear: "2026" },
+            "NUAPlot166_Uday_Ramachandran": { status: "Paid", amount: 15000, lastPaymentDate: "2026-03-30", fiscalYear: "2026" },
+            "NUAPlot201_RahulG": { status: "Paid", amount: 15000, lastPaymentDate: "2026-03-12", fiscalYear: "2026" },
+            "NUAPlot207_Shruthi": { status: "Pending", amount: 0, lastPaymentDate: "N/A", fiscalYear: "2026" },
+            "NUAPlot326_LathikaKrishnan": { status: "Paid", amount: 15000, lastPaymentDate: "2026-02-10", fiscalYear: "2026" },
+            "NUAPlot96_JashPalKhillon": { status: "Paid", amount: 15000, lastPaymentDate: "2026-03-29", fiscalYear: "2026" },
+            "NUAPlot153_JeanCarlyneRao": { status: "Paid", amount: 15000, lastPaymentDate: "2026-03-15", fiscalYear: "2026" },
+            "NUAPlot159_AngarajPalKhillan_": { status: "GracePeriod", amount: 7500, lastPaymentDate: "2026-04-18", fiscalYear: "2026" },
+            "NUAPlot160__AngarajPalKhillan": { status: "Paid", amount: 15000, lastPaymentDate: "2026-03-22", fiscalYear: "2026" },
+            "NUAPlot313_SubbaramanN": { status: "Paid", amount: 15000, lastPaymentDate: "2026-03-28", fiscalYear: "2026" }
+        };
+
+        let heatmapActive = false;
+        let welfareData = MOCK_WELFARE_DATA;
+
+        btn.addEventListener('click', () => { modal.style.display = 'flex'; });
+        closeBtn.addEventListener('click', () => { modal.style.display = 'none'; resetView(); });
+        resetBtn.addEventListener('click', () => resetView());
+
+        function applyHeatmapColors(svgDoc) {
+            svgDoc.querySelectorAll('[id]').forEach(el => {
+                if (el.id.startsWith('NUAPlot')) {
+                    if (searchDropdown.value === el.id) {
+                        // Maintain selected glowing highlights
+                        el.style.fill = "rgba(255, 200, 0, 0.45)";
+                        el.style.stroke = "#ff5722";
+                        el.style.strokeWidth = "3px";
+                        return;
+                    }
+
+                    const info = welfareData[el.id];
+                    if (info) {
+                        if (info.status === "Paid") {
+                            el.style.fill = "rgba(102, 187, 106, 0.45)";
+                            el.style.stroke = "#66BB6A";
+                            el.style.strokeWidth = "2px";
+                        } else if (info.status === "GracePeriod") {
+                            el.style.fill = "rgba(255, 167, 38, 0.45)";
+                            el.style.stroke = "#ffa726";
+                            el.style.strokeWidth = "2px";
+                        } else if (info.status === "Pending") {
+                            el.style.fill = "rgba(239, 83, 80, 0.45)";
+                            el.style.stroke = "#ef5350";
+                            el.style.strokeWidth = "2.5px";
+                        }
+                    } else {
+                        // Unallocated / No data plot
+                        el.style.fill = "rgba(255, 255, 255, 0.1)";
+                        el.style.stroke = "rgba(255, 255, 255, 0.25)";
+                        el.style.strokeWidth = "1px";
+                    }
+                }
+            });
+        }
+
+        async function initHeatmapToggle(svgDoc) {
+            const heatmapToggle = document.getElementById('heatmapToggle');
+            const legend = document.getElementById('heatmapLegend');
+
+            if (!heatmapToggle) return;
+
+            // Register event listener synchronously so it responds instantly on the very first click
+            heatmapToggle.addEventListener('change', (e) => {
+                heatmapActive = e.target.checked;
+                if (heatmapActive) {
+                    legend.style.display = 'flex';
+                    applyHeatmapColors(svgDoc);
+                } else {
+                    legend.style.display = 'none';
+                    svgDoc.querySelectorAll('[id]').forEach(el => {
+                        if (el.id.startsWith('NUAPlot')) {
+                            if (searchDropdown.value === el.id) return;
+                            el.style.fill = "rgba(102, 187, 106, 0.15)";
+                            el.style.stroke = "rgba(102, 187, 106, 0.5)";
+                            el.style.strokeWidth = "1.5px";
+                        }
+                    });
+                }
+            });
+
+            // Attempt background fetch of live data in parallel
+            try {
+                const response = await fetch(`${GAS_URL}?action=getWelfareStatus`);
+                if (response.ok) {
+                    const liveData = await response.json();
+                    // Validate that the returned data is an object mapping plot IDs to status values
+                    if (liveData && typeof liveData === 'object' && !Array.isArray(liveData) && Object.keys(liveData).some(k => k.startsWith('NUAPlot'))) {
+                        welfareData = liveData;
+                        console.log("Welfare heatmap data loaded successfully from live server:", welfareData);
+                        // Refresh the map colors with the new live data if the toggle was already enabled early
+                        if (heatmapActive) {
+                            applyHeatmapColors(svgDoc);
+                        }
+                    } else {
+                        console.log("Live API is active but action=getWelfareStatus returned no mapping. Falling back to layout mock database.");
+                    }
+                }
+            } catch (err) {
+                console.log("Using local offline database for welfare collection status heatmap:", err);
+            }
+        }
+
+        function getViewportGroup(svgDoc) {
+            return svgDoc.getElementById('viewportGroup');
+        }
+
+        function updateRadar() {
+            const radarViewport = document.getElementById('radarViewport');
+            if (!radarViewport) return;
+            
+            const radarSize = 120;
+            const svgWidth = 1500;
+            const svgHeight = 1500;
+            
+            const screenW = mapObj.clientWidth || 1;
+            const screenH = mapObj.clientHeight || 1;
+            
+            // Visible width and height in SVG coordinates
+            const visibleW_SVG = svgWidth / scale;
+            const visibleH_SVG = visibleW_SVG * (screenH / screenW);
+            
+            // Scaled down to radar pixels (radarSize = 120 represents 1500 SVG units)
+            const w = (visibleW_SVG * radarSize) / svgWidth;
+            const h = (visibleH_SVG * radarSize) / svgHeight;
+            
+            // Top-left corner of screen viewport in SVG coordinates
+            const left_SVG = -posX / scale;
+            const top_SVG = -posY / scale;
+            
+            // Map to radar pixels
+            const l = (left_SVG * radarSize) / svgWidth;
+            const t = (top_SVG * radarSize) / svgHeight;
+            
+            radarViewport.style.width = `${Math.max(2, Math.min(w, radarSize * 4))}px`;
+            radarViewport.style.height = `${Math.max(2, Math.min(h, radarSize * 4))}px`;
+            radarViewport.style.left = `${l}px`;
+            radarViewport.style.top = `${t}px`;
+        }
+
+        window.addEventListener('resize', () => {
+            updateRadar();
+        });
+
+        function updateTransform(svgDoc) {
+            const viewport = getViewportGroup(svgDoc);
+            if (viewport) {
+                viewport.setAttribute("transform", `translate(${posX},${posY}) scale(${scale})`);
+            }
+            updateRadar();
+        }
+
+        function resetView() {
+            scale = 1; posX = 0; posY = 0;
+            if (mapObj.contentDocument) {
+                const svgDoc = mapObj.contentDocument;
+                if (heatmapActive) {
+                    applyHeatmapColors(svgDoc);
+                } else {
+                    svgDoc.querySelectorAll('[id]').forEach(el => {
+                        if (el.id.startsWith('NUAPlot')) {
+                            el.style.fill = "rgba(102, 187, 106, 0.15)";
+                            el.style.stroke = "rgba(102, 187, 106, 0.5)";
+                            el.style.strokeWidth = "1.5px";
+                        }
+                    });
+                }
+                updateTransform(svgDoc);
+            }
+            searchDropdown.value = "";
+            const mapSearchInput = document.getElementById('mapSearchInput');
+            if (mapSearchInput) mapSearchInput.value = "";
+        }
+
+        // Fullscreen
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                modal.requestFullscreen().catch(err => {
+                    console.error("Error attempting to enable full-screen mode:", err);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                fullscreenBtn.textContent = 'Exit Fullscreen';
+            } else {
+                fullscreenBtn.textContent = 'Fullscreen';
+            }
+        });
+
+        mapObj.addEventListener('load', () => {
+            const svgDoc = mapObj.contentDocument;
+            initHeatmapToggle(svgDoc);
+
+            // Populate dropdown with sorted Plot IDs
+            const allPlots = Array.from(svgDoc.querySelectorAll('[id]')).filter(el => el.id.startsWith('NUAPlot'));
+
+            // Set initial light green styles for all plots
+            allPlots.forEach(el => {
+                el.style.fill = "rgba(102, 187, 106, 0.15)";
+                el.style.stroke = "rgba(102, 187, 106, 0.5)";
+                el.style.strokeWidth = "1.5px";
+            });
+
+            if (allPlots.length === 0) {
+                const searchContainer = document.querySelector('.search-container');
+                if (searchContainer) searchContainer.style.display = "none";
+            } else {
+                // Map plot elements to structured search list
+                const searchData = allPlots.map(el => {
+                    const id = el.id;
+                    const plotNumMatch = id.match(/\d+/);
+                    const plotNum = plotNumMatch ? plotNumMatch[0] : "";
+                    
+                    let owner = "";
+                    const parts = id.split(/_+/);
+                    if (parts.length > 1) {
+                        owner = parts.slice(1).join(" ").trim();
+                    }
+                    const formattedOwner = owner.replace(/([A-Z])/g, ' $1').trim().replace(/\s+/g, ' ');
+                    
+                    return {
+                        id: id,
+                        plotNum: plotNum,
+                        owner: formattedOwner,
+                        display: `NUA Plot ${plotNum}` + (formattedOwner ? ` - ${formattedOwner}` : "")
+                    };
+                }).sort((a, b) => {
+                    const numA = parseInt(a.plotNum, 10) || 0;
+                    const numB = parseInt(b.plotNum, 10) || 0;
+                    return numA - numB;
+                });
+
+                const mapSearchInput = document.getElementById('mapSearchInput');
+                const mapSearchResults = document.getElementById('mapSearchResults');
+                let activeIndex = -1;
+
+                function renderResults(filtered) {
+                    mapSearchResults.innerHTML = "";
+                    if (filtered.length === 0) {
+                        mapSearchResults.style.display = "none";
+                        return;
+                    }
+
+                    filtered.forEach((item, idx) => {
+                        const div = document.createElement('div');
+                        div.className = "search-result-item";
+                        div.textContent = item.display;
+                        
+                        div.addEventListener('click', () => {
+                            selectItem(item);
+                        });
+                        mapSearchResults.appendChild(div);
+                    });
+
+                    mapSearchResults.style.display = "block";
+                    activeIndex = -1;
+                }
+
+                function selectItem(item) {
+                    mapSearchInput.value = item.display;
+                    searchDropdown.value = item.id;
+                    mapSearchResults.style.display = "none";
+                    searchDropdown.dispatchEvent(new Event('change'));
+                    mapSearchInput.blur();
+                }
+
+                mapSearchInput.addEventListener('input', (e) => {
+                    const val = e.target.value.toLowerCase().trim();
+                    if (!val) {
+                        mapSearchResults.style.display = "none";
+                        searchDropdown.value = "";
+                        searchDropdown.dispatchEvent(new Event('change'));
+                        return;
+                    }
+
+                    const filtered = searchData.filter(item => {
+                        return item.plotNum.includes(val) || item.owner.toLowerCase().includes(val);
+                    });
+
+                    renderResults(filtered);
+                });
+
+                mapSearchInput.addEventListener('focus', () => {
+                    const val = mapSearchInput.value.toLowerCase().trim();
+                    if (val) {
+                        const filtered = searchData.filter(item => {
+                            return item.plotNum.includes(val) || item.owner.toLowerCase().includes(val);
+                        });
+                        renderResults(filtered);
+                    }
+                });
+
+                // Keyboard navigation
+                mapSearchInput.addEventListener('keydown', (e) => {
+                    const items = mapSearchResults.querySelectorAll('.search-result-item');
+                    if (items.length === 0) return;
+
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        activeIndex = (activeIndex + 1) % items.length;
+                        updateActiveItem(items);
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        activeIndex = (activeIndex - 1 + items.length) % items.length;
+                        updateActiveItem(items);
+                    } else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const val = mapSearchInput.value.toLowerCase().trim();
+                        const filtered = searchData.filter(item => {
+                            return item.plotNum.includes(val) || item.owner.toLowerCase().includes(val);
+                        });
+
+                        if (activeIndex >= 0 && activeIndex < items.length) {
+                            items[activeIndex].click();
+                        } else if (filtered.length > 0) {
+                            selectItem(filtered[0]);
+                        }
+                    } else if (e.key === 'Escape') {
+                        mapSearchResults.style.display = 'none';
+                        mapSearchInput.blur();
+                    }
+                });
+
+                function updateActiveItem(items) {
+                    items.forEach((item, idx) => {
+                        if (idx === activeIndex) {
+                            item.classList.add('active');
+                            item.scrollIntoView({ block: 'nearest' });
+                        } else {
+                            item.classList.remove('active');
+                        }
+                    });
+                }
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!mapSearchInput.contains(e.target) && !mapSearchResults.contains(e.target)) {
+                        mapSearchResults.style.display = "none";
+                    }
+                });
+
+                // Listen to main searchDropdown change to update visual text and map highlighting/zoom
+                searchDropdown.addEventListener('change', () => {
+                    const query = searchDropdown.value;
+                    if (heatmapActive) {
+                        applyHeatmapColors(svgDoc);
+                    } else {
+                        // Reset all other plot styles to default light green
+                        allPlots.forEach(el => {
+                            el.style.fill = "rgba(102, 187, 106, 0.15)";
+                            el.style.stroke = "rgba(102, 187, 106, 0.5)";
+                            el.style.strokeWidth = "1.5px";
+                        });
+                    }
+
+                    if (query) {
+                        const target = svgDoc.getElementById(query);
+                        if (target) {
+                            target.style.fill = "rgba(255, 200, 0, 0.45)";
+                            target.style.stroke = "#ff5722";
+                            target.style.strokeWidth = "3px";
+
+                            // Sync visual search input
+                            const match = searchData.find(item => item.id === query);
+                            if (match) {
+                                mapSearchInput.value = match.display;
+                            }
+
+                            const bbox = target.getBBox();
+                            const centerX = bbox.x + bbox.width / 2;
+                            const centerY = bbox.y + bbox.height / 2;
+
+                            scale = 2.5;
+                            const svgWidth = 1500;
+                            const svgHeight = 1500;
+                            posX = svgWidth / 2 - centerX * scale;
+                            posY = svgHeight / 2 - centerY * scale;
+                            updateTransform(svgDoc);
+                        }
+                    } else {
+                        mapSearchInput.value = "";
+                    }
+                });
+            }
+
+            // Zoom buttons centered mathematically
+            zoomInBtn.addEventListener('click', () => {
+                const oldScale = scale;
+                scale = Math.min(scale * 1.3, 10);
+                const ratio = scale / oldScale;
+                const svgWidth = 1500;
+                const svgHeight = 1500;
+                posX = svgWidth / 2 - (svgWidth / 2 - posX) * ratio;
+                posY = svgHeight / 2 - (svgHeight / 2 - posY) * ratio;
+                updateTransform(svgDoc);
+            });
+
+            zoomOutBtn.addEventListener('click', () => {
+                const oldScale = scale;
+                scale = Math.max(scale / 1.3, 0.5);
+                const ratio = scale / oldScale;
+                const svgWidth = 1500;
+                const svgHeight = 1500;
+                posX = svgWidth / 2 - (svgWidth / 2 - posX) * ratio;
+                posY = svgHeight / 2 - (svgHeight / 2 - posY) * ratio;
+                updateTransform(svgDoc);
+            });
+
+            // Mathematically 1:1 Dragging/Panning inside the SVG Document context
+            svgDoc.addEventListener('mousedown', e => {
+                isDragging = true;
+                startClientX = e.clientX;
+                startClientY = e.clientY;
+                startPosX = posX;
+                startPosY = posY;
+                svgDoc.documentElement.style.cursor = 'grabbing';
+                wrapper.style.cursor = 'grabbing';
+            });
+
+            svgDoc.addEventListener('mouseup', () => {
+                isDragging = false;
+                svgDoc.documentElement.style.cursor = 'grab';
+                wrapper.style.cursor = 'grab';
+            });
+
+            svgDoc.addEventListener('mousemove', e => {
+                if (!isDragging) return;
+                const deltaX = e.clientX - startClientX;
+                const deltaY = e.clientY - startClientY;
+
+                const svgWidth = 1500;
+                const svgHeight = 1500;
+                const scaleFactorX = svgWidth / mapObj.clientWidth;
+                const scaleFactorY = svgHeight / mapObj.clientHeight;
+
+                posX = startPosX + (deltaX * scaleFactorX) / scale;
+                posY = startPosY + (deltaY * scaleFactorY) / scale;
+
+                updateTransform(svgDoc);
+            });
+
+            // Add support for wheel zoom
+            svgDoc.addEventListener('wheel', e => {
+                e.preventDefault();
+                const zoomFactor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+                const oldScale = scale;
+                scale = Math.max(0.5, Math.min(scale * zoomFactor, 10));
+
+                const ratio = scale / oldScale;
+                const svgWidth = 1500;
+                const svgHeight = 1500;
+                posX = svgWidth / 2 - (svgWidth / 2 - posX) * ratio;
+                posY = svgHeight / 2 - (svgHeight / 2 - posY) * ratio;
+
+                updateTransform(svgDoc);
+            }, { passive: false });
+
+            // Create tooltip element in the main document
+            const tooltip = document.createElement('div');
+            tooltip.className = 'map-tooltip';
+            document.body.appendChild(tooltip);
+
+            // Set up hover highlights, tooltips and clicking on the map
+            allPlots.forEach(el => {
+                el.addEventListener('mouseenter', e => {
+                    let text = el.id.replace('NUAPlot', 'NUA Plot ').replace('_', ' - ');
+                    
+                    if (heatmapActive) {
+                        const info = welfareData[el.id];
+                        if (info) {
+                            const statusStr = info.status === "GracePeriod" ? "Grace Period" : info.status;
+                            text += ` (${statusStr} - Paid: ₹${info.amount.toLocaleString()})`;
+                        } else {
+                            text += ` (Unregistered Plot)`;
+                        }
+                    }
+
+                    tooltip.textContent = text;
+                    tooltip.style.display = 'block';
+
+                    if (searchDropdown.value !== el.id) {
+                        if (heatmapActive) {
+                            const info = welfareData[el.id];
+                            if (info) {
+                                if (info.status === "Paid") {
+                                    el.style.fill = "rgba(102, 187, 106, 0.65)"; // brighter transparent green on hover
+                                } else if (info.status === "GracePeriod") {
+                                    el.style.fill = "rgba(255, 167, 38, 0.65)"; // brighter transparent orange on hover
+                                } else if (info.status === "Pending") {
+                                    el.style.fill = "rgba(239, 83, 80, 0.65)"; // brighter transparent red on hover
+                                }
+                            } else {
+                                el.style.fill = "rgba(255, 255, 255, 0.25)";
+                            }
+                        } else {
+                            el.style.fill = "rgba(102, 187, 106, 0.35)"; // Revert back to standard bright hover green
+                            el.style.stroke = "#66BB6A"; // Brand green stroke
+                            el.style.strokeWidth = "2px";
+                        }
+                        el.style.cursor = "pointer";
+                    }
+                });
+
+                el.addEventListener('mousemove', e => {
+                    const rect = mapObj.getBoundingClientRect();
+                    tooltip.style.left = (rect.left + e.clientX + 15) + 'px';
+                    tooltip.style.top = (rect.top + e.clientY + 15) + 'px';
+                });
+
+                el.addEventListener('mouseleave', () => {
+                    tooltip.style.display = 'none';
+                    if (searchDropdown.value !== el.id) {
+                        if (heatmapActive) {
+                            const info = welfareData[el.id];
+                            if (info) {
+                                if (info.status === "Paid") {
+                                    el.style.fill = "rgba(102, 187, 106, 0.45)";
+                                    el.style.stroke = "#66BB6A";
+                                    el.style.strokeWidth = "2px";
+                                } else if (info.status === "GracePeriod") {
+                                    el.style.fill = "rgba(255, 167, 38, 0.45)";
+                                    el.style.stroke = "#ffa726";
+                                    el.style.strokeWidth = "2px";
+                                } else if (info.status === "Pending") {
+                                    el.style.fill = "rgba(239, 83, 80, 0.45)";
+                                    el.style.stroke = "#ef5350";
+                                    el.style.strokeWidth = "2.5px";
+                                }
+                            } else {
+                                el.style.fill = "rgba(255, 255, 255, 0.1)";
+                                el.style.stroke = "rgba(255, 255, 255, 0.25)";
+                                el.style.strokeWidth = "1px";
+                            }
+                        } else {
+                            el.style.fill = "rgba(102, 187, 106, 0.15)"; // Revert back to light green fill
+                            el.style.stroke = "rgba(102, 187, 106, 0.5)"; // Revert back to light green stroke
+                            el.style.strokeWidth = "1.5px";
+                        }
+                    }
+                });
+
+                el.addEventListener('click', () => {
+                    searchDropdown.value = el.id;
+                    searchDropdown.dispatchEvent(new Event('change'));
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
