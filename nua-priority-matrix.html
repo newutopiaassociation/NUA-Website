@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>NUA MC Priority Viewer</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .container { display: flex; gap: 40px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    .form-section { margin-bottom: 20px; }
+    .Basic { background-color: #ffcccc; }
+    .Safety { background-color: #ffe0b3; }
+    .Community { background-color: #ccffcc; }
+    .Esteem { background-color: #cce0ff; }
+    .Growth { background-color: #e0ccff; }
+  </style>
+</head>
+<body>
+  <h2>NUA MC Priority Matrix</h2>
+  <div class="form-section">
+    <label for="email">Enter your email: </label>
+    <input type="text" id="email" placeholder="member@example.com">
+    <button onclick="fetchData()">Submit</button>
+  </div>
+
+  <div class="container">
+    <div>
+      <h3>Your Ratings</h3>
+      <table id="memberTable">
+        <thead>
+          <tr>
+            <th>Sl. No</th>
+            <th>Action Item</th>
+            <th>Your Rating</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div>
+      <h3>Overall Summary</h3>
+      <table id="summaryTable">
+        <thead>
+          <tr>
+            <th>Sl. No</th>
+            <th>Action Item</th>
+            <th>Status</th>
+            <th>Date of Adding</th>
+            <th>Date of Closure</th>
+            <th>Summary Rating</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    async function fetchData() {
+      const email = document.getElementById("email").value.trim();
+      if (!email) {
+        alert("Please enter your email.");
+        return;
+      }
+
+      const url = "https://script.google.com/macros/s/AKfycbwty7PjHXYMwPOdTFqtdd7i7akUd7uqsq0KFSKGazazxbbpEI_JQyQvD2vp3Mds1vRL/exec?email=" + encodeURIComponent(email);
+
+      try {
+        //const response = await fetch(url);
+        //const data = await response.json();
+		
+		const response = await fetch(url);
+		const text = await response.text();
+		console.log(text);
+
+        // Populate member table (only 3 columns)
+        const memberBody = document.querySelector("#memberTable tbody");
+        memberBody.innerHTML = "";
+        data.forEach(row => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row["Sl. No"]}</td>
+            <td>${row["Action Item"]}</td>
+            <td>${row["Member Rating"] || "-"}</td>
+          `;
+          memberBody.appendChild(tr);
+        });
+
+        // Populate summary table (full details)
+        const summaryBody = document.querySelector("#summaryTable tbody");
+        summaryBody.innerHTML = "";
+        data.forEach(row => {
+          const ratingClass = getRatingClass(row["Summary Rating"]);
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row["Sl. No"]}</td>
+            <td>${row["Action Item"]}</td>
+            <td>${row["Status"]}</td>
+            <td>${row["Date of Adding"]}</td>
+            <td>${row["Date of Closure"]}</td>
+            <td class="${ratingClass}">${row["Summary Rating"]}</td>
+          `;
+          summaryBody.appendChild(tr);
+        });
+
+      } catch (err) {
+        console.error(err);
+        alert("Error fetching data. Please check the endpoint.");
+      }
+    }
+
+    function getRatingClass(rating) {
+      if (!rating) return "";
+      if (rating.includes("Basic")) return "Basic";
+      if (rating.includes("Safety")) return "Safety";
+      if (rating.includes("Community")) return "Community";
+      if (rating.includes("Esteem")) return "Esteem";
+      if (rating.includes("Growth")) return "Growth";
+      return "";
+    }
+  </script>
+</body>
+</html>
