@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Set Priority</title>
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <script>
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('is-embedded');
+        }
+    </script>
+    <style>
+        body { background: transparent; padding: 30px; color: var(--text-primary); }
+        .welcome-card { background: var(--bg-secondary); padding: 40px; border-radius: 12px; border: 1px solid rgba(45, 90, 39, 0.1); box-shadow: var(--shadow-soft); margin-bottom: 30px; }
+        .welcome-title { font-family: 'Outfit', sans-serif; color: var(--brand-primary); margin-bottom: 10px; font-size: 2rem; }
+        
+        .container { display: flex; flex-direction: column; gap: 20px; margin-top: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; border-radius: 8px; overflow: hidden; font-size: 0.95rem; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(130, 160, 130, 0.2); }
+        th { background-color: var(--brand-primary); color: white; font-weight: 600; }
+        
+        .btn-primary {
+            padding: 10px 20px;
+            background: var(--brand-primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-primary:hover { background: var(--brand-secondary); }
+        
+        .select-priority, .input-field {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(130, 160, 130, 0.5);
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            font-family: inherit;
+            width: 100%;
+        }
+
+        .Basic { background-color: rgba(255, 99, 71, 0.2); }
+        .Safety { background-color: rgba(255, 165, 0, 0.2); }
+        .Community { background-color: rgba(60, 179, 113, 0.2); }
+        .Esteem { background-color: rgba(100, 149, 237, 0.2); }
+        .Growth { background-color: rgba(147, 112, 219, 0.2); }
+        
+        body.moonlit-theme .welcome-card { background: var(--bg-secondary); border-color: rgba(255,255,255,0.1); }
+        body.moonlit-theme .select-priority, body.moonlit-theme .input-field { 
+            background-color: #2C3E50 !important; 
+            color: #ffffff !important; 
+            border-color: rgba(255,255,255,0.1); 
+        }
+        body.moonlit-theme th { background-color: var(--brand-secondary); }
+        body.moonlit-theme .tab-btn { color: #E0EADD; opacity: 0.6; }
+        body.moonlit-theme .tab-btn.active { color: #ffffff; border-bottom-color: #ffffff; opacity: 1; }
+
+        /* Tabs styling */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid rgba(130, 160, 130, 0.3);
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0.7;
+            white-space: nowrap;
+        }
+        .tab-btn:hover { opacity: 1; }
+        .tab-btn.active {
+            opacity: 1;
+            color: var(--brand-primary);
+            border-bottom-color: var(--brand-primary);
+            font-weight: 600;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="moonlit-theme">
+    <div class="welcome-card animate-slide-up">
+        <h1 class="welcome-title">Set Priority</h1>
+
+        <div id="error-message" style="color: #ff6b6b; display: none; margin-bottom: 15px;"></div>
+
+        <div class="container" id="data-container">
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="openTab('tab-summary', this)">Overall Summary</button>
+                <button class="tab-btn" onclick="openTab('tab-ratings', this)">Your Ratings</button>
+                <button class="tab-btn" onclick="openTab('tab-definitions', this)">Definitions</button>
+                <button class="tab-btn" id="admin-tab-btn" onclick="openTab('tab-admin', this)" style="display: none; color: #ff9800;">Admin Area</button>
+            </div>
+
+            <!-- Tab 1: Overall Summary -->
+            <div id="tab-summary" class="tab-content active">
+                <div id="summary-loading" style="margin-bottom: 15px; opacity: 0.8;">Loading summary data...</div>
+                <table id="summaryTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">Sl. No</th>
+                            <th>Action Item</th>
+                            <th>Status</th>
+                            <th>Date of Adding</th>
+                            <th>Date of Closure</th>
+                            <th>Summary Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- Tab 2: Your Ratings -->
+            <div id="tab-ratings" class="tab-content">
+                <div id="member-controls" style="margin-bottom: 20px;">
+                    <p>Load your specific action items to edit priorities.</p>
+                    <button class="btn-primary" id="btn-load-member" onclick="fetchMemberData()">Load My Action Items</button>
+                </div>
+                <table id="memberTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">Sl. No</th>
+                            <th>Action Item</th>
+                            <th style="width: 250px;">Your Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div id="member-update-section" style="margin-top: 20px; text-align: right; display: none;">
+                    <button class="btn-primary" id="btn-update" onclick="updatePriority()">Update Priority</button>
+                </div>
+            </div>
+
+            <!-- Tab 3: Definitions -->
+            <div id="tab-definitions" class="tab-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 200px;">Priority Tier</th>
+                            <th>Definition</th>
+                            <th>Criteria for Classification</th>
+                            <th>Closure (General) Guideline</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="Basic">
+                            <td><strong>Basic / Survival Needs</strong></td>
+                            <td>🛡️ Shield & Gavel – Protects legal identity and ensures essential utilities</td>
+                            <td>- Legal compliance (Registrar, caveats)<br>- Security of association rights<br>- Essential services (electricity, sewage, water)</td>
+                            <td>Close within 1 week – These are existential and cannot be delayed</td>
+                        </tr>
+                        <tr class="Safety">
+                            <td><strong>Safety & Stability Needs</strong></td>
+                            <td>🏢 Office & Ledger – Provides organizational stability and financial continuity</td>
+                            <td>- Financial inflows/outflows<br>- Securing office space<br>- Governance tools for risk prevention</td>
+                            <td>Close within 2 weeks – Stabilization tasks should be resolved quickly</td>
+                        </tr>
+                        <tr class="Community">
+                            <td><strong>Community & Belonging Needs</strong></td>
+                            <td>🌱 Tree & Fence – Strengthens shared infrastructure and collective participation</td>
+                            <td>- Projects benefiting multiple members<br>- Shared facilities/environmental initiatives<br>- Maintenance tools/logistics</td>
+                            <td>Close within 1 month – Requires coordination but should not linger</td>
+                        </tr>
+                        <tr class="Esteem">
+                            <td><strong>Esteem Needs</strong></td>
+                            <td>✒️ Stamp & Document – Formalizes authority and recognition</td>
+                            <td>- Tools symbolizing legitimacy<br>- Enhances trust in official dealings</td>
+                            <td>Close within 1–2 months – Important for credibility, but less urgent</td>
+                        </tr>
+                        <tr class="Growth">
+                            <td><strong>Growth / Self‑Actualization</strong></td>
+                            <td>🚀 Lightbulb & Digital Screen – Drives innovation and modernization</td>
+                            <td>- Pilots/demos of new systems<br>- Digital transformation initiatives<br>- Long‑term capability building</td>
+                            <td>Close within 3 months – Future‑oriented, can be phased</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tab 4: Admin -->
+            <div id="tab-admin" class="tab-content">
+                <div style="margin-bottom: 15px; padding: 15px; background: rgba(255, 152, 0, 0.1); border-left: 4px solid #ff9800; border-radius: 4px;">
+                    <strong>Admin Mode:</strong> You can add new action items to the matrix below.
+                </div>
+                <table id="adminTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">Sl. No</th>
+                            <th>Action Item</th>
+                            <th>Status</th>
+                            <th>Date of Adding</th>
+                            <th>Date of Closure</th>
+                            <th>Summary Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                    <tfoot>
+                        <tr style="background: rgba(45, 90, 39, 0.05);">
+                            <td><input type="text" id="add-slno" class="input-field" placeholder="Auto/New"></td>
+                            <td><input type="text" id="add-action" class="input-field" placeholder="Enter new action item"></td>
+                            <td>
+                                <select id="add-status" class="select-priority">
+                                    <option value="Open">Open</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Closed">Closed</option>
+                                </select>
+                            </td>
+                            <td><input type="date" id="add-date-adding" class="input-field"></td>
+                            <td><input type="date" id="add-date-closure" class="input-field"></td>
+                            <td>
+                                <select id="add-summary-rating" class="select-priority">
+                                    <option value="">-- Select --</option>
+                                    <option value="Basic Needs">Basic Needs</option>
+                                    <option value="Safety Needs">Safety Needs</option>
+                                    <option value="Community Needs">Community Needs</option>
+                                    <option value="Esteem Needs">Esteem Needs</option>
+                                    <option value="Growth Needs">Growth Needs</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div style="margin-top: 20px; text-align: right;">
+                    <p style="font-size: 0.85rem; color: #ff9800; margin-bottom: 8px;">Endpoint integration ready for Google Apps Script to write to 'table1 in input sheet' with formulas.</p>
+                    <button class="btn-primary" id="btn-add" style="background: #ff9800;" onclick="addActionItem()">Add Action Item</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbwty7PjHXYMwPOdTFqtdd7i7akUd7uqsq0KFSKGazazxbbpEI_JQyQvD2vp3Mds1vRL/exec"; 
+        const ADMIN_EMAILS = ["ecirams@gmail.com"];
+
+        const PRIORITY_OPTIONS = [
+            "",
+            "Basic Needs",
+            "Safety Needs",
+            "Community Needs",
+            "Esteem Needs",
+            "Growth Needs"
+        ];
+
+        function getUserEmail() {
+            try {
+                const sessionStr = sessionStorage.getItem('nua_auth');
+                if (sessionStr) {
+                    const session = JSON.parse(sessionStr);
+                    if (session.profile && session.profile.email) {
+                        return session.profile.email;
+                    }
+                }
+            } catch (e) {
+                console.error("Error reading session:", e);
+            }
+            return null;
+        }
+
+        function checkAdminAccess(email) {
+            if (email && ADMIN_EMAILS.includes(email.toLowerCase())) {
+                document.getElementById('admin-tab-btn').style.display = 'inline-block';
+            } else {
+                document.getElementById('admin-tab-btn').style.display = 'none';
+            }
+        }
+
+        function openTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            if(btn) btn.classList.add('active');
+        }
+
+        function formatDateOnly(dateString) {
+            if (!dateString) return "-";
+            try {
+                const d = new Date(dateString);
+                if (isNaN(d.getTime())) return dateString; // Fallback if invalid
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        // Fetch Overall Summary (mode=summary)
+        async function fetchSummaryData() {
+            const errorDiv = document.getElementById("error-message");
+            errorDiv.style.display = "none";
+            
+            // Check admin access proactively
+            const email = getUserEmail();
+            checkAdminAccess(email);
+
+            const url = `${API_URL}?mode=summary`;
+
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                let data = [];
+                try {
+                    data = JSON.parse(text);
+                } catch(e) {
+                    console.error("JSON parse error:", e);
+                    // Hide loading text on error
+                    document.getElementById("summary-loading").style.display = "none";
+                    errorDiv.textContent = "Error parsing summary data from server. Ensure the Apps Script endpoint is correctly handling mode=summary.";
+                    errorDiv.style.display = "block";
+                    return;
+                }
+
+                document.getElementById("summary-loading").style.display = "none";
+                document.getElementById("summaryTable").style.display = "table";
+
+                const summaryBody = document.querySelector("#summaryTable tbody");
+                const adminBody = document.querySelector("#adminTable tbody");
+                
+                summaryBody.innerHTML = "";
+                adminBody.innerHTML = "";
+                
+                data.forEach(row => {
+                    const ratingClass = getRatingClass(row["Summary Rating"]);
+                    const trSum = document.createElement("tr");
+                    trSum.innerHTML = `
+                        <td>${row["Sl. No"] || ""}</td>
+                        <td>${row["Action Item"] || ""}</td>
+                        <td>${row["Status"] || "-"}</td>
+                        <td>${formatDateOnly(row["Date of Adding"])}</td>
+                        <td>${formatDateOnly(row["Date of Closure"])}</td>
+                        <td class="${ratingClass}">${row["Summary Rating"] || "-"}</td>
+                    `;
+                    summaryBody.appendChild(trSum);
+                    adminBody.appendChild(trSum.cloneNode(true));
+                });
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById("summary-loading").style.display = "none";
+                errorDiv.textContent = "Error fetching summary data. Please check your network or endpoint configuration.";
+                errorDiv.style.display = "block";
+            }
+        }
+
+        // Fetch Member Specific Ratings (mode=member)
+        async function fetchMemberData() {
+            const email = getUserEmail();
+            const errorDiv = document.getElementById("error-message");
+            const btn = document.getElementById("btn-load-member");
+            
+            if (!email) {
+                errorDiv.textContent = "Unable to retrieve your email from the session. Please ensure you are signed in.";
+                errorDiv.style.display = "block";
+                return;
+            }
+
+            errorDiv.style.display = "none";
+            btn.innerHTML = `Loading <span class="loading-spinner"></span>`;
+            btn.disabled = true;
+
+            const url = `${API_URL}?mode=member&email=` + encodeURIComponent(email);
+
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                let data = [];
+                try {
+                    data = JSON.parse(text);
+                } catch(e) {
+                    console.error("JSON parse error:", e);
+                    errorDiv.textContent = "Error parsing member data. Ensure the Apps Script endpoint is correctly handling mode=member.";
+                    errorDiv.style.display = "block";
+                    btn.innerHTML = "Load My Action Items";
+                    btn.disabled = false;
+                    return;
+                }
+
+                document.getElementById("member-controls").style.display = "none";
+                document.getElementById("memberTable").style.display = "table";
+                document.getElementById("member-update-section").style.display = "block";
+
+                const memberBody = document.querySelector("#memberTable tbody");
+                memberBody.innerHTML = "";
+                
+                data.forEach(row => {
+                    const trMem = document.createElement("tr");
+                    let selectHtml = `<select class="select-priority rating-select" data-sl="${row["Sl. No"]}">`;
+                    PRIORITY_OPTIONS.forEach(opt => {
+                        const selected = (row["Member Rating"] === opt) ? "selected" : "";
+                        selectHtml += `<option value="${opt}" ${selected}>${opt || "-- Select --"}</option>`;
+                    });
+                    selectHtml += `</select>`;
+                    trMem.innerHTML = `<td>${row["Sl. No"] || ""}</td><td>${row["Action Item"] || ""}</td><td>${selectHtml}</td>`;
+                    memberBody.appendChild(trMem);
+                });
+
+            } catch (err) {
+                console.error(err);
+                errorDiv.textContent = "Error fetching member data. Please check your network or endpoint configuration.";
+                errorDiv.style.display = "block";
+                btn.innerHTML = "Load My Action Items";
+                btn.disabled = false;
+            }
+        }
+
+        // Update Priority (POST method per specification)
+        async function updatePriority() {
+            const email = getUserEmail();
+            if (!email) {
+                alert("Cannot update. User email not found in session.");
+                return;
+            }
+
+            const selects = document.querySelectorAll(".rating-select");
+            const updates = [];
+            selects.forEach(select => {
+                updates.push({
+                    "Sl. No": select.getAttribute("data-sl"),
+                    "Member Rating": select.value
+                });
+            });
+
+            const btn = document.getElementById("btn-update");
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `Updating <span class="loading-spinner"></span>`;
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ email, updates })
+                });
+
+                if (response.ok) {
+                    alert("Priorities updated successfully!");
+                } else {
+                    alert("Failed to update priorities.");
+                }
+            } catch (err) {
+                console.error("Error updating priorities:", err);
+                alert("An error occurred while updating priorities. Check console for details.");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Add Action Item via Admin (POST)
+        async function addActionItem() {
+            const slNo = document.getElementById('add-slno').value.trim();
+            const actionItem = document.getElementById('add-action').value.trim();
+            const status = document.getElementById('add-status').value;
+            const dateAdding = document.getElementById('add-date-adding').value;
+            const dateClosure = document.getElementById('add-date-closure').value;
+            const summaryRating = document.getElementById('add-summary-rating').value;
+
+            if (!actionItem) {
+                alert("Please enter an Action Item.");
+                return;
+            }
+
+            const payload = {
+                "action": "ADD_ITEM",
+                "email": getUserEmail(),
+                "Sl. No": slNo,
+                "Action Item": actionItem,
+                "Status": status,
+                "Date of Adding": dateAdding,
+                "Date of Closure": dateClosure,
+                "Summary Rating": summaryRating
+            };
+
+            const btn = document.getElementById("btn-add");
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `Adding <span class="loading-spinner"></span>`;
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert("Action Item added successfully! (Make sure Apps Script handles 'table1 in input sheet' formulas)");
+                    // Clear inputs
+                    document.getElementById('add-slno').value = '';
+                    document.getElementById('add-action').value = '';
+                    document.getElementById('add-date-adding').value = '';
+                    document.getElementById('add-date-closure').value = '';
+                    document.getElementById('add-summary-rating').value = '';
+                    fetchSummaryData(); // Refresh summary table
+                } else {
+                    alert("Failed to add action item.");
+                }
+            } catch (err) {
+                console.error("Error adding item:", err);
+                alert("An error occurred while adding the item.");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function getRatingClass(rating) {
+            if (!rating) return "";
+            if (rating.includes("Basic")) return "Basic";
+            if (rating.includes("Safety")) return "Safety";
+            if (rating.includes("Community")) return "Community";
+            if (rating.includes("Esteem")) return "Esteem";
+            if (rating.includes("Growth")) return "Growth";
+            return "";
+        }
+
+        // Initialize: Load Summary data automatically on load
+        document.addEventListener('DOMContentLoaded', fetchSummaryData);
+
+    </script>
+</body>
+</html>

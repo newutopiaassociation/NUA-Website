@@ -82,7 +82,9 @@
             tbody.innerHTML = `<tr><td colspan="2"><div class="loader-container">Fetching documents...</div></td></tr>`;
 
             try {
-                const response = await fetch(`${GAS_URL}?folder=${folderKey}`);
+                const token = sessionStorage.getItem('nua_token');
+                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+                const response = await fetch(`${GAS_URL}?folder=${folderKey}`, { headers });
                 const files = await response.json();
 
                 tbody.innerHTML = ""; // clear old rows

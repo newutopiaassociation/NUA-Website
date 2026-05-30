@@ -1,7 +1,26 @@
-// auth.js
-// Basic Authentication Overlay for NUA Members Resources
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { 
+    getAuth, 
+    onAuthStateChanged, 
+    GoogleAuthProvider, 
+    signInWithPopup, 
+    signInWithEmailAndPassword, 
+    signOut 
+} from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
-const GOOGLE_CLIENT_ID = "772239537570-70m35m5h0190abucrk4b4lggqn45jtgc.apps.googleusercontent.com"; // Placeholder for the actual client ID
+const firebaseConfig = {
+  apiKey: "AIzaSyAHhNq8KFSj7Q57_N4hSoHoGiefl6K3jUc",
+  authDomain: "nua-mc-spa.firebaseapp.com",
+  projectId: "nua-mc-spa",
+  storageBucket: "nua-mc-spa.firebasestorage.app",
+  messagingSenderId: "799717145184",
+  appId: "1:799717145184:web:deda58b29874f358d72105",
+  measurementId: "G-Z813Y7500E"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
 // State
 let isAuthenticated = false;
@@ -11,7 +30,6 @@ let authTimeout = null;
 const createAuthOverlay = () => {
     const overlay = document.createElement('div');
     overlay.id = 'auth-overlay';
-    // Style directly to avoid depending on CSS loading order initially, though it will be in style.css
     overlay.style.cssText = `
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
@@ -26,6 +44,8 @@ const createAuthOverlay = () => {
 
     const isMoonlit = document.body.classList.contains('moonlit-theme');
     const textColor = isMoonlit ? '#E0EADD' : '#2C3E50';
+    const inputBg = isMoonlit ? 'rgba(255,255,255,0.05)' : '#fff';
+    const inputBorder = isMoonlit ? 'rgba(255,255,255,0.1)' : '#ccc';
 
     overlay.innerHTML = `
         <div class="auth-card" style="
@@ -41,26 +61,84 @@ const createAuthOverlay = () => {
         ">
             <img src="assets/logo.png" alt="NUA Logo" style="width: 120px; margin-bottom: 20px;">
             <h2 style="font-family: 'Outfit', sans-serif; color: var(--brand-primary, #2D5A27); margin-bottom: 10px;">MC Members Area</h2>
-            <p style="margin-bottom: 25px;">Please sign in with your Google account to access NUA MC resources.</p>
+            <p style="margin-bottom: 25px;">Please sign in to access NUA MC resources.</p>
             
-            <div id="google-signin-btn-container" style="display: flex; justify-content: center; min-height: 40px;">
-                <!-- Google Sign-In button will render here -->
-            </div>
-            
-            <div style="margin-top: 20px; font-size: 0.85rem; opacity: 0.9; line-height: 1.5;">
-                <p style="margin-bottom: 8px;"><strong>Only verified NUA MC members are authorized to view these documents.</strong></p>
-                <p style="margin-bottom: 15px;">If you are an MC member and need access, contact <a href="mailto:nua-managing-committee@googlegroups.com" style="color: var(--brand-primary, #2D5A27); text-decoration: underline;">nua-managing-committee@googlegroups.com</a></p>
-                <a href="#" onclick="window.history.length > 1 ? window.history.back() : window.location.href='index.html'; return false;" style="display: inline-block; padding: 8px 16px; background: rgba(0,0,0,0.05); border-radius: 6px; color: ${textColor}; text-decoration: none; font-weight: 600; transition: background 0.3s; border: 1px solid rgba(0,0,0,0.1);">&larr; Back to previous page</a>
+            <div id="auth-error-container" style="display: none; background: rgba(211, 47, 47, 0.1); border: 1px solid #d32f2f; color: #d32f2f; padding: 10px; border-radius: 8px; font-weight: 600; text-align: left; margin-bottom: 15px; font-size: 0.9rem;">
             </div>
 
+            <!-- Email / Password Form -->
+            <form id="email-login-form" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;">
+                <input type="email" id="auth-email" placeholder="Email Address" required style="
+                    padding: 12px;
+                    border-radius: 8px;
+                    border: 1px solid ${inputBorder};
+                    background: ${inputBg};
+                    color: ${textColor};
+                    font-size: 1rem;
+                ">
+                <input type="password" id="auth-password" placeholder="Password" required style="
+                    padding: 12px;
+                    border-radius: 8px;
+                    border: 1px solid ${inputBorder};
+                    background: ${inputBg};
+                    color: ${textColor};
+                    font-size: 1rem;
+                ">
+                <button type="submit" style="
+                    padding: 12px;
+                    background: var(--brand-primary, #2D5A27);
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 1rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: background 0.3s;
+                ">Sign In</button>
+            </form>
+
+            <div style="display: flex; align-items: center; margin: 20px 0;">
+                <div style="flex: 1; height: 1px; background: rgba(130, 160, 130, 0.3);"></div>
+                <span style="padding: 0 10px; font-size: 0.9rem; opacity: 0.7;">OR</span>
+                <div style="flex: 1; height: 1px; background: rgba(130, 160, 130, 0.3);"></div>
+            </div>
+
+            <button id="google-signin-btn" style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                width: 100%;
+                padding: 12px;
+                background: white;
+                color: #444;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                font-size: 1rem;
+                font-weight: 600;
+                cursor: pointer;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            ">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width: 18px; height: 18px;">
+                Sign in with Google
+            </button>
+            
+            <div style="margin-top: 25px; font-size: 0.85rem; opacity: 0.9; line-height: 1.5;">
+                <p style="margin-bottom: 8px;"><strong>Only verified NUA MC members are authorized to view these documents.</strong></p>
+                <p style="margin-bottom: 15px;">If you need access, contact <a href="mailto:nua-managing-committee@googlegroups.com" style="color: var(--brand-primary, #2D5A27); text-decoration: underline;">nua-managing-committee@googlegroups.com</a></p>
+                <a href="#" onclick="window.history.length > 1 ? window.history.back() : window.location.href='index.html'; return false;" style="display: inline-block; padding: 8px 16px; background: rgba(0,0,0,0.05); border-radius: 6px; color: ${textColor}; text-decoration: none; font-weight: 600; transition: background 0.3s; border: 1px solid rgba(0,0,0,0.1);">&larr; Back to previous page</a>
+            </div>
         </div>
     `;
 
     document.body.appendChild(overlay);
+
+    // Event Listeners
+    document.getElementById('email-login-form').addEventListener('submit', handleEmailLogin);
+    document.getElementById('google-signin-btn').addEventListener('click', handleGoogleLogin);
 };
 
 const ALLOWED_EMAILS = [
-    // TODO: Replace with actual emails from nua-managing-committee@googlegroups.com
     "bassraju@outlook.com",
     "ecirams@gmail.com",
     "kvchacko@gmail.com",
@@ -72,100 +150,60 @@ const ALLOWED_EMAILS = [
 ];
 
 const showErrorInModal = (message) => {
-    const btnContainer = document.getElementById('google-signin-btn-container');
-
-    // Clear the button area and show error
-    if (btnContainer) {
-        btnContainer.style.flexDirection = 'column';
-        btnContainer.innerHTML = `
-            <div style="background: rgba(211, 47, 47, 0.1); border: 1px solid #d32f2f; color: #d32f2f; padding: 15px; border-radius: 8px; font-weight: 600; text-align: left;">
-                <span style="font-size: 1.2rem; display: block; margin-bottom: 5px;">Access Restricted</span>
-                ${message}
-            </div>
-            <button onclick="window.location.reload()" style="
-                margin-top: 15px;
-                padding: 10px 20px;
-                background: var(--brand-primary, #2D5A27);
-                color: white;
-                border: none;
-                border-radius: 8px;
-                cursor: pointer;
-                font-weight: 600;
-            ">Try Another Account</button>
-        `;
+    const errorContainer = document.getElementById('auth-error-container');
+    if (errorContainer) {
+        errorContainer.style.display = 'block';
+        errorContainer.innerHTML = message;
     }
 };
 
-const handleCredentialResponse = (response) => {
-    console.log("Authentication Response received");
+const hideErrorInModal = () => {
+    const errorContainer = document.getElementById('auth-error-container');
+    if (errorContainer) {
+        errorContainer.style.display = 'none';
+        errorContainer.innerHTML = '';
+    }
+};
 
-    let payload;
-    let email = "";
+const checkAuthorization = (user) => {
+    const email = user.email || "";
+    // Allow if email ends with @nua.org OR is in the ALLOWED_EMAILS list
+    if (email.endsWith('@nua.org') || ALLOWED_EMAILS.includes(email.toLowerCase())) {
+        return true;
+    }
+    return false;
+};
+
+const handleEmailLogin = async (e) => {
+    e.preventDefault();
+    hideErrorInModal();
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
 
     try {
-        // Validating the Google JWT ID token
-        const base64Url = response.credential.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-
-        payload = JSON.parse(jsonPayload);
-        email = payload.email;
-
-        // Check expiry
-        const currentTime = Math.floor(Date.now() / 1000);
-        if (payload.exp && payload.exp < currentTime) {
-            showErrorInModal("Your login session has expired. Please sign in again.");
-            return;
-        }
-
-    } catch (e) {
-        console.error("Failed to parse or validate JWT", e);
-        showErrorInModal("Invalid authentication token. Please try signing in again.");
-        return;
+        await signInWithEmailAndPassword(auth, email, password);
+        // Authorization is handled by onAuthStateChanged
+    } catch (error) {
+        console.error("Email Login Error:", error);
+        showErrorInModal("Login failed. Please check your email and password.");
     }
+};
 
-    // Check Email Whitelist
-    if (!ALLOWED_EMAILS.includes(email)) {
-        console.warn(`Unauthorized login attempt. Email ${email} is not in the allowed list.`);
-        showErrorInModal(`This email address (${email}) is not authorized to access the Members Area. Please ensure you are signing in with your registered NUA Managing Committee email.`);
-        return;
+const handleGoogleLogin = async () => {
+    hideErrorInModal();
+    const provider = new GoogleAuthProvider();
+    try {
+        await signInWithPopup(auth, provider);
+        // Authorization is handled by onAuthStateChanged
+    } catch (error) {
+        console.error("Google Login Error:", error);
+        showErrorInModal("Google sign-in failed. Please try again.");
     }
-
-    // Authentication and Authorization successful
-    if (authTimeout) clearTimeout(authTimeout);
-    isAuthenticated = true;
-    userProfile = {
-        name: payload.name,
-        email: payload.email,
-        picture: payload.picture
-    };
-
-    // Save session
-    sessionStorage.setItem('nua_auth', JSON.stringify({
-        profile: userProfile,
-        expires: Date.now() + 1000 * 60 * 60 * 0.5 // 30 Minutes
-    }));
-
-    // Hide Overlay
-    const overlay = document.getElementById('auth-overlay');
-    if (overlay) {
-        overlay.style.opacity = '0';
-        setTimeout(() => overlay.remove(), 500); // Remove after fade out
-    }
-
-    // Update UI 
-    document.dispatchEvent(new CustomEvent('nua-auth-success', { detail: userProfile }));
-    updateUserAvatar();
 };
 
 const updateUserAvatar = () => {
-    // Update the header avatar if present (like in index.html)
-    // We'll create elements if they don't exist
     let avatarContainer = document.querySelector('.header-right');
 
-    // If we have a header but no specific right container, add it
     if (!avatarContainer) {
         const desktopControls = document.querySelector('.desktop-only-controls');
         if (desktopControls) {
@@ -176,7 +214,7 @@ const updateUserAvatar = () => {
             if (userProfile.picture) {
                 div.innerHTML = `<img src="${userProfile.picture}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--brand-primary); margin-right: 10px;">`;
             } else {
-                const initial = userProfile.name ? userProfile.name.charAt(0).toUpperCase() : 'U';
+                const initial = userProfile.name ? userProfile.name.charAt(0).toUpperCase() : (userProfile.email ? userProfile.email.charAt(0).toUpperCase() : 'U');
                 div.innerHTML = `<div style="width: 32px; height: 32px; border-radius: 50%; background: var(--brand-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 10px;">${initial}</div>`;
             }
 
@@ -191,74 +229,87 @@ const updateUserAvatar = () => {
     }
 };
 
-const handleSignOut = () => {
+const handleSignOut = async () => {
+    try {
+        await signOut(auth);
+    } catch(e) {
+        console.error("Sign out error", e);
+    }
     isAuthenticated = false;
     userProfile = null;
     sessionStorage.removeItem('nua_auth');
-    // Reload page to reset state (which will show the auth overlay again)
+    sessionStorage.removeItem('nua_token');
     window.location.reload();
 };
 
 const initAuth = () => {
-    // 0. Check cached session
-    const savedSessionString = sessionStorage.getItem('nua_auth');
-    if (savedSessionString) {
-        try {
-            const savedSession = JSON.parse(savedSessionString);
-            if (savedSession && savedSession.expires > Date.now()) {
-                isAuthenticated = true;
-                userProfile = savedSession.profile;
-                document.dispatchEvent(new CustomEvent('nua-auth-success', { detail: userProfile }));
-                updateUserAvatar();
-                return; // Skip rendering auth overlay completely
-            } else {
-                sessionStorage.removeItem('nua_auth');
-            }
-        } catch (e) {
-            sessionStorage.removeItem('nua_auth');
-        }
+    // 1. Prevent interacting with page behind
+    if (!isAuthenticated) {
+        document.body.style.overflow = 'hidden';
+        createAuthOverlay();
     }
 
-    // 1. Prevent interacting with page behind
-    document.body.style.overflow = 'hidden';
-
-    // 2. Create Overlay
-    createAuthOverlay();
-
-    // Set timeout to redirect to home page if inactive for 2 minutes
+    // Set timeout to redirect to home page if inactive for 2 minutes and not authenticated
     authTimeout = setTimeout(() => {
         if (!isAuthenticated) {
             window.location.href = 'index.html';
         }
     }, 120000);
 
-    // 3. Load Google Identity Services Script
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    script.onload = () => {
-        // Initialize Google Sign-In Options
-        google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
-            callback: handleCredentialResponse
-        });
+    // Listen for Firebase Auth State Changes
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            if (!checkAuthorization(user)) {
+                // User is authenticated but not authorized
+                showErrorInModal(`This email address (${user.email}) is not authorized to access the Members Area.`);
+                await signOut(auth);
+                return;
+            }
 
-        // Render Button
-        google.accounts.id.renderButton(
-            document.getElementById("google-signin-btn-container"),
-            { theme: "outline", size: "large", type: "standard", shape: "pill" }
-        );
+            // Authentication & Authorization successful
+            if (authTimeout) clearTimeout(authTimeout);
+            isAuthenticated = true;
+            
+            // Generate userProfile object
+            userProfile = {
+                name: user.displayName || user.email.split('@')[0],
+                email: user.email,
+                picture: user.photoURL
+            };
 
-        // Optionally prompt One Tap
-        // google.accounts.id.prompt();
-    };
+            // Retrieve ID token for backend authentication
+            const idToken = await user.getIdToken();
 
-    document.head.appendChild(script);
+            // Store in sessionStorage (preserve nua_auth for UI, add nua_token for API)
+            sessionStorage.setItem('nua_auth', JSON.stringify({
+                profile: userProfile,
+                expires: Date.now() + 1000 * 60 * 60 * 2 // 2 Hours
+            }));
+            sessionStorage.setItem('nua_token', idToken);
 
-    // Listen for auth success to restore body scrolling
-    document.addEventListener('nua-auth-success', () => {
-        document.body.style.overflow = '';
+            // Hide Overlay
+            const overlay = document.getElementById('auth-overlay');
+            if (overlay) {
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.remove(), 500); 
+            }
+            document.body.style.overflow = '';
+
+            // Update UI
+            document.dispatchEvent(new CustomEvent('nua-auth-success', { detail: userProfile }));
+            updateUserAvatar();
+        } else {
+            // User is signed out
+            isAuthenticated = false;
+            userProfile = null;
+            sessionStorage.removeItem('nua_auth');
+            sessionStorage.removeItem('nua_token');
+            const overlay = document.getElementById('auth-overlay');
+            if (!overlay) {
+                document.body.style.overflow = 'hidden';
+                createAuthOverlay();
+            }
+        }
     });
 };
 

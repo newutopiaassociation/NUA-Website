@@ -499,7 +499,9 @@
 
             // Attempt background fetch of live data in parallel
             try {
-                const response = await fetch(`${GAS_URL}?action=getWelfareStatus`);
+                const token = sessionStorage.getItem('nua_token');
+                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+                const response = await fetch(`${GAS_URL}?action=getWelfareStatus`, { headers });
                 if (response.ok) {
                     const liveData = await response.json();
                     // Validate that the returned data is an object mapping plot IDs to status values
