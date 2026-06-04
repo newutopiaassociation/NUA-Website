@@ -148,7 +148,7 @@
 
             try {
                 const token = sessionStorage.getItem('nua_token');
-                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+                const headers = {};
                 const response = await fetch(`${GAS_URL}?folder=${folderKey}`, { headers });
                 const files = await response.json();
 

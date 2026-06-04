@@ -132,12 +132,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    window.syncIframeTheme = function(isMoonlit) {
+        document.querySelectorAll('iframe').forEach(iframe => {
+            try {
+                if (iframe.contentDocument && iframe.contentDocument.body) {
+                    if (isMoonlit) {
+                        iframe.contentDocument.body.classList.add('moonlit-theme');
+                    } else {
+                        iframe.contentDocument.body.classList.remove('moonlit-theme');
+                    }
+                }
+            } catch(e) {}
+        });
+    };
+
     function toggleTheme() {
         body.classList.toggle('moonlit-theme');
         const isMoonlit = body.classList.contains('moonlit-theme');
         localStorage.setItem('theme', isMoonlit ? 'moonlit' : 'sunny');
         updateThemeIcons(isMoonlit);
         updateHeaderStyle();
+        if (window.syncIframeTheme) window.syncIframeTheme(isMoonlit);
     }
 
     if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
@@ -548,6 +563,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         pageFlip?.turnToPage(match.page - 1);
+
+        // Scroll to document viewer on mobile
+        if (window.innerWidth <= 768) {
+            const viewer = document.getElementById('pdf-viewport');
+            if (viewer) viewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     }
 
     function onNextMatch() {
@@ -607,4 +628,15 @@ document.addEventListener('DOMContentLoaded', () => {
         searchResults?.classList.remove('hidden');
         thumbnailList?.classList.add('hidden');
     });
+
+    // --- PWA Service Worker Registration ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').then(registration => {
+                console.log('SW registered: ', registration);
+            }).catch(registrationError => {
+                console.log('SW registration failed: ', registrationError);
+            });
+        });
+    }
 });

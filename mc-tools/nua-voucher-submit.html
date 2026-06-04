@@ -131,7 +131,7 @@
         async function loadVoucherNumber() {
             try {
                 const token = sessionStorage.getItem('nua_token');
-                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+                const headers = {};
                 const response = await fetch("https://script.google.com/macros/s/AKfycbxd4sk0zFku0aMaZUNIgeNYlm-hhlxT9PQeWe9ytuypQkFXFhQxKkwtx4AZQp-J8QEM/exec", { headers });
                 const data = await response.json();
                 if (data.status === "success") {
@@ -163,7 +163,7 @@
 
             try {
                 const token = sessionStorage.getItem('nua_token');
-                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+                const headers = {};
                 const response = await fetch("https://script.google.com/macros/s/AKfycbxd4sk0zFku0aMaZUNIgeNYlm-hhlxT9PQeWe9ytuypQkFXFhQxKkwtx4AZQp-J8QEM/exec", {
                     method: "POST",
                     headers: headers,

@@ -5,7 +5,8 @@ import {
     GoogleAuthProvider, 
     signInWithPopup, 
     signInWithEmailAndPassword, 
-    signOut 
+    signOut,
+    sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -84,6 +85,9 @@ const createAuthOverlay = () => {
                     color: ${textColor};
                     font-size: 1rem;
                 ">
+                <div style="text-align: right; margin-top: -10px;">
+                    <a href="#" id="forgot-password-link" style="color: var(--brand-primary, #2D5A27); font-size: 0.85rem; text-decoration: underline;">Forgot password?</a>
+                </div>
                 <button type="submit" style="
                     padding: 12px;
                     background: var(--brand-primary, #2D5A27);
@@ -136,6 +140,7 @@ const createAuthOverlay = () => {
     // Event Listeners
     document.getElementById('email-login-form').addEventListener('submit', handleEmailLogin);
     document.getElementById('google-signin-btn').addEventListener('click', handleGoogleLogin);
+    document.getElementById('forgot-password-link').addEventListener('click', handleForgotPassword);
 };
 
 const ALLOWED_EMAILS = [
@@ -149,9 +154,18 @@ const ALLOWED_EMAILS = [
     "prasad.mj@gmail.com"
 ];
 
-const showErrorInModal = (message) => {
+const showErrorInModal = (message, type = 'error') => {
     const errorContainer = document.getElementById('auth-error-container');
     if (errorContainer) {
+        if (type === 'success') {
+            errorContainer.style.background = 'rgba(45, 90, 39, 0.1)';
+            errorContainer.style.borderColor = 'var(--brand-primary, #2D5A27)';
+            errorContainer.style.color = 'var(--brand-primary, #2D5A27)';
+        } else {
+            errorContainer.style.background = 'rgba(211, 47, 47, 0.1)';
+            errorContainer.style.borderColor = '#d32f2f';
+            errorContainer.style.color = '#d32f2f';
+        }
         errorContainer.style.display = 'block';
         errorContainer.innerHTML = message;
     }
@@ -198,6 +212,25 @@ const handleGoogleLogin = async () => {
     } catch (error) {
         console.error("Google Login Error:", error);
         showErrorInModal("Google sign-in failed. Please try again.");
+    }
+};
+
+const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    hideErrorInModal();
+    const email = document.getElementById('auth-email').value;
+    
+    if (!email) {
+        showErrorInModal("Please enter your email address first to reset your password.");
+        return;
+    }
+
+    try {
+        await sendPasswordResetEmail(auth, email);
+        showErrorInModal("Password reset email sent! Check your inbox.", "success");
+    } catch (error) {
+        console.error("Password Reset Error:", error);
+        showErrorInModal("Error sending password reset email. Make sure the email is valid.");
     }
 };
 

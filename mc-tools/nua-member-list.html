@@ -180,6 +180,8 @@
         
         .table-responsive {
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
             border-radius: 8px;
             border: 1px solid var(--border-color, rgba(45, 90, 39, 0.1));
         }
@@ -223,7 +225,7 @@
             try {
                 // Fetch listAll to get both names and plot numbers efficiently
                 const token = sessionStorage.getItem('nua_token');
-                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+                const headers = {};
                 const response = await fetch(`${GAS_URL}?action=listAll`, { headers });
                 const rows = await response.json();
                 
@@ -314,7 +316,7 @@
             
             try {
                 const token = sessionStorage.getItem('nua_token');
-                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+                const headers = {};
                 const response = await fetch(`${GAS_URL}?action=getMember&name=${encodeURIComponent(name)}`, { headers });
                 const data = await response.json();
 
@@ -440,7 +442,7 @@
             
             try {
                 const token = sessionStorage.getItem('nua_token');
-                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+                const headers = {};
                 const response = await fetch(`${GAS_URL}?action=listAll`, { headers });
                 const rows = await response.json();
 

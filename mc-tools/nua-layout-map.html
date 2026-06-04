@@ -500,7 +500,7 @@
             // Attempt background fetch of live data in parallel
             try {
                 const token = sessionStorage.getItem('nua_token');
-                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+                const headers = {};
                 const response = await fetch(`${GAS_URL}?action=getWelfareStatus`, { headers });
                 if (response.ok) {
                     const liveData = await response.json();

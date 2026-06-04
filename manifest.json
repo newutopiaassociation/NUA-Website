@@ -1,0 +1,22 @@
+{
+  "name": "NUA - New Utopia Association",
+  "short_name": "NUA",
+  "description": "NUA (New Utopia Association) — strengthening fairness, accountability, inclusiveness, and harmony among Utopia Owners.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a1f08",
+  "theme_color": "#0a1f08",
+  "icons": [
+    {
+      "src": "assets/logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/favicon.png",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/png"
+    }
+  ]
+}

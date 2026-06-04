@@ -1271,8 +1271,12 @@ body.moonlit-theme footer {
         font-size: 1.2rem;
     }
 
+    body.moonlit-theme .nav-links {
+        background: var(--bg-main);
+    }
+
     body.moonlit-theme .nav-links li a {
-        color: var(--text-inverse);
+        color: var(--text-primary);
     }
 
     #hero h1 {
