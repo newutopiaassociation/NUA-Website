@@ -467,7 +467,12 @@
                     rows.forEach(row => {
                         html += `<tr>`;
                         allKeys.forEach(k => {
-                            html += `<td>${row[k] !== undefined && row[k] !== "" ? row[k] : 'N/A'}</td>`;
+                            if (k.toLowerCase() === 'rowid') return; // Hide RowID
+                            if (k.toLowerCase() === 'name') {
+                                html += `<td data-label="${k}"><strong>${row[k] || ''}</strong></td>`;
+                            } else {
+                                html += `<td data-label="${k}">${row[k] !== undefined && row[k] !== "" ? row[k] : 'N/A'}</td>`;
+                            }
                         });
                         html += `</tr>`;
                     });
@@ -487,5 +492,28 @@
             loadMembers();
         });
     </script>
+
+<script>
+    function applyDataLabels() {
+        document.querySelectorAll('.table-responsive table').forEach(table => {
+            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+            table.querySelectorAll('tbody tr').forEach(row => {
+                Array.from(row.querySelectorAll('td')).forEach((td, index) => {
+                    if (headers[index] && !td.hasAttribute('data-label')) {
+                        td.setAttribute('data-label', headers[index]);
+                    }
+                });
+            });
+        });
+    }
+    document.addEventListener('DOMContentLoaded', applyDataLabels);
+    const observer = new MutationObserver(() => {
+        // Debounce to prevent excessive calls
+        clearTimeout(window.dataLabelTimeout);
+        window.dataLabelTimeout = setTimeout(applyDataLabels, 100);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+</script>
+
 </body>
 </html>

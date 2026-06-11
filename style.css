@@ -2740,3 +2740,60 @@ body.dashboard-fullscreen .mc-dashboard {
 body.dashboard-fullscreen .mc-content {
     height: 100vh !important;
 }
+
+/* Responsive Card Tables */
+@media (max-width: 768px) {
+    .table-responsive table, .table-responsive thead, .table-responsive tbody, .table-responsive th, .table-responsive td, .table-responsive tr {
+        display: block;
+    }
+    .table-responsive thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+    .table-responsive tr {
+        border: 1px solid #ccc;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        background: var(--bg-main);
+        box-shadow: var(--shadow-soft);
+        overflow: hidden;
+    }
+    .table-responsive td {
+        border: none;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        position: relative;
+        padding-left: 50% !important;
+        text-align: right !important;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        word-break: break-word;
+    }
+    .table-responsive td:last-child {
+        border-bottom: none;
+    }
+    .table-responsive td::before {
+        position: absolute;
+        top: 0;
+        left: 10px;
+        width: 45%;
+        height: 100%;
+        padding-right: 10px;
+        white-space: normal;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        content: attr(data-label);
+        color: var(--brand-primary);
+        text-align: left;
+    }
+    body.moonlit-theme .table-responsive tr {
+        border-color: rgba(255,255,255,0.1);
+        background: rgba(0,0,0,0.2);
+    }
+    body.moonlit-theme .table-responsive td {
+        border-bottom-color: rgba(255,255,255,0.05);
+    }
+}

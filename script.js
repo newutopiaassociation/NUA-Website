@@ -72,26 +72,51 @@ document.addEventListener('DOMContentLoaded', () => {
     if (contactForm) {
         const membershipCheckbox = document.getElementById('membership-interest');
         const queryTextarea = document.getElementById('query');
+        const accessMCResourcesCheckbox = document.getElementById('access-mc-resources');
+        const accessNUADocsCheckbox = document.getElementById('access-nua-docs');
         const membershipText = `Dear NUA Managing Committee,\nI am an owner in Utopia Layout and would like to express my interest in becoming a member of NUA. I value fairness, transparency, open communication, and cost optimization, and I believe in contributing to the community with these principles.\nKindly share the membership form and details of the process. I will complete the form and provide the required documents promptly.`;
+        const mcResourcesText = `\nI am an NUA Member and I would like to request access to the MC Resources (MC Tools Dashboard). Please verify my membership and grant me access.`;
+        const nuaDocsText = `\nI am an NUA Member and I would like to request access to the NUA Documents folder. Please verify my membership and grant me access.`;
 
-        if (membershipCheckbox && queryTextarea) {
-            membershipCheckbox.addEventListener('change', () => {
-                if (membershipCheckbox.checked) {
-                    queryTextarea.value = membershipText;
-                } else {
-                    if (queryTextarea.value.trim() === membershipText.trim()) {
-                        queryTextarea.value = '';
-                    }
-                }
-            });
-        }
+        const updateQueryText = () => {
+            let baseText = '';
+            if (membershipCheckbox && membershipCheckbox.checked) baseText += membershipText;
+            if (accessMCResourcesCheckbox && accessMCResourcesCheckbox.checked) baseText += mcResourcesText;
+            if (accessNUADocsCheckbox && accessNUADocsCheckbox.checked) baseText += nuaDocsText;
+            queryTextarea.value = baseText.trim();
+        };
+
+        if (membershipCheckbox) membershipCheckbox.addEventListener('change', updateQueryText);
+        if (accessMCResourcesCheckbox) accessMCResourcesCheckbox.addEventListener('change', updateQueryText);
+        if (accessNUADocsCheckbox) accessNUADocsCheckbox.addEventListener('change', updateQueryText);
 
         contactForm.addEventListener('submit', (e) => {
-            // Standard form submission to Google Forms
+            e.preventDefault(); // Prevent redirect to Google Forms
             const btn = contactForm.querySelector('button');
+            const originalText = btn.textContent;
             btn.textContent = 'Submitting...';
             btn.style.opacity = '0.7';
             btn.disabled = true;
+
+            const formData = new FormData(contactForm);
+            
+            fetch(contactForm.action, {
+                method: 'POST',
+                body: formData,
+                mode: 'no-cors'
+            }).then(() => {
+                alert('Thank you! Your inquiry has been submitted successfully.');
+                contactForm.reset();
+                btn.textContent = originalText;
+                btn.style.opacity = '1';
+                btn.disabled = false;
+            }).catch(err => {
+                console.error('Error submitting form', err);
+                alert('An error occurred while submitting. Please try again later.');
+                btn.textContent = originalText;
+                btn.style.opacity = '1';
+                btn.disabled = false;
+            });
         });
     }
 

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Purchase Order Log Viewer</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    label { margin-right: 10px; }
+    select, button { margin: 5px; padding: 5px 10px; }
+    table { border-collapse: collapse; margin-top: 20px; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <h2>Purchase Order Log Viewer</h2>
+
+  <form id="poForm">
+    <label for="month">Month:</label>
+    <select id="month" name="month">
+      <option value="1">January</option>
+      <option value="2">February</option>
+      <option value="3">March</option>
+      <option value="4">April</option>
+      <option value="5">May</option>
+      <option value="6">June</option>
+      <option value="7">July</option>
+      <option value="8">August</option>
+      <option value="9">September</option>
+      <option value="10">October</option>
+      <option value="11">November</option>
+      <option value="12">December</option>
+    </select>
+
+    <label for="year">Year:</label>
+    <select id="year" name="year">
+      <option value="2025">2025</option>
+      <option value="2026" selected>2026</option>
+      <option value="2027">2027</option>
+    </select>
+
+    <button type="submit">Get POs</button>
+  </form>
+
+  <div id="results"></div>
+
+  <script>
+    document.getElementById("poForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      var month = document.getElementById("month").value;
+      var year = document.getElementById("year").value;
+
+      var url = "https://script.google.com/macros/s/AKfycbxA9E7wHy7DTtj2e2AGe4eVBsY77_M0y6MI7kqFyf1zTKFrjcC3Vzm5kNfA-EAEDjpu/exec/exec?month=" + month + "&year=" + year;
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById("results").innerHTML = "<p style='color:red'>" + data.error + "</p>";
+            return;
+          }
+
+          var pos = data.purchaseOrders;
+          if (!pos || pos.length === 0) {
+            document.getElementById("results").innerHTML = "<p>No POs found for " + month + "/" + year + "</p>";
+            return;
+          }
+
+          // Build table
+          var table = "<table><thead><tr>";
+          var headers = Object.keys(pos[0]);
+          headers.forEach(h => { table += "<th>" + h + "</th>"; });
+          table += "</tr></thead><tbody>";
+
+          pos.forEach(po => {
+            table += "<tr>";
+            headers.forEach(h => { table += "<td>" + (po[h] || "") + "</td>"; });
+            table += "</tr>";
+          });
+
+          table += "</tbody></table>";
+          document.getElementById("results").innerHTML = table;
+        })
+        .catch(err => {
+          document.getElementById("results").innerHTML = "<p style='color:red'>Error: " + err + "</p>";
+        });
+    });
+  </script>
+
+<script>
+    function applyDataLabels() {
+        document.querySelectorAll('.table-responsive table').forEach(table => {
+            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+            table.querySelectorAll('tbody tr').forEach(row => {
+                Array.from(row.querySelectorAll('td')).forEach((td, index) => {
+                    if (headers[index] && !td.hasAttribute('data-label')) {
+                        td.setAttribute('data-label', headers[index]);
+                    }
+                });
+            });
+        });
+    }
+    document.addEventListener('DOMContentLoaded', applyDataLabels);
+    const observer = new MutationObserver(() => {
+        // Debounce to prevent excessive calls
+        clearTimeout(window.dataLabelTimeout);
+        window.dataLabelTimeout = setTimeout(applyDataLabels, 100);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Me Details</title>
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <script>
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('is-embedded');
+        }
+
+        // Enforce Authentication
+        (function enforceAuth() {
+            try {
+                const sessionStr = sessionStorage.getItem('nua_auth');
+                if (!sessionStr) throw new Error("No session");
+                const session = JSON.parse(sessionStr);
+                if (session.expires < Date.now()) throw new Error("Session expired");
+                window.currentUserProfile = session.profile;
+            } catch (e) {
+                document.documentElement.innerHTML = `
+                    <div style="font-family: 'Outfit', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; background: #fdfdfd; color: #2C3E50;">
+                        <h2 style="color: #d32f2f; margin-bottom: 10px;">Unauthorized Access</h2>
+                        <p style="font-size: 1.1rem; margin-bottom: 20px;">You must log in through the MC Dashboard to view this tool.</p>
+                        <p style="font-size: 0.9rem; opacity: 0.7;">Redirecting to dashboard...</p>
+                    </div>
+                `;
+                setTimeout(() => {
+                    window.top.location.href = '../mc-members.html';
+                }, 2000);
+            }
+        })();
+    </script>
+    <style>
+        body { background: transparent; padding: 20px; }
+        .mc-tool-container { max-width: 1000px; margin: 0 auto; }
+        
+        .loader-container { padding: 40px; text-align: center; color: var(--brand-primary); font-weight: 600; }
+        .empty-state { padding: 40px; text-align: center; color: var(--text-secondary); font-style: italic; opacity: 0.7; }
+        
+        .json-dump {
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(45, 90, 39, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 14px;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body class="moonlit-theme">
+    
+    <div class="mc-tool-container">
+        <div class="section-header" style="margin-bottom: 20px;">
+             <img src="../assets/leaf.svg" alt="" class="leaf-motif left">
+             <h2>My Profile & Details</h2>
+             <img src="../assets/leaf.svg" alt="" class="leaf-motif right">
+        </div>
+
+        <div class="card animate-slide-up" id="details-container">
+            <div class="loader-container">Fetching your details...</div>
+        </div>
+    </div>
+
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycby860ZlLkiQl22QntvO4PgHQsogyvk4o9Ro00YxESYCLZX1q-1nt379mJrKnmvmDBx8/exec";
+
+        async function loadMeDetails() {
+            const container = document.getElementById('details-container');
+            
+            if (!window.currentUserProfile || !window.currentUserProfile.email) {
+                container.innerHTML = `<div class="empty-state" style="color: red;">Error: User email not found. Please re-login.</div>`;
+                return;
+            }
+
+            const email = window.currentUserProfile.email;
+
+            try {
+                // Fetch using no-cors might not give us a readable JSON response.
+                // But we will try normal fetch first, assuming the endpoint handles CORS.
+                const response = await fetch(`${GAS_URL}?action=getMemberDetails&email=${encodeURIComponent(email)}`);
+                const data = await response.json();
+                
+                // For now, dump the JSON array as requested
+                container.innerHTML = `
+                    <div style="margin-bottom: 15px;">
+                        <strong>Email Associated:</strong> ${email}
+                    </div>
+                    <pre class="json-dump">${JSON.stringify(data, null, 4)}</pre>
+                `;
+
+            } catch (err) {
+                console.error("Error loading details:", err);
+                container.innerHTML = `
+                    <div class="empty-state" style="color: red;">
+                        Failed to fetch details. The endpoint might be restricted or experiencing issues.<br><br>
+                        <em>Error details: ${err.message}</em>
+                    </div>
+                `;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadMeDetails);
+    </script>
+
+<script>
+    function applyDataLabels() {
+        document.querySelectorAll('.table-responsive table').forEach(table => {
+            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+            table.querySelectorAll('tbody tr').forEach(row => {
+                Array.from(row.querySelectorAll('td')).forEach((td, index) => {
+                    if (headers[index] && !td.hasAttribute('data-label')) {
+                        td.setAttribute('data-label', headers[index]);
+                    }
+                });
+            });
+        });
+    }
+    document.addEventListener('DOMContentLoaded', applyDataLabels);
+    const observer = new MutationObserver(() => {
+        // Debounce to prevent excessive calls
+        clearTimeout(window.dataLabelTimeout);
+        window.dataLabelTimeout = setTimeout(applyDataLabels, 100);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+</script>
+
+</body>
+</html>

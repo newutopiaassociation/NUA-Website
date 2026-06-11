@@ -57,6 +57,8 @@ const createAuthOverlay = () => {
             text-align: center;
             max-width: 400px;
             width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
             border: 1px solid rgba(130, 160, 130, 0.2);
             color: ${textColor}
         ">
@@ -85,7 +87,10 @@ const createAuthOverlay = () => {
                     color: ${textColor};
                     font-size: 1rem;
                 ">
-                <div style="text-align: right; margin-top: -10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: -10px;">
+                    <label style="font-size: 0.85rem; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="checkbox" id="auth-remember-me" ${localStorage.getItem('nua_remember_email') ? 'checked' : ''}> Remember Me
+                    </label>
                     <a href="#" id="forgot-password-link" style="color: var(--brand-primary, #2D5A27); font-size: 0.85rem; text-decoration: underline;">Forgot password?</a>
                 </div>
                 <button type="submit" style="
@@ -129,13 +134,19 @@ const createAuthOverlay = () => {
             
             <div style="margin-top: 25px; font-size: 0.85rem; opacity: 0.9; line-height: 1.5;">
                 <p style="margin-bottom: 8px;"><strong>Only verified NUA MC members are authorized to view these documents.</strong></p>
-                <p style="margin-bottom: 15px;">If you need access, contact <a href="mailto:nua-managing-committee@googlegroups.com" style="color: var(--brand-primary, #2D5A27); text-decoration: underline;">nua-managing-committee@googlegroups.com</a></p>
-                <a href="#" onclick="window.history.length > 1 ? window.history.back() : window.location.href='index.html'; return false;" style="display: inline-block; padding: 8px 16px; background: rgba(0,0,0,0.05); border-radius: 6px; color: ${textColor}; text-decoration: none; font-weight: 600; transition: background 0.3s; border: 1px solid rgba(0,0,0,0.1);">&larr; Back to previous page</a>
+                <p style="margin-bottom: 15px;">If you need access, <a href="https://newutopiaassociation.github.io/NUA-Website/index.html#contact" style="color: var(--brand-primary, #2D5A27); text-decoration: underline;">contact NUA MC</a></p>
+                <a href="#" onclick="window.history.length > 1 ? window.history.back() : window.location.href='index.html'; return false;" style="display: inline-block; padding: 8px 16px; background: rgba(0,0,0,0.05); border-radius: 6px; color: ${textColor}; text-decoration: none; font-weight: 600; transition: background 0.3s; border: 1px solid rgba(0,0,0,0.1);">&larr; Back to Home</a>
             </div>
         </div>
     `;
 
     document.body.appendChild(overlay);
+
+    // Populate Remember Me
+    const savedEmail = localStorage.getItem('nua_remember_email');
+    if (savedEmail) {
+        document.getElementById('auth-email').value = savedEmail;
+    }
 
     // Event Listeners
     document.getElementById('email-login-form').addEventListener('submit', handleEmailLogin);
@@ -193,6 +204,13 @@ const handleEmailLogin = async (e) => {
     hideErrorInModal();
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
+    const rememberMe = document.getElementById('auth-remember-me').checked;
+
+    if (rememberMe) {
+        localStorage.setItem('nua_remember_email', email);
+    } else {
+        localStorage.removeItem('nua_remember_email');
+    }
 
     try {
         await signInWithEmailAndPassword(auth, email, password);

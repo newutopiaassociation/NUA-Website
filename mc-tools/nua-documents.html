@@ -57,7 +57,7 @@
              <img src="../assets/leaf.svg" alt="" class="leaf-motif right">
         </div>
 
-        <div class="card animate-slide-up">
+        <div class="card animate-slide-up" id="list-view">
             <div class="table-responsive">
                 <table id="docTable" class="nua-table">
                     <thead>
@@ -71,6 +71,14 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <!-- Inline Viewer Section -->
+        <div class="card animate-slide-up" id="viewer-view" style="display: none;">
+            <div style="margin-bottom: 15px;">
+                <button onclick="closeViewer()" class="btn-action secondary">← Back to List</button>
+            </div>
+            <iframe id="pdf-frame" style="width: 100%; height: 75vh; border: 1px solid rgba(45, 90, 39, 0.1); border-radius: 8px;"></iframe>
         </div>
     </div>
 
@@ -97,10 +105,9 @@
                 files.forEach(file => {
                     const row = document.createElement("tr");
                     row.innerHTML = `
-                        <td><strong>${file.name}</strong></td>
-                        <td style="text-align: center; white-space: nowrap;">
-                            <a href="${file.url}" target="_blank" class="btn-action">View</a>
-                            <a href="${file.url}" target="_blank" download class="btn-action secondary">Download</a>
+                        <td data-label="Document Name"><strong>${file.name}</strong></td>
+                        <td data-label="Actions" style="text-align: center; white-space: nowrap;">
+                            <button onclick="viewDocument('${file.url}')" class="btn-action">View</button>
                         </td>
                     `;
                     tbody.appendChild(row);
@@ -111,9 +118,50 @@
             }
         }
 
+        function viewDocument(url) {
+            document.getElementById('list-view').style.display = 'none';
+            document.getElementById('viewer-view').style.display = 'block';
+            
+            // Google Drive preview URL formatting
+            let viewUrl = url;
+            if (url.includes('drive.google.com') && url.includes('/view')) {
+                viewUrl = url.replace('/view', '/preview');
+            }
+            document.getElementById('pdf-frame').src = viewUrl;
+        }
+
+        function closeViewer() {
+            document.getElementById('viewer-view').style.display = 'none';
+            document.getElementById('list-view').style.display = 'block';
+            document.getElementById('pdf-frame').src = '';
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             loadFolder("documents");
         });
     </script>
+
+<script>
+    function applyDataLabels() {
+        document.querySelectorAll('.table-responsive table').forEach(table => {
+            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+            table.querySelectorAll('tbody tr').forEach(row => {
+                Array.from(row.querySelectorAll('td')).forEach((td, index) => {
+                    if (headers[index] && !td.hasAttribute('data-label')) {
+                        td.setAttribute('data-label', headers[index]);
+                    }
+                });
+            });
+        });
+    }
+    document.addEventListener('DOMContentLoaded', applyDataLabels);
+    const observer = new MutationObserver(() => {
+        // Debounce to prevent excessive calls
+        clearTimeout(window.dataLabelTimeout);
+        window.dataLabelTimeout = setTimeout(applyDataLabels, 100);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+</script>
+
 </body>
 </html>

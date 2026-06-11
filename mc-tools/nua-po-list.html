@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="../style.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap"
+    rel="stylesheet">
+  <script>
+    if (window.self !== window.top) {
+      document.documentElement.classList.add('is-embedded');
+    }
+
+    // Enforce Authentication
+    (function enforceAuth() {
+      try {
+        const sessionStr = sessionStorage.getItem('nua_auth');
+        if (!sessionStr) throw new Error("No session");
+        const session = JSON.parse(sessionStr);
+        if (session.expires < Date.now()) throw new Error("Session expired");
+      } catch (e) {
+        document.documentElement.innerHTML = `
+          <div style="font-family: 'Outfit', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; background: #fdfdfd; color: #2C3E50;">
+            <h2 style="color: #d32f2f; margin-bottom: 10px;">Unauthorized Access</h2>
+            <p style="font-size: 1.1rem; margin-bottom: 20px;">You must log in through the MC Dashboard to view this tool.</p>
+            <p style="font-size: 0.9rem; opacity: 0.7;">Redirecting to dashboard...</p>
+          </div>
+        `;
+        setTimeout(() => {
+          window.top.location.href = '../mc-members.html';
+        }, 2000);
+      }
+    })();
+  </script>
+  <style>
+    body { background: transparent; padding: 20px; text-align: center; font-family: 'Outfit', sans-serif; }
+    button { background: var(--brand-primary); color: #fff; font-weight: 600; cursor: pointer; padding: 10px 20px; border-radius: 6px; border: none; margin-top: 20px; }
+    button:hover { opacity: 0.9; }
+    table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    .table-responsive { overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; color: var(--text-primary); }
+    th { background: var(--brand-secondary); color: #fff; }
+    #loading { display: none; font-size: 1.1rem; color: var(--brand-primary); margin-top: 15px; }
+    form { margin-top: 30px; text-align: left; }
+    label { display: block; margin-top: 10px; }
+    input, textarea { width: 100%; padding: 6px; margin-top: 4px; }
+  </style>
+</head>
+
+<body class="moonlit-theme">
+  <h2 style="color: var(--brand-primary); margin-bottom: 15px;">Purchase Orders</h2>
+
+  <!-- Filter for Month/Year -->
+  <label for="month">Month:</label>
+  <select id="month">
+    <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+    <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+    <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+    <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+  </select>
+  <label for="year">Year:</label>
+  <select id="year"><option value="2025">2025</option><option value="2026" selected>2026</option><option value="2027">2027</option></select>
+  <button id="listPOs">Get POs</button>
+
+  <div id="loading">⏳ Loading purchase orders...</div>
+  <div id="poLog"></div>
+
+  <!-- New PO Form -->
+  <h3 style="margin-top:40px;color:var(--brand-primary)">Submit New Purchase Order</h3>
+  <form id="poForm">
+    <label>PO Date <input type="date" id="po_date"></label>
+    <label>PO Number <input type="text" id="po_number"></label>
+    <label>Vendor <input type="text" id="po_vendor"></label>
+    <label>Ship To <textarea id="po_ship_to"></textarea></label>
+    <label>Requisitioner <input type="text" id="po_requisitioner"></label>
+    <label>Ship Via <input type="text" id="po_ship_via"></label>
+    <label>FOB <input type="text" id="po_fob"></label>
+    <label>Shipping Terms <input type="text" id="po_shipping_terms"></label>
+    <label>Sub Total <input type="number" id="po_sub_total_amount"></label>
+    <label>Tax <input type="number" id="po_tax_amount"></label>
+    <label>Shipping <input type="number" id="po_shipping_amount"></label>
+    <label>Other <input type="number" id="po_other_amount"></label>
+    <label>Total <input type="number" id="po_total_amount"></label>
+    <label>Comments <textarea id="po_comments"></textarea></label>
+
+    <h4>Items</h4>
+    <table id="itemsTable">
+      <thead><tr><th>Item No</th><th>Description</th><th>Qty</th><th>Unit Price</th><th>Item Total</th><th>Action</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <button type="button" onclick="addItem()">Add Item</button><br><br>
+
+    <button type="submit">Submit PO</button>
+  </form>
+
+  <div id="response"></div>
+
+  <script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzgcgjJTLLvzvyS7KY5-E1CtdSk49r_1tVkPpLmLj0y3M_eMxWrTK-oFhkNnVfBHUNU/exec";
+
+    document.getElementById("listPOs").addEventListener("click", async () => {
+      document.getElementById("loading").style.display = "block";
+      document.getElementById("poLog").innerHTML = "";
+
+      const month = document.getElementById("month").value;
+      const year = document.getElementById("year").value;
+
+      try {
+        const response = await fetch(`${GAS_URL}?month=${month}&year=${year}`);
+        const data = await response.json();
+
+        if (data.purchaseOrders && data.purchaseOrders.length > 0) {
+          let html = "<div class='table-responsive'><table><tr>";
+          html += Object.keys(data.purchaseOrders[0]).map(h => `<th>${h}</th>`).join("");
+          html += "</tr>";
+          data.purchaseOrders.forEach(po => {
+            html += "<tr>";
+            Object.keys(po).forEach(key => {
+              let val = po[key];
+              if (key.toLowerCase().includes("file url") && val) {
+                html += `<td><a href="${val}" target="_blank">Open PO</a></td>`;
+              } else {
+                html += `<td>${val}</td>`;
+              }
+            });
+            html += "</tr>";
+          });
+          html += "</table></div>";
+          document.getElementById("poLog").innerHTML = html;
+        } else {
+          document.getElementById("poLog").innerText = "No POs found.";
+        }
+      } catch (err) {
+        document.getElementById("poLog").innerText = "Error: " + err.message;
+      } finally {
+        document.getElementById("loading").style.display = "none";
+      }
+    });
+
+    function addItem() {
+      const table = document.getElementById("itemsTable").getElementsByTagName("tbody")[0];
+      const row = table.insertRow();
+      row.innerHTML = `
+        <td><input type="number" class="itemNo"></td>
+        <td><input type="text" class="description"></td>
+        <td><input type="number" class="qty"></td>
+        <td><input type="number" class="unitPrice"></td>
+        <td><input type="number" class="itemTotal"></td

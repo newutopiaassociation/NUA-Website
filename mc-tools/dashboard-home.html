@@ -34,7 +34,7 @@
         .welcome-header-content { display: flex; align-items: center; justify-content: space-between; gap: 30px; margin-bottom: 30px; }
         .welcome-text-area { flex: 1; }
         .welcome-image-area { flex-shrink: 0; width: 350px; text-align: center; }
-        .welcome-image-area img { max-width: 100%; height: auto; border-radius: 12px; box-shadow: var(--shadow-soft); transition: transform 0.3s ease; }
+        .welcome-image-area img { max-width: 70%; height: auto; border-radius: 12px; box-shadow: var(--shadow-soft); transition: transform 0.3s ease; }
         .welcome-image-area img:hover { transform: scale(1.02); }
         
         @media (max-width: 768px) {
@@ -76,6 +76,11 @@
         
         <div class="tools-grid">
             <div class="tool-info-card">
+                <h4><span>👤</span> Me Details Module</h4>
+                <p>Quickly access your personal profile, download your membership documents, and review all invoices assigned to your plot.</p>
+            </div>
+
+            <div class="tool-info-card">
                 <h4><span>👥</span> Member Module</h4>
                 <p>Access the comprehensive member directory, view detailed profiles, property information, and efficiently onboard new association members.</p>
             </div>
@@ -91,8 +96,28 @@
             </div>
             
             <div class="tool-info-card">
-                <h4><span>💰</span> Invoice & Payments</h4>
-                <p>Track the welfare collection status, raise new invoices, send receipts, and securely submit and review vendor payment vouchers.</p>
+                <h4><span>💰</span> Invoice Module</h4>
+                <p>Track the welfare collection status, raise new invoices, and send receipts to members for association dues.</p>
+            </div>
+
+            <div class="tool-info-card">
+                <h4><span>📊</span> MC Action Items</h4>
+                <p>Prioritize, assign, and track the completion status of essential tasks and operational objectives for the Managing Committee.</p>
+            </div>
+
+            <div class="tool-info-card">
+                <h4><span>📝</span> Vendor Payment Module</h4>
+                <p>Securely submit new payment vouchers and review the detailed list of historical vendor payments for full financial transparency.</p>
+            </div>
+
+            <div class="tool-info-card">
+                <h4><span>🛒</span> PO Module</h4>
+                <p>Manage Purchase Orders effectively by submitting new POs and tracking approved expenditures from start to finish.</p>
+            </div>
+
+            <div class="tool-info-card">
+                <h4><span>📈</span> Reporting Module</h4>
+                <p>Generate analytical summaries and comprehensive reports to assess the operational health of the association. <em>(Coming soon)</em></p>
             </div>
         </div>
 
@@ -103,5 +128,28 @@
             <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.7;"><em>Select a module from the left menu to get started.</em></p>
         </div>
     </div>
+
+<script>
+    function applyDataLabels() {
+        document.querySelectorAll('.table-responsive table').forEach(table => {
+            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+            table.querySelectorAll('tbody tr').forEach(row => {
+                Array.from(row.querySelectorAll('td')).forEach((td, index) => {
+                    if (headers[index] && !td.hasAttribute('data-label')) {
+                        td.setAttribute('data-label', headers[index]);
+                    }
+                });
+            });
+        });
+    }
+    document.addEventListener('DOMContentLoaded', applyDataLabels);
+    const observer = new MutationObserver(() => {
+        // Debounce to prevent excessive calls
+        clearTimeout(window.dataLabelTimeout);
+        window.dataLabelTimeout = setTimeout(applyDataLabels, 100);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+</script>
+
 </body>
 </html>

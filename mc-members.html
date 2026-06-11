@@ -118,14 +118,15 @@
         <!-- Sidebar Navigation -->
         <aside class="mc-sidebar" id="mc-sidebar">
             <div class="sidebar-toggle-container"
-                style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                style="display: flex; flex-direction: column; gap: 10px; width: 100%; margin-bottom: 20px;">
                 <button class="toggle-sidebar-btn" id="toggle-fullscreen" title="Minimize Top Navigation"
-                    style="background: var(--brand-secondary); display: flex; align-items: center; justify-content: center;">
+                    style="background: var(--brand-secondary); display: flex; align-items: center; justify-content: center; width: 100%;">
                     <span style="font-size: 1.1rem; margin-right: 5px;">⛶</span> <span class="menu-text"
                         style="font-size: 0.85rem;">Expand View</span>
                 </button>
-                <button class="toggle-sidebar-btn" id="toggle-sidebar" title="Toggle Menu">
-                    ☰
+                <button class="toggle-sidebar-btn" id="toggle-sidebar" title="Toggle Menu" style="width: 100%; display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 1.1rem; margin-right: 5px;">☰</span> <span class="menu-text"
+                        style="font-size: 0.85rem;">Toggle Menu</span>
                 </button>
             </div>
             <h3
@@ -135,7 +136,14 @@
                 <li><a href="#" class="mc-nav-link active" data-target="mc-tools/dashboard-home.html"><span
                             class="menu-icon">🏠</span> <span class="menu-text">MC Tools Home</span></a></li>
             </ul>
-            <div class="menu-category collapsible-category closed"><span>Member Module</span><span
+            <div class="menu-category collapsible-category closed"><span>👤 Me Details</span><span
+                    class="chevron">▼</span></div>
+            <ul class="mc-menu-list closed">
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-me-details.html"><span
+                            class="menu-icon">👤</span> <span class="menu-text">My Profile & Docs</span></a></li>
+            </ul>
+
+            <div class="menu-category collapsible-category closed"><span>👥 Member Module</span><span
                     class="chevron">▼</span></div>
             <ul class="mc-menu-list closed">
                 <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-member-list.html"><span
@@ -144,11 +152,11 @@
                             class="menu-icon">🤝</span> <span class="menu-text">Onboard New Member</span></a></li>
             </ul>
 
-            <div class="menu-category collapsible-category closed"><span>Document Module</span><span
+            <div class="menu-category collapsible-category closed"><span>📁 Document Module</span><span
                     class="chevron">▼</span></div>
             <ul class="mc-menu-list closed">
                 <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-documents.html"><span
-                            class="menu-icon">📁</span> <span class="menu-text">Documents</span></a></li>
+                            class="menu-icon">📁</span> <span class="menu-text">Document List</span></a></li>
                 <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-upload.html"><span
                             class="menu-icon">📤</span> <span class="menu-text">Upload Document</span></a></li>
                 <li><a href="#" class="mc-nav-link" data-target="byelaws.html"><span class="menu-icon">📜</span> <span
@@ -157,7 +165,7 @@
                             class="menu-icon">📜</span><span class="menu-text">NUA Layout Map</span></a></li>
             </ul>
 
-            <div class="menu-category collapsible-category closed"><span>Communication & Meetings</span><span
+            <div class="menu-category collapsible-category closed"><span>🏛️ Communication & Meetings</span><span
                     class="chevron">▼</span></div>
             <ul class="mc-menu-list closed">
                 <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-meetings.html"><span
@@ -170,14 +178,14 @@
                             class="menu-icon">🖃</span> <span class="menu-text">Mail Merge</span></a></li>
             </ul>
 
-            <div class="menu-category collapsible-category closed"><span>MC Action Items</span><span
+            <div class="menu-category collapsible-category closed"><span>📊 MC Action Items</span><span
                     class="chevron">▼</span></div>
             <ul class="mc-menu-list closed">
                 <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-priority-matrix.html"><span
                             class="menu-icon">📊</span> <span class="menu-text">Set Priority</span></a></li>
             </ul>
 
-            <div class="menu-category collapsible-category closed"><span>Invoice Module</span><span
+            <div class="menu-category collapsible-category closed"><span>💰 Invoice Module</span><span
                     class="chevron">▼</span></div>
             <ul class="mc-menu-list closed">
                 <li><a href="#" class="mc-nav-link" data-target="mc-tools/coming-soon.html"><span
@@ -189,13 +197,29 @@
                 </li>
             </ul>
 
-            <div class="menu-category collapsible-category closed"><span>Vendor Payment Module</span><span
+            <div class="menu-category collapsible-category closed"><span>📝 Vendor Payment Module</span><span
                     class="chevron">▼</span></div>
             <ul class="mc-menu-list closed">
                 <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-voucher-submit.html"><span
                             class="menu-icon">📝</span> <span class="menu-text">Submit Voucher </span></a></li>
                 <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-voucher-list.html"><span
-                            class="menu-icon">📋</span> <span class="menu-text">View List </span></a></li>
+                            class="menu-icon">📋</span> <span class="menu-text">View Payment Vouchers</span></a></li>
+            </ul>
+
+            <div class="menu-category collapsible-category closed"><span>🛒 PO Module</span><span
+                    class="chevron">▼</span></div>
+            <ul class="mc-menu-list closed">
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-po-submit.html"><span
+                            class="menu-icon">🛒</span> <span class="menu-text">Submit PO</span></a></li>
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/nua-po-list.html"><span
+                            class="menu-icon">📋</span> <span class="menu-text">View PO List</span></a></li>
+            </ul>
+
+            <div class="menu-category collapsible-category closed"><span>📈 Reporting Module</span><span
+                    class="chevron">▼</span></div>
+            <ul class="mc-menu-list closed">
+                <li><a href="#" class="mc-nav-link" data-target="mc-tools/coming-soon.html"><span
+                            class="menu-icon">📈</span> <span class="menu-text">Reports Dashboard ⏳</span></a></li>
             </ul>
         </aside>
 

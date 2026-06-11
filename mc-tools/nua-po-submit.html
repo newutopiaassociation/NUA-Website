@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Purchase Order Form</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    label { display: inline-block; width: 150px; margin-top: 8px; }
+    input, textarea, select { margin-top: 5px; padding: 5px; width: 300px; }
+    table { border-collapse: collapse; margin-top: 20px; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    button { margin-top: 15px; padding: 10px 20px; }
+    #response { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Purchase Order Entry</h2>
+
+  <form id="poForm">
+    <label>PO Date:</label><input type="date" id="po_date"><br>
+    <label>PO Number:</label><input type="text" id="po_number"><br>
+    <label>Vendor:</label><input type="text" id="po_vendor"><br>
+    <label>Ship To:</label><textarea id="po_ship_to"></textarea><br>
+    <label>Requisitioner:</label><input type="text" id="po_requisitioner"><br>
+    <label>Ship Via:</label><input type="text" id="po_ship_via"><br>
+    <label>FOB:</label><input type="text" id="po_fob"><br>
+    <label>Shipping Terms:</label><input type="text" id="po_shipping_terms"><br>
+    <label>Sub Total:</label><input type="number" id="po_sub_total_amount"><br>
+    <label>Tax:</label><input type="number" id="po_tax_amount"><br>
+    <label>Shipping:</label><input type="number" id="po_shipping_amount"><br>
+    <label>Other:</label><input type="number" id="po_other_amount"><br>
+    <label>Total:</label><input type="number" id="po_total_amount"><br>
+    <label>Comments:</label><textarea id="po_comments"></textarea><br>
+
+    <h3>Items</h3>
+    <table id="itemsTable">
+      <thead>
+        <tr>
+          <th>Item No</th>
+          <th>Description</th>
+          <th>Qty</th>
+          <th>Unit Price</th>
+          <th>Item Total</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button type="button" onclick="addItem()">Add Item</button><br><br>
+
+    <button type="submit">Submit PO</button>
+  </form>
+
+  <div id="response"></div>
+
+  <script>
+    function addItem() {
+      var table = document.getElementById("itemsTable").getElementsByTagName("tbody")[0];
+      var row = table.insertRow();
+      row.innerHTML = `
+        <td><input type="number" class="itemNo"></td>
+        <td><input type="text" class="description"></td>
+        <td><input type="number" class="qty"></td>
+        <td><input type="number" class="unitPrice"></td>
+        <td><input type="number" class="itemTotal"></td>
+        <td><button type="button" onclick="this.parentElement.parentElement.remove()">Remove</button></td>
+      `;
+    }
+
+    document.getElementById("poForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      var items = [];
+      document.querySelectorAll("#itemsTable tbody tr").forEach(function(row) {
+        items.push({
+          itemNo: row.querySelector(".itemNo").value,
+          description: row.querySelector(".description").value,
+          qty: row.querySelector(".qty").value,
+          unitPrice: row.querySelector(".unitPrice").value,
+          itemTotal: row.querySelector(".itemTotal").value
+        });
+      });
+
+      var payload = {
+        po_date: document.getElementById("po_date").value,
+        po_number: document.getElementById("po_number").value,
+        po_vendor: document.getElementById("po_vendor").value,
+        po_ship_to: document.getElementById("po_ship_to").value,
+        po_requisitioner: document.getElementById("po_requisitioner").value,
+        po_ship_via: document.getElementById("po_ship_via").value,
+        po_fob: document.getElementById("po_fob").value,
+        po_shipping_terms: document.getElementById("po_shipping_terms").value,
+        po_sub_total_amount: document.getElementById("po_sub_total_amount").value,
+        po_tax_amount: document.getElementById("po_tax_amount").value,
+        po_shipping_amount: document.getElementById("po_shipping_amount").value,
+        po_other_amount: document.getElementById("po_other_amount").value,
+        po_total_amount: document.getElementById("po_total_amount").value,
+        po_comments: document.getElementById("po_comments").value,
+        po_items: items
+      };
+
+      fetch("https://script.google.com/macros/s/AKfycbwTjMpJq8fqKuw-tODyS1nUJP7xX7zeKTbeT5V7C18FpVQyjCREaWsMV2yzcnTpLCDb/exec/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("response").innerHTML = "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
+      })
+      .catch(err => {
+        document.getElementById("response").innerHTML = "<p style='color:red'>Error: " + err + "</p>";
+      });
+    });
+  </script>
+
+<script>
+    function applyDataLabels() {
+        document.querySelectorAll('.table-responsive table').forEach(table => {
+            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+            table.querySelectorAll('tbody tr').forEach(row => {
+                Array.from(row.querySelectorAll('td')).forEach((td, index) => {
+                    if (headers[index] && !td.hasAttribute('data-label')) {
+                        td.setAttribute('data-label', headers[index]);
+                    }
+                });
+            });
+        });
+    }
+    document.addEventListener('DOMContentLoaded', applyDataLabels);
+    const observer = new MutationObserver(() => {
+        // Debounce to prevent excessive calls
+        clearTimeout(window.dataLabelTimeout);
+        window.dataLabelTimeout = setTimeout(applyDataLabels, 100);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+</script>
+
+</body>
+</html>
