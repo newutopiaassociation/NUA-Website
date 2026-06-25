@@ -86,6 +86,94 @@
             display: none;
             font-size: 1.1rem;
             color: var(--brand-primary);
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <script>
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('is-embedded');
+        }
+
+        // Enforce Authentication
+        (function enforceAuth() {
+            try {
+                const sessionStr = sessionStorage.getItem('nua_auth');
+                if (!sessionStr) throw new Error("No session");
+                const session = JSON.parse(sessionStr);
+                if (session.expires < Date.now()) throw new Error("Session expired");
+            } catch (e) {
+                document.documentElement.innerHTML = `
+          <div style="font-family: 'Outfit', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; background: #fdfdfd; color: #2C3E50;">
+            <h2 style="color: #d32f2f; margin-bottom: 10px;">Unauthorized Access</h2>
+            <p style="font-size: 1.1rem; margin-bottom: 20px;">You must log in through the MC Dashboard to view this tool.</p>
+            <p style="font-size: 0.9rem; opacity: 0.7;">Redirecting to dashboard...</p>
+          </div>
+        `;
+                setTimeout(() => {
+                    window.top.location.href = '../mc-members.html';
+                }, 2000);
+            }
+        })();
+    </script>
+    <style>
+        body {
+            background: transparent;
+            padding: 20px;
+            text-align: center;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        button {
+            background: var(--brand-primary);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            width: 100%;
+            -webkit-overflow-scrolling: touch;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+            color: var(--text-primary);
+        }
+
+        th {
+            background: var(--brand-secondary);
+            color: #fff;
+        }
+
+        #loading {
+            display: none;
+            font-size: 1.1rem;
+            color: var(--brand-primary);
             margin-top: 15px;
         }
     </style>
@@ -93,6 +181,9 @@
 
 <body class="moonlit-theme">
     <h2 style="color: var(--brand-primary); margin-bottom: 15px;">Latest Payment Vouchers</h2>
+    <div style="margin-bottom: 15px;">
+        <input type="text" id="voucherSearch" placeholder="Search vouchers (e.g. vendor name, amount, xyz)..." style="padding: 10px; width: 80%; max-width: 400px; border-radius: 6px; border: 1px solid #ccc;">
+    </div>
     <button id="listVouchers">Get Latest 10 Vouchers</button>
     <div id="loading">⏳ Loading vouchers...</div>
     <div id="voucherLog"></div>
@@ -138,6 +229,20 @@
             } finally {
                 document.getElementById("loading").style.display = "none";
             }
+        });
+
+        document.getElementById("voucherSearch").addEventListener("input", function() {
+            const filter = this.value.toLowerCase();
+            const rows = document.querySelectorAll("#voucherLog table tr");
+            rows.forEach((row) => {
+                if (row.querySelector('th')) return; // Skip headers
+                const text = row.textContent.toLowerCase();
+                if (text.includes(filter)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
         });
     </script>
 

@@ -78,7 +78,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const mcResourcesText = `\nI am an NUA Member and I would like to request access to the MC Resources (MC Tools Dashboard). Please verify my membership and grant me access.`;
         const nuaDocsText = `\nI am an NUA Member and I would like to request access to the NUA Documents folder. Please verify my membership and grant me access.`;
 
-        const updateQueryText = () => {
+        const checkboxes = [membershipCheckbox, accessMCResourcesCheckbox, accessNUADocsCheckbox].filter(Boolean);
+
+        const updateQueryText = (e) => {
+            if (e && e.target && e.target.checked) {
+                checkboxes.forEach(cb => {
+                    if (cb !== e.target) cb.checked = false;
+                });
+            }
+
             let baseText = '';
             if (membershipCheckbox && membershipCheckbox.checked) baseText += membershipText;
             if (accessMCResourcesCheckbox && accessMCResourcesCheckbox.checked) baseText += mcResourcesText;
@@ -86,9 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
             queryTextarea.value = baseText.trim();
         };
 
-        if (membershipCheckbox) membershipCheckbox.addEventListener('change', updateQueryText);
-        if (accessMCResourcesCheckbox) accessMCResourcesCheckbox.addEventListener('change', updateQueryText);
-        if (accessNUADocsCheckbox) accessNUADocsCheckbox.addEventListener('change', updateQueryText);
+        checkboxes.forEach(cb => cb.addEventListener('change', updateQueryText));
 
         contactForm.addEventListener('submit', (e) => {
             e.preventDefault(); // Prevent redirect to Google Forms
@@ -665,3 +671,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// Global function to force refresh the PWA cache
+window.refreshApp = function() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for (let registration of registrations) {
+                registration.unregister();
+            }
+            // Add a small delay to ensure unregistration is processed
+            setTimeout(() => {
+                window.location.reload(true);
+            }, 200);
+        });
+    } else {
+        window.location.reload(true);
+    }
+};

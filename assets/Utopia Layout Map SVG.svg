@@ -26,9 +26,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
-     inkscape:zoom="0.7071068"
-     inkscape:cx="321.73358"
-     inkscape:cy="362.74577"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="987.12104"
+     inkscape:cy="478.35772"
      inkscape:window-width="1920"
      inkscape:window-height="991"
      inkscape:window-x="-9"
@@ -260,6 +260,62 @@
          x="729.0271"
          y="734.68396"
          ry="4.2426405" />
+      <rect
+         style="fill:none;stroke:#000000"
+         id="rect1"
+         width="42.426407"
+         height="31.112698"
+         x="634.98187"
+         y="822.36517"
+         ry="4.2426405"
+         inkscape:label="NUAPlot101_VijayBMutgi" />
+      <rect
+         style="fill:none;stroke:#000000"
+         id="rect2"
+         width="493.96454"
+         height="29.5"
+         x="702.47308"
+         y="570.25128"
+         ry="14.75"
+         rx="0"
+         inkscape:label="Utopia_Blvd" />
+      <rect
+         style="fill:none;stroke:#000000"
+         id="rect3"
+         width="12.5"
+         height="269"
+         x="1024.4731"
+         y="601.25128"
+         ry="6.25"
+         inkscape:label="Kadamba Avenue" />
+      <rect
+         style="fill:none;stroke:#000000"
+         id="rect4"
+         width="13.828427"
+         height="269.20709"
+         x="890.47308"
+         y="594.25128"
+         ry="5.5"
+         inkscape:label="PalmGrove Avenue" />
+      <rect
+         style="fill:none;stroke:#000000"
+         id="rect5"
+         width="11"
+         height="259.5"
+         x="790.97308"
+         y="591.75128"
+         ry="5.5"
+         inkscape:label="MangoGrove Avenue" />
+      <rect
+         style="fill:#89a02c;stroke:#000000;stroke-width:1.51044"
+         id="rect7"
+         width="15.46613"
+         height="590.66431"
+         x="706.70209"
+         y="287.29163"
+         ry="12.132771"
+         transform="matrix(1,0,-0.03321045,0.99944838,0,0)"
+         inkscape:label="CoconutAvenue" />
     </g>
   </g>
 </svg>

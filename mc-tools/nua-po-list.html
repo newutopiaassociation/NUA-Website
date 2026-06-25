@@ -48,102 +48,120 @@
   </style>
 </head>
 
-<body class="moonlit-theme">
-  <h2 style="color: var(--brand-primary); margin-bottom: 15px;">Purchase Orders</h2>
+<body>
+  <h2>Purchase Order Log Viewer</h2>
+  <div style="margin-bottom: 15px;">
+      <input type="text" id="poSearch" placeholder="Search POs (e.g. vendor name, PO#, xyz)..." style="padding: 10px; width: 80%; max-width: 400px; border-radius: 6px; border: 1px solid #ccc;">
+  </div>
 
-  <!-- Filter for Month/Year -->
-  <label for="month">Month:</label>
-  <select id="month">
-    <option value="1">January</option><option value="2">February</option><option value="3">March</option>
-    <option value="4">April</option><option value="5">May</option><option value="6">June</option>
-    <option value="7">July</option><option value="8">August</option><option value="9">September</option>
-    <option value="10">October</option><option value="11">November</option><option value="12">December</option>
-  </select>
-  <label for="year">Year:</label>
-  <select id="year"><option value="2025">2025</option><option value="2026" selected>2026</option><option value="2027">2027</option></select>
-  <button id="listPOs">Get POs</button>
-
-  <div id="loading">⏳ Loading purchase orders...</div>
-  <div id="poLog"></div>
-
-  <!-- New PO Form -->
-  <h3 style="margin-top:40px;color:var(--brand-primary)">Submit New Purchase Order</h3>
   <form id="poForm">
-    <label>PO Date <input type="date" id="po_date"></label>
-    <label>PO Number <input type="text" id="po_number"></label>
-    <label>Vendor <input type="text" id="po_vendor"></label>
-    <label>Ship To <textarea id="po_ship_to"></textarea></label>
-    <label>Requisitioner <input type="text" id="po_requisitioner"></label>
-    <label>Ship Via <input type="text" id="po_ship_via"></label>
-    <label>FOB <input type="text" id="po_fob"></label>
-    <label>Shipping Terms <input type="text" id="po_shipping_terms"></label>
-    <label>Sub Total <input type="number" id="po_sub_total_amount"></label>
-    <label>Tax <input type="number" id="po_tax_amount"></label>
-    <label>Shipping <input type="number" id="po_shipping_amount"></label>
-    <label>Other <input type="number" id="po_other_amount"></label>
-    <label>Total <input type="number" id="po_total_amount"></label>
-    <label>Comments <textarea id="po_comments"></textarea></label>
+    <label for="month">Month:</label>
+    <select id="month" name="month">
+      <option value="1">January</option>
+      <option value="2">February</option>
+      <option value="3">March</option>
+      <option value="4">April</option>
+      <option value="5">May</option>
+      <option value="6">June</option>
+      <option value="7">July</option>
+      <option value="8">August</option>
+      <option value="9">September</option>
+      <option value="10">October</option>
+      <option value="11">November</option>
+      <option value="12">December</option>
+    </select>
 
-    <h4>Items</h4>
-    <table id="itemsTable">
-      <thead><tr><th>Item No</th><th>Description</th><th>Qty</th><th>Unit Price</th><th>Item Total</th><th>Action</th></tr></thead>
-      <tbody></tbody>
-    </table>
-    <button type="button" onclick="addItem()">Add Item</button><br><br>
+    <label for="year">Year:</label>
+    <select id="year" name="year">
+      <option value="2025">2025</option>
+      <option value="2026" selected>2026</option>
+      <option value="2027">2027</option>
+    </select>
 
-    <button type="submit">Submit PO</button>
+    <button type="submit">Get POs</button>
   </form>
 
-  <div id="response"></div>
+  <div id="results"></div>
 
   <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzgcgjJTLLvzvyS7KY5-E1CtdSk49r_1tVkPpLmLj0y3M_eMxWrTK-oFhkNnVfBHUNU/exec";
+    document.getElementById("poForm").addEventListener("submit", function(e) {
+      e.preventDefault();
 
-    document.getElementById("listPOs").addEventListener("click", async () => {
-      document.getElementById("loading").style.display = "block";
-      document.getElementById("poLog").innerHTML = "";
+      var month = document.getElementById("month").value;
+      var year = document.getElementById("year").value;
 
-      const month = document.getElementById("month").value;
-      const year = document.getElementById("year").value;
+      var url = "https://script.google.com/macros/s/AKfycbxA9E7wHy7DTtj2e2AGe4eVBsY77_M0y6MI7kqFyf1zTKFrjcC3Vzm5kNfA-EAEDjpu/exec/exec?month=" + month + "&year=" + year;
 
-      try {
-        const response = await fetch(`${GAS_URL}?month=${month}&year=${year}`);
-        const data = await response.json();
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById("results").innerHTML = "<p style='color:red'>" + data.error + "</p>";
+            return;
+          }
 
-        if (data.purchaseOrders && data.purchaseOrders.length > 0) {
-          let html = "<div class='table-responsive'><table><tr>";
-          html += Object.keys(data.purchaseOrders[0]).map(h => `<th>${h}</th>`).join("");
-          html += "</tr>";
-          data.purchaseOrders.forEach(po => {
-            html += "<tr>";
-            Object.keys(po).forEach(key => {
-              let val = po[key];
-              if (key.toLowerCase().includes("file url") && val) {
-                html += `<td><a href="${val}" target="_blank">Open PO</a></td>`;
-              } else {
-                html += `<td>${val}</td>`;
-              }
-            });
-            html += "</tr>";
+          var pos = data.purchaseOrders;
+          if (!pos || pos.length === 0) {
+            document.getElementById("results").innerHTML = "<p>No POs found for " + month + "/" + year + "</p>";
+            return;
+          }
+
+          // Build table
+          var table = "<table><thead><tr>";
+          var headers = Object.keys(pos[0]);
+          headers.forEach(h => { table += "<th>" + h + "</th>"; });
+          table += "</tr></thead><tbody>";
+
+          pos.forEach(po => {
+            table += "<tr>";
+            headers.forEach(h => { table += "<td>" + (po[h] || "") + "</td>"; });
+            table += "</tr>";
           });
-          html += "</table></div>";
-          document.getElementById("poLog").innerHTML = html;
-        } else {
-          document.getElementById("poLog").innerText = "No POs found.";
-        }
-      } catch (err) {
-        document.getElementById("poLog").innerText = "Error: " + err.message;
-      } finally {
-        document.getElementById("loading").style.display = "none";
-      }
+
+          table += "</tbody></table>";
+          document.getElementById("results").innerHTML = table;
+        })
+        .catch(err => {
+          document.getElementById("results").innerHTML = "<p style='color:red'>Error: " + err + "</p>";
+        });
     });
 
-    function addItem() {
-      const table = document.getElementById("itemsTable").getElementsByTagName("tbody")[0];
-      const row = table.insertRow();
-      row.innerHTML = `
-        <td><input type="number" class="itemNo"></td>
-        <td><input type="text" class="description"></td>
-        <td><input type="number" class="qty"></td>
-        <td><input type="number" class="unitPrice"></td>
-        <td><input type="number" class="itemTotal"></td
+    document.getElementById("poSearch").addEventListener("input", function() {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll("#results table tr");
+        rows.forEach((row) => {
+            if (row.querySelector('th')) return; // Skip headers
+            const text = row.textContent.toLowerCase();
+            if (text.includes(filter)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    });
+  </script>
+
+<script>
+    function applyDataLabels() {
+        document.querySelectorAll('.table-responsive table').forEach(table => {
+            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+            table.querySelectorAll('tbody tr').forEach(row => {
+                Array.from(row.querySelectorAll('td')).forEach((td, index) => {
+                    if (headers[index] && !td.hasAttribute('data-label')) {
+                        td.setAttribute('data-label', headers[index]);
+                    }
+                });
+            });
+        });
+    }
+    document.addEventListener('DOMContentLoaded', applyDataLabels);
+    const observer = new MutationObserver(() => {
+        // Debounce to prevent excessive calls
+        clearTimeout(window.dataLabelTimeout);
+        window.dataLabelTimeout = setTimeout(applyDataLabels, 100);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+</script>
+
+</body>
+

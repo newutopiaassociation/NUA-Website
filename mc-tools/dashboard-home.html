@@ -19,6 +19,20 @@
                         const nameEl = document.getElementById('mc-member-name');
                         if (nameEl) nameEl.textContent = session.profile.name;
                     }
+					if (session.profile && session.profile.role) {
+                        const roleEl = document.getElementById('mc-member-role');
+                        if (roleEl) roleEl.textContent = session.profile.role;
+						
+						document.querySelectorAll('.mc-only').forEach(el => {
+							el.style.display = (session.profile.role === 'MC Member') ? 'block' : 'none';
+						});
+				
+						//if (session.profile.role === 'Member') {
+						//	document.querySelectorAll('.mc-only').forEach(el => {
+						//		el.style.display = 'block';
+						//	});
+						//}
+                    }
                 }
             } catch (e) {}
         });
@@ -65,7 +79,8 @@
         <div class="welcome-header-content">
             <div class="welcome-text-area">
                 <h1 class="welcome-title">Welcome, <span id="mc-member-name">MC Member</span>!</h1>
-                <p class="welcome-subtitle">This is your centralized dashboard for managing NUA operations securely and efficiently.</p>
+				<h1 class="welcome-title"><span id="mc-member-role">Role</span></h1>
+                <p class="welcome-subtitle">This is your centralized dashboard to access and manage NUA information securely and efficiently.</p>
             </div>
             <div class="welcome-image-area">
                 <img src="../assets/mc_tools_illustration.png" alt="Digitally Connected Association Tools">
@@ -80,7 +95,7 @@
                 <p>Quickly access your personal profile, download your membership documents, and review all invoices assigned to your plot.</p>
             </div>
 
-            <div class="tool-info-card">
+            <div class="tool-info-card mc-only">
                 <h4><span>👥</span> Member Module</h4>
                 <p>Access the comprehensive member directory, view detailed profiles, property information, and efficiently onboard new association members.</p>
             </div>
@@ -95,22 +110,22 @@
                 <p>Log and review meeting minutes, track sent letters, and perform bulk mail merges for mass communication to members.</p>
             </div>
             
-            <div class="tool-info-card">
+            <div class="tool-info-card mc-only">
                 <h4><span>💰</span> Invoice Module</h4>
                 <p>Track the welfare collection status, raise new invoices, and send receipts to members for association dues.</p>
             </div>
 
-            <div class="tool-info-card">
+            <div class="tool-info-card mc-only">
                 <h4><span>📊</span> MC Action Items</h4>
                 <p>Prioritize, assign, and track the completion status of essential tasks and operational objectives for the Managing Committee.</p>
             </div>
 
-            <div class="tool-info-card">
+            <div class="tool-info-card mc-only">
                 <h4><span>📝</span> Vendor Payment Module</h4>
                 <p>Securely submit new payment vouchers and review the detailed list of historical vendor payments for full financial transparency.</p>
             </div>
 
-            <div class="tool-info-card">
+            <div class="tool-info-card mc-only">
                 <h4><span>🛒</span> PO Module</h4>
                 <p>Manage Purchase Orders effectively by submitting new POs and tracking approved expenditures from start to finish.</p>
             </div>

@@ -2694,6 +2694,14 @@ html.is-embedded .section {
     justify-content: center;
 }
 
+.mc-only {
+	display: none;
+}
+
+.mc-only-menu {
+    display: none;
+}
+
 /* MC Dashboard Mobile Overrides & Fullscreen Mode */
 @media (max-width: 768px) {
     .mc-dashboard {

@@ -63,8 +63,8 @@ const createAuthOverlay = () => {
             color: ${textColor}
         ">
             <img src="assets/logo.png" alt="NUA Logo" style="width: 120px; margin-bottom: 20px;">
-            <h2 style="font-family: 'Outfit', sans-serif; color: var(--brand-primary, #2D5A27); margin-bottom: 10px;">MC Members Area</h2>
-            <p style="margin-bottom: 25px;">Please sign in to access NUA MC resources.</p>
+            <h2 style="font-family: 'Outfit', sans-serif; color: var(--brand-primary, #2D5A27); margin-bottom: 10px;">NUA Members Area</h2>
+            <p style="margin-bottom: 25px;">Please sign in to access NUA resources.</p>
             
             <div id="auth-error-container" style="display: none; background: rgba(211, 47, 47, 0.1); border: 1px solid #d32f2f; color: #d32f2f; padding: 10px; border-radius: 8px; font-weight: 600; text-align: left; margin-bottom: 15px; font-size: 0.9rem;">
             </div>
@@ -133,9 +133,9 @@ const createAuthOverlay = () => {
             </button>
             
             <div style="margin-top: 25px; font-size: 0.85rem; opacity: 0.9; line-height: 1.5;">
-                <p style="margin-bottom: 8px;"><strong>Only verified NUA MC members are authorized to view these documents.</strong></p>
+                <p style="margin-bottom: 8px;"><strong>Only verified NUA members are authorized to view these documents.</strong></p>
                 <p style="margin-bottom: 15px;">If you need access, <a href="https://newutopiaassociation.github.io/NUA-Website/index.html#contact" style="color: var(--brand-primary, #2D5A27); text-decoration: underline;">contact NUA MC</a></p>
-                <a href="#" onclick="window.history.length > 1 ? window.history.back() : window.location.href='index.html'; return false;" style="display: inline-block; padding: 8px 16px; background: rgba(0,0,0,0.05); border-radius: 6px; color: ${textColor}; text-decoration: none; font-weight: 600; transition: background 0.3s; border: 1px solid rgba(0,0,0,0.1);">&larr; Back to Home</a>
+                <a href="#" onclick="window.history.length > 1 ? window.location.href='index.html' : window.location.href='index.html'; return false;" style="display: inline-block; padding: 8px 16px; background: rgba(0,0,0,0.05); border-radius: 6px; color: ${textColor}; text-decoration: none; font-weight: 600; transition: background 0.3s; border: 1px solid rgba(0,0,0,0.1);">&larr; Back to Home</a>
             </div>
         </div>
     `;
@@ -162,7 +162,31 @@ const ALLOWED_EMAILS = [
     "lorrainefernandez1@gmail.com",
     "manjunatha.tn@gmail.com",
     "mvad.mysore@gmail.com",
-    "prasad.mj@gmail.com"
+    "prasad.mj@gmail.com",
+	"apk009@yahoo.com",
+	"aravindaiyar@gmail.com",
+	"arkahuja@yahoo.com",
+	"asubbaramu@gmail.com",
+	"drmurali78@gmail.com",
+	"george@vfmindia.biz",
+	"hsraghu@gmail.com",
+	"jashpalkhillon288@gmail.com",
+	"jeancrao@gmail.com",
+	"jhony_sri@yahoo.co.in",
+	"kav.devarapalli@gmail.com",
+	"krish.nayar@yahoo.com",
+	"lathikris@gmail.com",
+	"mutgiv@gmail.com",
+	"neenakchacko@gmail.com",
+	"rahulgk@yahoo.com",
+	"shrutinayar16@gmail.com",
+	"subbaraman.n@gmail.com",
+	"sunilmachiah70@gmail.com",
+	"udayra@gmail.com",
+	"newutopiaassociation@gmail.com",
+	"nuatreasureroffice@gmail.com",
+	"ecirams@yahoo.com"
+
 ];
 
 const showErrorInModal = (message, type = 'error') => {
@@ -290,7 +314,22 @@ const handleSignOut = async () => {
     userProfile = null;
     sessionStorage.removeItem('nua_auth');
     sessionStorage.removeItem('nua_token');
-    window.location.reload();
+    window.location.replace("index.html");
+};
+
+const fetchMemberDetails = async (email) => {
+    const url = `https://script.google.com/macros/s/AKfycbyBhhhYWpnbvtOATqpdjOO1Kl3jUqVYUcuHYKIT9ZsiYPaQJYKNY1GoIMUfc_wWBm4J/exec?action=getMemberDetails&email=${encodeURIComponent(email)}`;
+
+    const response = await fetch(url, {
+        method: 'GET',
+        mode: 'cors'
+    });
+
+    if (!response.ok) {
+        throw new Error(`GAS request failed: ${response.status}`);
+    }
+
+    return await response.json();
 };
 
 const initAuth = () => {
@@ -312,7 +351,7 @@ const initAuth = () => {
         if (user) {
             if (!checkAuthorization(user)) {
                 // User is authenticated but not authorized
-                showErrorInModal(`This email address (${user.email}) is not authorized to access the Members Area.`);
+                showErrorInModal(`This email address (${user.email}) is not authorized to access the NUA Members Area.`);
                 await signOut(auth);
                 return;
             }
@@ -320,16 +359,24 @@ const initAuth = () => {
             // Authentication & Authorization successful
             if (authTimeout) clearTimeout(authTimeout);
             isAuthenticated = true;
+			
+			const memberDetails = await fetchMemberDetails(user.email);
             
             // Generate userProfile object
             userProfile = {
-                name: user.displayName || user.email.split('@')[0],
+                // name: user.displayName || user.email.split('@')[0],
+				name: user.displayName || memberDetails?.memberName,
                 email: user.email,
-                picture: user.photoURL
+                picture: user.photoURL,
+				role: memberDetails?.role || null,
+				memberDetails: memberDetails 
             };
 
             // Retrieve ID token for backend authentication
             const idToken = await user.getIdToken();
+			
+			// Debugging statement
+			// console.log('Final userProfile being saved:', userProfile);
 
             // Store in sessionStorage (preserve nua_auth for UI, add nua_token for API)
             sessionStorage.setItem('nua_auth', JSON.stringify({

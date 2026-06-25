@@ -1,4 +1,6 @@
-const CACHE_NAME = 'nua-cache-v2';
+const CACHE_NAME = 'nua-cache-v13';
+
+// Only pre-cache the core shell assets
 const urlsToCache = [
   './',
   './index.html',
@@ -9,60 +11,63 @@ const urlsToCache = [
   './assets/leaf.svg'
 ];
 
+// ── Install: pre-cache shell assets ──────────────────────────────────────────
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
   );
 });
 
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        return fetch(event.request).then(
-          function(response) {
-            // Check if we received a valid response
-            if(!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            // Clone the response
-            var responseToCache = response.clone();
-
-            caches.open(CACHE_NAME)
-              .then(function(cache) {
-                // Dynamically cache other requests (like images, other html pages)
-                if (event.request.method === 'GET' && !event.request.url.startsWith('chrome-extension')) {
-                   cache.put(event.request, responseToCache);
-                }
-              });
-
-            return response;
-          }
-        );
-      })
-  );
-});
-
+// ── Activate: remove ALL old caches ──────────────────────────────────────────
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
+    caches.keys().then(cacheNames =>
+      Promise.all(
+        cacheNames
+          .filter(name => name !== CACHE_NAME)
+          .map(name => caches.delete(name))
+      )
+    ).then(() => self.clients.claim())
+  );
+});
+
+// ── Fetch: smart strategy based on request type ───────────────────────────────
+self.addEventListener('fetch', event => {
+  const { request } = event;
+  const url = new URL(request.url);
+
+  // Skip non-GET requests and cross-origin requests (e.g. Google APIs)
+  if (request.method !== 'GET' || url.origin !== location.origin) {
+    return;
+  }
+
+  // HTML pages → Network First (always get latest, fall back to cache offline)
+  if (request.headers.get('accept') && request.headers.get('accept').includes('text/html')) {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          // Update the cache with the fresh response
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, responseToCache));
+          return response;
         })
-      );
+        .catch(() => caches.match(request)) // offline fallback
+    );
+    return;
+  }
+
+  // JS / CSS / Images → Cache First (fast, update cache in background)
+  event.respondWith(
+    caches.match(request).then(cached => {
+      const networkFetch = fetch(request).then(response => {
+        if (response && response.status === 200 && response.type === 'basic') {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, responseToCache));
+        }
+        return response;
+      });
+      return cached || networkFetch;
     })
   );
 });
