@@ -42,7 +42,7 @@
         }
 
         form {
-            max-width: 500px;
+            max-width: 700px;
             margin: 0 auto;
             text-align: left;
             background: var(--bg-main);
@@ -87,14 +87,15 @@
     <h2 style="color: var(--brand-primary); margin-bottom: 15px;">Voucher Entry Form</h2>
     <form id="voucherForm">
         <label>Voucher Number:</label>
-        <input type="text" id="voucherNumber" name="voucherNumber" disabled>
+        <input type="text" id="voucherNumber" name="voucherNumber" readonly>
         <small>This will be updated automatically by the system</small>
 
         <label>Amount:</label>
-        <input type="number" name="vendorAmount" required>
+        <input type="number" name="vendorAmount" id="amount" oninput="updateAmountInWords()" required>
 
         <label>Amount in Words:</label>
-        <input type="text" name="vendorsAmountText" required>
+        <input type="text" name="vendorsAmountText"id="amountWords" readonly>
+		<small>This will be updated automatically by the system</small>
 
         <label>Payment Mode:</label>
         <div>
@@ -204,6 +205,62 @@
     });
     observer.observe(document.body, { childList: true, subtree: true });
 </script>
+
+  <script>
+    function convertNumberToWords(num) {
+      if (num === 0) return "Zero";
+
+      const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+                    "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen",
+                    "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+      const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+      const scales = ["", "Thousand", "Lakh", "Crore"];
+
+      function twoDigits(n) {
+        if (n < 20) return ones[n];
+        return tens[Math.floor(n / 10)] + (n % 10 ? " " + ones[n % 10] : "");
+      }
+
+      function threeDigits(n) {
+        let str = "";
+        if (n >= 100) {
+          str += ones[Math.floor(n / 100)] + " Hundred";
+          if (n % 100) str += " ";
+        }
+        if (n % 100) str += twoDigits(n % 100);
+        return str;
+      }
+
+      let parts = [];
+      let scaleIndex = 0;
+      while (num > 0) {
+        let chunk;
+        if (scaleIndex === 0) {
+          chunk = num % 1000;
+          num = Math.floor(num / 1000);
+        } else {
+          chunk = num % 100;
+          num = Math.floor(num / 100);
+        }
+        if (chunk) {
+          parts.unshift(threeDigits(chunk) + (scales[scaleIndex] ? " " + scales[scaleIndex] : ""));
+        }
+        scaleIndex++;
+      }
+
+      return parts.join(" ").trim();
+    }
+
+    function updateAmountInWords() {
+      const amount = document.getElementById("amount").value;
+      const wordsField = document.getElementById("amountWords");
+      if (amount && !isNaN(amount)) {
+        wordsField.value = convertNumberToWords(parseInt(amount)) + " Only";
+      } else {
+        wordsField.value = "";
+      }
+    }
+  </script>
 
 </body>
 

@@ -180,6 +180,21 @@
             opacity: 0.7;
             text-align: center;
         }
+		
+		.profile-layout {
+		  display: flex;
+		  justify-content: space-between;
+		  align-items: flex-start;
+		}
+
+		.profile-details {
+		  flex: 2;
+		}
+
+		.profile-photo {
+		  flex: 1;
+		  text-align: center;
+		}
 
         .error-state {
             padding: 20px;
@@ -187,6 +202,32 @@
             color: #d32f2f;
             font-style: italic;
         }
+		
+		/* ── Thumbnail view of listed documents ── */
+		.file-item-wrapper {
+		  position: relative;
+		  display: inline-block;
+		}
+
+		.file-thumbnail {
+		  display: none;
+		  position: absolute;
+		  top: 100%;
+		  left: 0;
+		  z-index: 10;
+		  background: #fff;
+		  border: 1px solid #ccc;
+		  padding: 5px;
+		}
+
+		.file-thumbnail img {
+		  max-width: 200px;
+		  max-height: 200px;
+		}
+
+		.file-item-wrapper:hover .file-thumbnail {
+		  display: block;
+		}
 
         /* ── Documents / Files List Styling ── */
         .file-list {
@@ -483,21 +524,31 @@
                     const { icon, label } = fileIcon(f.name);
                     const url = f.url || '#';
                     const folderText = f.folder ? `<span class="file-folder-badge">📁 ${f.folder}</span>` : '';
-                    filesHtml += `
-                        <a class="file-item" href="${url}" target="_blank" rel="noopener noreferrer">
-                            <span class="file-icon">${icon}</span>
-                            <div class="file-details-container">
-                                <span class="file-name">${f.name}</span>
-                                ${folderText}
-                            </div>
-                            <span class="file-type-badge">${label}</span>
-                            <span class="file-open-icon">↗</span>
-                        </a>`;
-                });
-                filesHtml += `</div>`;
-            }
-            container.innerHTML = filesHtml;
-        }
+					
+					// Assume your backend returns a thumbnailUrl for each file
+					const thumbUrl = f.thumbnailUrl || '';
+                    
+					filesHtml += `
+						<div class="file-item-wrapper">
+							<a class="file-item" href="${url}" target="_blank" rel="noopener noreferrer">
+								<span class="file-icon">${icon}</span>
+								<div class="file-details-container">
+									<span class="file-name">${f.name}</span>
+									${folderText}
+								</div>
+								<span class="file-type-badge">${label}</span>
+								<span class="file-open-icon">↗</span>
+							</a> 
+							${thumbUrl ? `
+								<div class="file-thumbnail">
+								  <img src="${thumbUrl}" alt="Preview of ${f.name}">
+								</div> `: ''}
+						</div>`;
+					});
+					filesHtml += `</div>`;
+				}
+				container.innerHTML = filesHtml;
+			}
 
         function showCardLoading(containerId, loadingMsg) {
             document.getElementById(containerId).innerHTML = `
@@ -507,137 +558,139 @@
         }
 
         async function loadProfile(event) {
-    if (event) event.stopPropagation();
-    const container = document.getElementById('details-container');
-    const email = window.currentUserProfile.email;
-    showCardLoading('details-container', 'Fetching your profile...');
+			if (event) event.stopPropagation();
+			const container = document.getElementById('details-container');
+			const email = window.currentUserProfile.email;
+			showCardLoading('details-container', 'Fetching your profile...');
 
-    try {
-        const response = await fetch(`${GAS_URL}?action=getMemberDetails&email=${encodeURIComponent(email)}`);
-        const raw = await response.json();
-        const data = Array.isArray(raw) ? (raw[0] || {}) : (raw || {});
+			try {
+				const response = await fetch(`${GAS_URL}?action=getMemberDetails&email=${encodeURIComponent(email)}`);
+				const raw = await response.json();
+				const data = Array.isArray(raw) ? (raw[0] || {}) : (raw || {});
 
-        const val = v => (v !== null && v !== undefined && v !== "" ? v : "Not available");
+				const val = v => (v !== null && v !== undefined && v !== "" ? v : "Not available");
 
-        // Extract fields directly
-        const dateofJoin = val(data.dateofJoin);
-        const name = val(data.memberName) || email.split('@')[0];
-        const plotNumber = val(data.plotNumber);
-		const role = val(data.role); 
-        const phone = val(data.contactPhone);
-        const memberEmail = val(email);
+				// Extract fields directly
+				const dateofJoin = val(data.dateofJoin);
+				const name = val(data.memberName) || email.split('@')[0];
+				const plotNumber = val(data.plotNumber);
+				const role = val(data.role); 
+				const phone = val(data.contactPhone);
+				const memberEmail = val(email);
 
-        const emergencyName = val(data.emergencyContactName);
-        const emergencyRelation = val(data.emergencyContactRelation);
-        const emergencyNumber = val(data.emergencyContactNumber);
-        const emergencyEmail = val(data.emergencyContactEmail);
+				const emergencyName = val(data.emergencyContactName);
+				const emergencyRelation = val(data.emergencyContactRelation);
+				const emergencyNumber = val(data.emergencyContactNumber);
+				const emergencyEmail = val(data.emergencyContactEmail);
 
-        const consentWhatsApp = val(data.consetWhatsApp);
-        const consentEmail = val(data.consetEmail);
-        const agreeTerms = val(data.agreeTerms);
-        const declaration = val(data.declaration);
+				const consentWhatsApp = val(data.consetWhatsApp);
+				const consentEmail = val(data.consetEmail);
+				const agreeTerms = val(data.agreeTerms);
+				const declaration = val(data.declaration);
 
-        resolvedPlotNumber = plotNumber;
+				resolvedPlotNumber = plotNumber;
 
-        document.getElementById('btn-load-docs').disabled = false;
-        document.getElementById('btn-load-invoices').disabled = false;
+				document.getElementById('btn-load-docs').disabled = false;
+				document.getElementById('btn-load-invoices').disabled = false;
 
-        container.innerHTML = `
-            <!-- First row: Member info -->
-            <div class="profile-compact-row">
-                <div class="profile-param">
-                    <span class="param-label">Member Since</span>
-                    <span class="param-value">${dateofJoin}</span>
-                </div>
-                <div class="profile-param">
-                    <span class="param-label">User Name</span>
-                    <span class="param-value">${name}</span>
-                </div>
-                <div class="profile-param">
-                    <span class="param-label">Email Associated</span>
-                    <span class="param-value">${memberEmail}</span>
-                </div>
-                <div class="profile-param">
-                    <span class="param-label">Plot Number</span>
-                    <span class="param-value">${plotNumber}</span>
-                </div>
-                <div class="profile-param">
-                    <span class="param-label">Contact Phone</span>
-                    <span class="param-value">${phone}</span>
-                </div>
-            </div>
+				const photoResponse = await fetch(		`${GAS_URL}?action=getMemberPlotPhoto&plotNumber=${encodeURIComponent(plotNumber)}`);
+				const photoData = await photoResponse.json();
 
-            <!-- Second row: Emergency contact -->
-            <div class="profile-compact-row">
-                <div class="profile-param">
-                    <span class="param-label">Emergency Contact Name</span>
-                    <span class="param-value">${emergencyName}</span>
-                </div>
-                <div class="profile-param">
-                    <span class="param-label">Relation</span>
-                    <span class="param-value">${emergencyRelation}</span>
-                </div>
-                <div class="profile-param">
-                    <span class="param-label">Emergency Phone</span>
-                    <span class="param-value">${emergencyNumber}</span>
-                </div>
-                <div class="profile-param">
-                    <span class="param-label">Emergency Email</span>
-                    <span class="param-value">${emergencyEmail}</span>
-                </div>
-            </div>
+				container.innerHTML = `
+				  <div class="profile-layout">
+					<!-- Left column: Member details -->
+					<div class="profile-details">
+					  <!-- First row: Member info -->
+					  <div class="profile-compact-row">
+						<div class="profile-param">
+						  <span class="param-label">Member Since</span>
+						  <span class="param-value">${dateofJoin}</span>
+						</div>
+						<div class="profile-param">
+						  <span class="param-label">User Name</span>
+						  <span class="param-value">${name}</span>
+						</div>
+						<div class="profile-param">
+						  <span class="param-label">Email Associated</span>
+						  <span class="param-value">${memberEmail}</span>
+						</div>
+						<div class="profile-param">
+						  <span class="param-label">Plot Number</span>
+						  <span class="param-value">${plotNumber}</span>
+						</div>
+						<div class="profile-param">
+						  <span class="param-label">Contact Phone</span>
+						  <span class="param-value">${phone}</span>
+						</div>
+					  </div>
 
-            <!-- Third row: Consents -->
-            <div class="profile-compact-row">
-                <div class="profile-param">
-                    <span class="param-label">WhatsApp Consent</span>
-                    <span class="param-value">${consentWhatsApp}</span>
-                </div>
-                <div class="profile-param">
-                    <span class="param-label">Email Consent</span>
-                    <span class="param-value">${consentEmail}</span>
-                </div>
-                <div class="profile-param">
-                    <span class="param-label">Agreed Terms</span>
-                    <span class="param-value">${agreeTerms}</span>
-                </div>
-                <div class="profile-param">
-                    <span class="param-label">Declaration</span>
-                    <span class="param-value">${declaration}</span>
-                </div>
-            </div>
+					  <!-- Second row: Emergency contact -->
+					  <div class="profile-compact-row">
+						<div class="profile-param">
+						  <span class="param-label">Emergency Contact Name</span>
+						  <span class="param-value">${emergencyName}</span>
+						</div>
+						<div class="profile-param">
+						  <span class="param-label">Relation</span>
+						  <span class="param-value">${emergencyRelation}</span>
+						</div>
+						<div class="profile-param">
+						  <span class="param-label">Emergency Phone</span>
+						  <span class="param-value">${emergencyNumber}</span>
+						</div>
+						<div class="profile-param">
+						  <span class="param-label">Emergency Email</span>
+						  <span class="param-value">${emergencyEmail}</span>
+						</div>
+					  </div>
 
-            <!-- Last row: Member Type -->
-            <div class="profile-compact-row">
-                <div class="profile-param">
-                    <span class="param-label">Member / MC Member</span>
-                    <span class="param-value">${role}</span>
-                </div>
-            </div>
+					  <!-- Third row: Consents -->
+					  <div class="profile-compact-row">
+						<div class="profile-param">
+						  <span class="param-label">WhatsApp Consent</span>
+						  <span class="param-value">${consentWhatsApp}</span>
+						</div>
+						<div class="profile-param">
+						  <span class="param-label">Email Consent</span>
+						  <span class="param-value">${consentEmail}</span>
+						</div>
+						<div class="profile-param">
+						  <span class="param-label">Agreed Terms</span>
+						  <span class="param-value">${agreeTerms}</span>
+						</div>
+						<div class="profile-param">
+						  <span class="param-label">Declaration</span>
+						  <span class="param-value">${declaration}</span>
+						</div>
+					  </div>
 
-            <div class="profile-details-footer">
-                Data is fetched securely from the NUA membership registry.
-            </div>
-        `;
-		
-		const photoResponse = await fetch(		`${GAS_URL}?action=getMemberPlotPhoto&plotNumber=${encodeURIComponent(plotNumber)}`);
-		const photoData = await photoResponse.json();
+					  <!-- Last row: Member Type -->
+					  <div class="profile-compact-row">
+						<div class="profile-param">
+						  <span class="param-label">Member / MC Member</span>
+						  <span class="param-value">${role}</span>
+						</div>
+					  </div>
 
-		if (!photoData.error) {
-		  container.innerHTML += `
-			<div class="profile-photo">
-			  <span class="param-label">Plot Photo</span><br>
-			  <img src="${photoData.url}" alt="Plot ${plotNumber} Photo - ${photoData.url}" style="max-width:300px; border:1px solid #ccc; margin-top:10px;">
-			</div>
-		  `;
-		}
+					  <div class="profile-details-footer">
+						Data is fetched securely from the NUA membership registry.
+					  </div>
+					</div>
 
-        setTimeout(() => toggleSection('docs'), 800);
-    } catch (err) {
-        container.innerHTML = `<div class="error-state">Error: ${err.message}</div>`;
-    }
-}
-
+					<!-- Right column: Plot photo -->
+					<div class="profile-photo">
+					  <span class="param-label">Plot Photo</span><br>
+					  <img src="${photoData.embedUrl}" alt="Plot ${plotNumber} Photo" style="max-width:300px; border:1px solid #ccc; margin-top:10px;">
+					  <p><a href="${photoData.viewerUrl}" target="_blank">Open in Drive</a></p>
+					</div>
+				  </div>
+				`;
+				
+				setTimeout(() => toggleSection('docs'), 800);
+				} catch (err) {
+					container.innerHTML = `<div class="error-state">Error: ${err.message}</div>`;
+				}
+			}
 
         async function loadMemberDocs(event) {
             if (event) event.stopPropagation();

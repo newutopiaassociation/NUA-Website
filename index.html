@@ -382,9 +382,23 @@
     </button>
 
     <audio id="ambient-sound" loop>
-        <source src="https://www.soundjay.com/nature/birds-chirping-01.mp3" type="audio/mpeg">
+        <source src="assets/birds-chirping.mp3"" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
+	<script>
+		const audio = document.getElementById("ambient-sound");
+		const toggle = document.getElementById("sound-toggle");
+
+		toggle.addEventListener("click", () => {
+			if (audio.paused) {
+				audio.play().catch(err => console.log("Playback blocked:", err));
+				toggle.textContent = "Sound ON";
+			} else {
+				audio.pause();
+				toggle.textContent = "Sound OFF";
+			}
+		});
+</script>
 
     <script src="script.js"></script>
 </body>

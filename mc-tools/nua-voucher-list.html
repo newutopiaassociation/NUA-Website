@@ -196,7 +196,7 @@
             try {
                 const token = sessionStorage.getItem('nua_token');
                 const headers = {};
-                const response = await fetch("https://script.google.com/macros/s/AKfycbwTjMpJq8fqKuw-tODyS1nUJP7xX7zeKTbeT5V7C18FpVQyjCREaWsMV2yzcnTpLCDb/exec/exec?action=log", { headers }); // replace with your GAS web app URL
+                const response = await fetch("https://script.google.com/macros/s/AKfycbxd4sk0zFku0aMaZUNIgeNYlm-hhlxT9PQeWe9ytuypQkFXFhQxKkwtx4AZQp-J8QEM/exec?action=log", { headers }); // replace with your GAS web app URL
                 const data = await response.json();
 
                 if (data.status === "success" && Array.isArray(data.vouchers) && data.vouchers.length > 0) {

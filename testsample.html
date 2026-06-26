@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Plot Photo Test</title>
+  <style>
+    .photo-container {
+      background: #fff;
+      padding: 15px;
+      border: 1px solid #ccc;
+      max-width: 400px;
+      margin: auto;
+      text-align: center;
+      font-family: Arial, sans-serif;
+    }
+    .photo-container img {
+      max-width: 100%;
+      border: 1px solid #ddd;
+      margin-top: 10px;
+    }
+    .error-message {
+      color: red;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+<div class="photo-container">
+  <span class="param-label">Plot Photo</span>
+  <img src="https://drive.google.com/thumbnail?id=1ZHCTbCGhdyXoa1ccgwQqy_dkqQTHjdef&sz=w400" 
+       alt="Plot - 195 Photo">
+  <p><a href="https://drive.google.com/file/d/1ZHCTbCGhdyXoa1ccgwQqy_dkqQTHjdef/view" target="_blank">
+    Open in Drive
+  </a></p>
+</div>
+  <div class="photo-container" id="photo-container">
+    <span class="param-label">Plot Photo</span>
+  </div>
+
+  <script>
+    const container = document.getElementById('photo-container');
+    const imgUrl = "https://drive.google.com/uc?export=view&id=1ZHCTbCGhdyXoa1ccgwQqy_dkqQTHjdef";
+
+    const img = new Image();
+    img.src = imgUrl;
+    img.alt = "Plot - 195 Photo";
+
+    img.onload = function() {
+      container.appendChild(img);
+    };
+
+    img.onerror = function() {
+      container.innerHTML += `
+        <div class="error-message">
+          Image could not be loaded. <br>
+          <a href="https://drive.google.com/file/d/1ZHCTbCGhdyXoa1ccgwQqy_dkqQTHjdef/view" target="_blank">
+            Open in Drive
+          </a>
+        </div>
+      `;
+    };
+  </script>
+</body>
+</html>
