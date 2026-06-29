@@ -603,6 +603,101 @@
             transform: translateY(-2px);
         }
 
+        /* --- Folder Tab Switcher --- */
+        .folder-tabs-bar {
+            background: var(--bg-dark);
+            border-bottom: 1px solid rgba(102, 187, 106, 0.12);
+            padding: 0 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .folder-tabs-bar::-webkit-scrollbar { display: none; }
+
+        .folder-tabs {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0 4px;
+        }
+
+        .folder-tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-secondary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: color 0.25s ease, border-color 0.25s ease;
+            position: relative;
+        }
+
+        .folder-tab:hover {
+            color: var(--text-primary);
+        }
+
+        .folder-tab.active {
+            color: var(--brand-primary);
+            border-bottom-color: var(--brand-primary);
+            font-weight: 600;
+        }
+
+        .folder-tab .tab-icon {
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .folder-tab .tab-badge {
+            background: rgba(102, 187, 106, 0.15);
+            color: var(--brand-primary);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 50px;
+            transition: background 0.25s ease;
+        }
+
+        .folder-tab.active .tab-badge {
+            background: rgba(102, 187, 106, 0.28);
+        }
+
+        .folder-tab-skeleton {
+            width: 100px;
+            height: 12px;
+            background: linear-gradient(90deg,
+                rgba(102,187,106,0.05) 25%,
+                rgba(102,187,106,0.12) 50%,
+                rgba(102,187,106,0.05) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 6px;
+            margin: 18px 12px;
+        }
+
+        /* Active folder breadcrumb in hero subtitle */
+        #active-folder-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--brand-primary);
+            background: rgba(102,187,106,0.1);
+            border: 1px solid rgba(102,187,106,0.2);
+            padding: 3px 12px;
+            border-radius: 50px;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
         /* --- Responsive toolbar --- */
         @media (max-width: 600px) {
             .gallery-toolbar-inner {
@@ -627,6 +722,11 @@
                 width: 42px;
                 height: 42px;
                 font-size: 1.2rem;
+            }
+
+            .folder-tab {
+                padding: 12px 14px;
+                font-size: 0.82rem;
             }
         }
     </style>
@@ -684,7 +784,7 @@
             </div>
             <div class="stat-item">
                 <span>📁</span>
-                <span>Community Album</span>
+                <span id="active-folder-label">📂 Community Album</span>
             </div>
             <div class="stat-item">
                 <span>🔄</span>
@@ -692,6 +792,15 @@
             </div>
         </div>
     </section>
+
+    <!-- ===================== FOLDER TABS ===================== -->
+    <div class="folder-tabs-bar" id="folder-tabs-bar">
+        <div class="folder-tabs" id="folder-tabs">
+            <!-- Skeleton while subfolders load -->
+            <div class="folder-tab-skeleton"></div>
+            <div class="folder-tab-skeleton" style="width:120px"></div>
+        </div>
+    </div>
 
     <!-- ===================== TOOLBAR ===================== -->
     <div class="gallery-toolbar">
@@ -767,52 +876,141 @@
            =================================================== */
 
         const GALLERY_CONFIG = {
-            API_KEY:   'AIzaSyDq0TJyQ3Gc1qFalork-8LcHNxUkCCOkZ8',
-            FOLDER_ID: '1-TJJAAHOEgGWWuim9fLMYPt4bClYKljH',
-            PAGE_SIZE:  50,                          // images per API call
-            THUMB_SIZE: 'w800',                      // thumbnail quality
-            FULL_SIZE:  'w1600',                     // lightbox quality
+            API_KEY:        'AIzaSyDq0TJyQ3Gc1qFalork-8LcHNxUkCCOkZ8',
+            ROOT_FOLDER_ID: '1-TJJAAHOEgGWWuim9fLMYPt4bClYKljH',
+            PAGE_SIZE:       50,   // images per API call
+            THUMB_SIZE:     'w800',
+            FULL_SIZE:      'w1600',
         };
 
         /* ---- State ---- */
         const state = {
-            allImages:     [],
-            filteredImages:[],
-            currentPage:   0,
-            perPage:       30,
-            nextPageToken: null,
-            lightboxIndex: 0,
-            isFetching:    false,
+            allImages:       [],
+            filteredImages:  [],
+            currentPage:     0,
+            perPage:         30,
+            nextPageToken:   null,
+            lightboxIndex:   0,
+            isFetching:      false,
+            activeFolderId:  GALLERY_CONFIG.ROOT_FOLDER_ID,  // currently viewed folder
+            activeFolderName:'Community Album',
+            subfolders:      [],   // [{id, name}] discovered subfolders
         };
 
         /* ---- DOM refs ---- */
-        const grid          = document.getElementById('masonry-grid');
-        const photoCount    = document.getElementById('photo-count');
-        const searchInput   = document.getElementById('gallery-search-input');
-        const loadMoreBtn   = document.getElementById('load-more-btn');
-        const lightbox      = document.getElementById('gallery-lightbox');
-        const lightboxImg   = document.getElementById('lightbox-img');
-        const lightboxClose = document.getElementById('lightbox-close');
-        const lightboxPrev  = document.getElementById('lightbox-prev');
-        const lightboxNext  = document.getElementById('lightbox-next');
-        const lightboxCounter = document.getElementById('lightbox-counter');
-        const lightboxCaption = document.getElementById('lightbox-caption');
-        const lightboxSpinner = document.getElementById('lightbox-spinner');
+        const grid             = document.getElementById('masonry-grid');
+        const photoCount       = document.getElementById('photo-count');
+        const searchInput      = document.getElementById('gallery-search-input');
+        const loadMoreBtn      = document.getElementById('load-more-btn');
+        const folderTabsEl     = document.getElementById('folder-tabs');
+        const activeFolderLabel= document.getElementById('active-folder-label');
+        const lightbox         = document.getElementById('gallery-lightbox');
+        const lightboxImg      = document.getElementById('lightbox-img');
+        const lightboxClose    = document.getElementById('lightbox-close');
+        const lightboxPrev     = document.getElementById('lightbox-prev');
+        const lightboxNext     = document.getElementById('lightbox-next');
+        const lightboxCounter  = document.getElementById('lightbox-counter');
+        const lightboxCaption  = document.getElementById('lightbox-caption');
+        const lightboxSpinner  = document.getElementById('lightbox-spinner');
 
         /* ====================================================
-           FETCH IMAGES FROM GOOGLE DRIVE
+           DISCOVER SUBFOLDERS IN ROOT FOLDER
+           ==================================================== */
+        async function discoverSubfolders() {
+            const base   = 'https://www.googleapis.com/drive/v3/files';
+            const params = new URLSearchParams({
+                key:      GALLERY_CONFIG.API_KEY,
+                q:        `'${GALLERY_CONFIG.ROOT_FOLDER_ID}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+                fields:   'files(id,name)',
+                pageSize: 50,
+                orderBy:  'name',
+            });
+
+            try {
+                const res  = await fetch(`${base}?${params}`);
+                const data = await res.json();
+                state.subfolders = (data.files || []).map(f => ({ id: f.id, name: f.name }));
+            } catch (e) {
+                console.warn('Could not discover subfolders:', e);
+                state.subfolders = [];
+            }
+
+            renderFolderTabs();
+        }
+
+        /* ====================================================
+           RENDER FOLDER TAB BAR
+           ==================================================== */
+        function renderFolderTabs() {
+            const allFolders = [
+                { id: GALLERY_CONFIG.ROOT_FOLDER_ID, name: 'Community Album', icon: '🏠' },
+                ...state.subfolders.map(sf => ({
+                    id:   sf.id,
+                    name: sf.name,
+                    icon: sf.name.toLowerCase().includes('plot') ? '🗺️' : '📁',
+                })),
+            ];
+
+            folderTabsEl.innerHTML = allFolders.map(f => `
+                <button
+                    class="folder-tab ${f.id === state.activeFolderId ? 'active' : ''}"
+                    data-folder-id="${f.id}"
+                    data-folder-name="${escapeHtml(f.name)}"
+                    title="View ${escapeHtml(f.name)}"
+                >
+                    <span class="tab-icon">${f.icon}</span>
+                    ${escapeHtml(f.name)}
+                    <span class="tab-badge" id="tab-badge-${f.id}">—</span>
+                </button>
+            `).join('');
+
+            // Attach click handlers
+            folderTabsEl.querySelectorAll('.folder-tab').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const fid  = btn.dataset.folderId;
+                    const fname= btn.dataset.folderName;
+                    if (fid !== state.activeFolderId) {
+                        switchFolder(fid, fname);
+                    }
+                });
+            });
+        }
+
+        /* ====================================================
+           SWITCH ACTIVE FOLDER
+           ==================================================== */
+        function switchFolder(folderId, folderName) {
+            state.activeFolderId   = folderId;
+            state.activeFolderName = folderName;
+
+            // Update tab active state
+            folderTabsEl.querySelectorAll('.folder-tab').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.folderId === folderId);
+            });
+
+            // Update hero label
+            const icon = folderName.toLowerCase().includes('plot') ? '🗺️' : '📂';
+            activeFolderLabel.textContent = `${icon} ${folderName}`;
+
+            // Clear search and reload images for new folder
+            searchInput.value = '';
+            initGallery();
+        }
+
+        /* ====================================================
+           FETCH IMAGES FROM ACTIVE FOLDER
            ==================================================== */
         async function fetchDriveImages(pageToken = null) {
             if (state.isFetching) return;
             state.isFetching = true;
 
-            const base = 'https://www.googleapis.com/drive/v3/files';
+            const base   = 'https://www.googleapis.com/drive/v3/files';
             const params = new URLSearchParams({
                 key:      GALLERY_CONFIG.API_KEY,
-                q:        `'${GALLERY_CONFIG.FOLDER_ID}' in parents and mimeType contains 'image/' and trashed=false`,
+                q:        `'${state.activeFolderId}' in parents and mimeType contains 'image/' and trashed=false`,
                 fields:   'nextPageToken,files(id,name,mimeType,imageMediaMetadata)',
                 pageSize: GALLERY_CONFIG.PAGE_SIZE,
-                orderBy:  'createdTime desc',
+                orderBy:  'name',
             });
 
             if (pageToken) params.set('pageToken', pageToken);
@@ -829,10 +1027,10 @@
                 state.nextPageToken = data.nextPageToken || null;
 
                 const newImages = (data.files || []).map(f => ({
-                    id:     f.id,
-                    name:   cleanName(f.name),
-                    width:  f.imageMediaMetadata?.width  || 800,
-                    height: f.imageMediaMetadata?.height || 600,
+                    id:       f.id,
+                    name:     cleanName(f.name),
+                    width:    f.imageMediaMetadata?.width  || 800,
+                    height:   f.imageMediaMetadata?.height || 600,
                     thumbUrl: `https://drive.google.com/thumbnail?id=${f.id}&sz=${GALLERY_CONFIG.THUMB_SIZE}`,
                     fullUrl:  `https://drive.google.com/thumbnail?id=${f.id}&sz=${GALLERY_CONFIG.FULL_SIZE}`,
                 }));
@@ -840,7 +1038,11 @@
                 state.allImages = [...state.allImages, ...newImages];
                 applySearch(searchInput.value);
 
-                photoCount.textContent = state.allImages.length + (state.nextPageToken ? '+' : '');
+                // Update photo count in stats and on the tab badge
+                const countText = state.allImages.length + (state.nextPageToken ? '+' : '');
+                photoCount.textContent = countText;
+                const badge = document.getElementById(`tab-badge-${state.activeFolderId}`);
+                if (badge) badge.textContent = countText;
 
             } catch (err) {
                 console.error('Drive API error:', err);
@@ -1117,8 +1319,11 @@
             await fetchDriveImages();
         }
 
-        // Start
-        initGallery();
+        // Start: discover subfolders first, then load root images
+        (async () => {
+            await discoverSubfolders();
+            await initGallery();
+        })();
     </script>
 </body>
 
