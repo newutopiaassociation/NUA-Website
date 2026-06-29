@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NUA Photo Gallery - New Utopia Association</title>
+    <meta name="description"
+        content="Browse the NUA community photo gallery — capturing moments, events, and life at New Utopia.">
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a1f08">
+    <link rel="apple-touch-icon" href="assets/logo.png">
+
+    <style>
+        /* =============================================
+           GALLERY PAGE — SCOPED STYLES
+           ============================================= */
+
+        /* --- Page Hero Banner --- */
+        .gallery-hero {
+            padding: 130px 20px 60px;
+            text-align: center;
+            background: linear-gradient(160deg, var(--bg-dark) 0%, var(--bg-secondary) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gallery-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(102, 187, 106, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(129, 199, 132, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .gallery-hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            color: var(--brand-primary);
+            margin-bottom: 12px;
+            text-shadow: 0 0 40px var(--accent-glow);
+            position: relative;
+        }
+
+        .gallery-hero p {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            max-width: 540px;
+            margin: 0 auto 28px;
+            position: relative;
+        }
+
+        .gallery-stats {
+            display: inline-flex;
+            gap: 32px;
+            background: var(--glass-bg);
+            border: 1px solid rgba(102, 187, 106, 0.2);
+            border-radius: 50px;
+            padding: 10px 28px;
+            backdrop-filter: blur(8px);
+            position: relative;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-item strong {
+            color: var(--brand-primary);
+            font-size: 1rem;
+        }
+
+        /* --- Filter / Sort Bar --- */
+        .gallery-toolbar {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid rgba(102, 187, 106, 0.1);
+            padding: 16px 20px;
+            position: sticky;
+            top: 72px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .gallery-toolbar-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .gallery-search {
+            position: relative;
+            flex: 1;
+            min-width: 220px;
+            max-width: 340px;
+        }
+
+        .gallery-search input {
+            width: 100%;
+            padding: 9px 16px 9px 40px;
+            background: var(--glass-bg);
+            border: 1px solid rgba(102, 187, 106, 0.2);
+            border-radius: 50px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .gallery-search input:focus {
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.15);
+        }
+
+        .gallery-search .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 6px;
+        }
+
+        .view-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid rgba(102, 187, 106, 0.2);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 0.85rem;
+        }
+
+        .view-btn.active,
+        .view-btn:hover {
+            background: var(--brand-primary);
+            color: #fff;
+            border-color: var(--brand-primary);
+        }
+
+        /* --- Masonry Grid --- */
+        .gallery-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        /* CSS Masonry using columns */
+        .masonry-grid {
+            column-count: 4;
+            column-gap: 16px;
+            transition: column-count 0.3s ease;
+        }
+
+        .masonry-grid.view-grid-2 { column-count: 2; }
+        .masonry-grid.view-grid-3 { column-count: 3; }
+        .masonry-grid.view-grid-4 { column-count: 4; }
+
+        @media (max-width: 1100px) {
+            .masonry-grid { column-count: 3; }
+            .masonry-grid.view-grid-4 { column-count: 3; }
+        }
+
+        @media (max-width: 768px) {
+            .masonry-grid,
+            .masonry-grid.view-grid-3,
+            .masonry-grid.view-grid-4 { column-count: 2; }
+            .masonry-grid.view-grid-2 { column-count: 2; }
+        }
+
+        @media (max-width: 480px) {
+            .masonry-grid,
+            .masonry-grid.view-grid-2,
+            .masonry-grid.view-grid-3,
+            .masonry-grid.view-grid-4 { column-count: 1; }
+        }
+
+        /* --- Gallery Item Card --- */
+        .gallery-item {
+            break-inside: avoid;
+            margin-bottom: 16px;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            background: var(--bg-secondary);
+            box-shadow: var(--shadow-soft);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(102, 187, 106, 0.3);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.45s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.04);
+        }
+
+        /* Overlay on hover */
+        .gallery-item-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 16px;
+        }
+
+        .gallery-item:hover .gallery-item-overlay {
+            opacity: 1;
+        }
+
+        .gallery-item-name {
+            color: #fff;
+            font-size: 0.82rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transform: translateY(8px);
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item:hover .gallery-item-name {
+            transform: translateY(0);
+        }
+
+        .gallery-item-zoom-icon {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(4px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.7);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .gallery-item:hover .gallery-item-zoom-icon {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Skeleton loaders */
+        .skeleton-item {
+            break-inside: avoid;
+            margin-bottom: 16px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+
+        .skeleton-img {
+            width: 100%;
+            background: linear-gradient(90deg,
+                rgba(102,187,106,0.05) 25%,
+                rgba(102,187,106,0.12) 50%,
+                rgba(102,187,106,0.05) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Staggered animation delays */
+        .gallery-item:nth-child(1)  { animation-delay: 0.05s; }
+        .gallery-item:nth-child(2)  { animation-delay: 0.10s; }
+        .gallery-item:nth-child(3)  { animation-delay: 0.15s; }
+        .gallery-item:nth-child(4)  { animation-delay: 0.20s; }
+        .gallery-item:nth-child(5)  { animation-delay: 0.25s; }
+        .gallery-item:nth-child(6)  { animation-delay: 0.30s; }
+        .gallery-item:nth-child(7)  { animation-delay: 0.35s; }
+        .gallery-item:nth-child(8)  { animation-delay: 0.40s; }
+        .gallery-item:nth-child(9)  { animation-delay: 0.45s; }
+        .gallery-item:nth-child(10) { animation-delay: 0.50s; }
+        .gallery-item:nth-child(n+11) { animation-delay: 0.55s; }
+
+        /* --- Status Messages --- */
+        .gallery-status {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .gallery-status .status-icon {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .gallery-status h3 {
+            color: var(--brand-primary);
+            margin-bottom: 10px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .gallery-status p {
+            color: var(--text-secondary);
+            max-width: 440px;
+            margin: 0 auto 20px;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .gallery-status .btn-retry {
+            display: inline-block;
+            padding: 10px 28px;
+            background: var(--brand-primary);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .gallery-status .btn-retry:hover {
+            background: var(--brand-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102,187,106,0.35);
+        }
+
+        /* API Key Config Notice */
+        .api-key-notice {
+            background: linear-gradient(135deg, rgba(102,187,106,0.08), rgba(129,199,132,0.04));
+            border: 1px solid rgba(102, 187, 106, 0.25);
+            border-radius: 16px;
+            padding: 28px 32px;
+            max-width: 620px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .api-key-notice h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            margin-bottom: 14px;
+            color: var(--brand-primary);
+        }
+
+        .api-key-notice ol {
+            margin: 0 0 0 16px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 2;
+        }
+
+        .api-key-notice code {
+            background: rgba(102,187,106,0.12);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.82rem;
+            color: var(--brand-primary);
+            font-family: 'Courier New', monospace;
+        }
+
+        /* --- LIGHTBOX --- */
+        #gallery-lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        #gallery-lightbox.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #lightbox-img {
+            max-width: 88vw;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        #lightbox-img.loading {
+            opacity: 0;
+            transform: scale(0.96);
+        }
+
+        /* Lightbox spinner */
+        .lightbox-spinner {
+            position: absolute;
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(102,187,106,0.2);
+            border-top-color: var(--brand-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        .lightbox-spinner.show { display: block; }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Close button */
+        #lightbox-close {
+            position: fixed;
+            top: 20px;
+            right: 24px;
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            color: #fff;
+            font-size: 1.3rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10000;
+            backdrop-filter: blur(4px);
+        }
+
+        #lightbox-close:hover {
+            background: rgba(102, 187, 106, 0.35);
+            border-color: var(--brand-primary);
+            transform: scale(1.1);
+        }
+
+        /* Prev / Next nav */
+        .lightbox-nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 52px;
+            height: 52px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 50%;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            z-index: 10000;
+            backdrop-filter: blur(4px);
+        }
+
+        .lightbox-nav:hover {
+            background: rgba(102, 187, 106, 0.3);
+            border-color: var(--brand-primary);
+            transform: translateY(-50%) scale(1.08);
+        }
+
+        .lightbox-nav.disabled {
+            opacity: 0.25;
+            pointer-events: none;
+        }
+
+        #lightbox-prev { left: 16px; }
+        #lightbox-next { right: 16px; }
+
+        /* Lightbox caption */
+        #lightbox-caption {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.75);
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80vw;
+            text-align: center;
+            z-index: 10000;
+        }
+
+        /* Lightbox counter */
+        #lightbox-counter {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.6);
+            font-size: 0.82rem;
+            font-family: 'Inter', sans-serif;
+            background: rgba(0,0,0,0.4);
+            padding: 4px 16px;
+            border-radius: 50px;
+            z-index: 10000;
+            backdrop-filter: blur(4px);
+        }
+
+        /* --- Load More --- */
+        .load-more-container {
+            text-align: center;
+            padding: 16px 0 48px;
+        }
+
+        #load-more-btn {
+            padding: 12px 36px;
+            background: transparent;
+            border: 1.5px solid var(--brand-primary);
+            color: var(--brand-primary);
+            border-radius: 50px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        #load-more-btn:hover {
+            background: var(--brand-primary);
+            color: #fff;
+            box-shadow: 0 6px 24px rgba(102,187,106,0.4);
+            transform: translateY(-2px);
+        }
+
+        /* --- Responsive toolbar --- */
+        @media (max-width: 600px) {
+            .gallery-toolbar-inner {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .gallery-search {
+                max-width: 100%;
+            }
+
+            .gallery-stats {
+                gap: 16px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            #lightbox-prev { left: 8px; }
+            #lightbox-next { right: 8px; }
+
+            .lightbox-nav {
+                width: 42px;
+                height: 42px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="moonlit-theme">
+
+    <!-- ===================== HEADER ===================== -->
+    <header id="main-header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="assets/logo.png" alt="NUA Logo" id="header-logo">
+                </a>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html#about" class="glow-on-hover">About NUA</a></li>
+                    <li><a href="index.html#principles" class="glow-on-hover">Guiding Principles</a></li>
+                    <li><a href="index.html#registration" class="glow-on-hover">Member Registration</a></li>
+                    <li><a href="mc-members.html" class="glow-on-hover">Member Resources</a></li>
+                    <li><a href="gallery.html" class="glow-on-hover active-page">Photo Gallery</a></li>
+                    <li><a href="index.html#contact" class="glow-on-hover">Contact NUA MC</a></li>
+                    <li><a href="index.html#newsletters" class="glow-on-hover">NUA Newsletters</a></li>
+                    <li class="mobile-only-controls">
+                        <div class="header-controls">
+                            <button id="theme-toggle-mobile" class="control-btn" title="Toggle Day/Night Mode">🌙</button>
+                            <button id="sound-toggle-mobile" class="control-btn" title="Toggle Ambient Sound">🔇</button>
+                            <button class="control-btn refresh-app-btn" title="Refresh App" onclick="refreshApp()">🔄</button>
+                        </div>
+                    </li>
+                </ul>
+                <div class="header-controls desktop-only-controls">
+                    <button id="theme-toggle" class="control-btn" title="Toggle Day/Night Mode">🌙</button>
+                    <button id="sound-toggle" class="control-btn" title="Toggle Ambient Sound">🔇</button>
+                    <button class="control-btn refresh-app-btn" title="Refresh App" onclick="refreshApp()">🔄</button>
+                </div>
+                <div class="menu-toggle" id="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ===================== HERO ===================== -->
+    <section class="gallery-hero">
+        <h1>📸 NUA Photo Gallery</h1>
+        <p>Capturing moments, milestones, and the spirit of our New Utopia community.</p>
+        <div class="gallery-stats">
+            <div class="stat-item">
+                <span>📷</span>
+                <span><strong id="photo-count">—</strong> Photos</span>
+            </div>
+            <div class="stat-item">
+                <span>📁</span>
+                <span>Community Album</span>
+            </div>
+            <div class="stat-item">
+                <span>🔄</span>
+                <span>Live from Drive</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== TOOLBAR ===================== -->
+    <div class="gallery-toolbar">
+        <div class="gallery-toolbar-inner">
+            <div class="gallery-search">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="gallery-search-input" placeholder="Search photos by name…" autocomplete="off">
+            </div>
+            <div class="view-toggle">
+                <button class="view-btn" id="btn-view-2" title="2 columns">⊞</button>
+                <button class="view-btn active" id="btn-view-3" title="3 columns">⊟</button>
+                <button class="view-btn" id="btn-view-4" title="4 columns">⠿</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== GALLERY GRID ===================== -->
+    <main>
+        <div class="gallery-container">
+            <div class="masonry-grid view-grid-3" id="masonry-grid">
+                <!-- Images injected by JS -->
+            </div>
+
+            <!-- Load More -->
+            <div class="load-more-container">
+                <button id="load-more-btn">Load More Photos</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- ===================== LIGHTBOX ===================== -->
+    <div id="gallery-lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+        <button id="lightbox-close" aria-label="Close lightbox" title="Close (Esc)">✕</button>
+        <button class="lightbox-nav" id="lightbox-prev" aria-label="Previous photo" title="Previous (←)">‹</button>
+        <div class="lightbox-content">
+            <div class="lightbox-spinner" id="lightbox-spinner"></div>
+            <img id="lightbox-img" src="" alt="" loading="lazy">
+        </div>
+        <button class="lightbox-nav" id="lightbox-next" aria-label="Next photo" title="Next (→)">›</button>
+        <div id="lightbox-counter"></div>
+        <div id="lightbox-caption"></div>
+    </div>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer>
+        <div class="container text-center">
+            <p>&copy; 2026 New Utopia Association (NUA). All rights reserved.</p>
+            <p class="designer-credit">Designed By: R&R Consulting</p>
+        </div>
+    </footer>
+
+    <button id="back-to-top" title="Go to top">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5V19M12 5L6 11M12 5L18 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+        </svg>
+    </button>
+
+    <!-- ===================== SCRIPTS ===================== -->
+    <script src="script.js"></script>
+    <script>
+        /* ===================================================
+           NUA PHOTO GALLERY — Google Drive API v3 Integration
+           ===================================================
+           SETUP: Replace YOUR_GOOGLE_API_KEY below with your
+           actual Google API key that has Google Drive API enabled.
+           
+           HOW TO GET A KEY:
+           1. Go to https://console.cloud.google.com/
+           2. APIs & Services → Library → Enable "Google Drive API"
+           3. APIs & Services → Credentials → Create API Key
+           4. Restrict: API = Google Drive API | HTTP referrer = your domain
+           =================================================== */
+
+        const GALLERY_CONFIG = {
+            API_KEY:   'AIzaSyDq0TJyQ3Gc1qFalork-8LcHNxUkCCOkZ8',
+            FOLDER_ID: '1-TJJAAHOEgGWWuim9fLMYPt4bClYKljH',
+            PAGE_SIZE:  50,                          // images per API call
+            THUMB_SIZE: 'w800',                      // thumbnail quality
+            FULL_SIZE:  'w1600',                     // lightbox quality
+        };
+
+        /* ---- State ---- */
+        const state = {
+            allImages:     [],
+            filteredImages:[],
+            currentPage:   0,
+            perPage:       30,
+            nextPageToken: null,
+            lightboxIndex: 0,
+            isFetching:    false,
+        };
+
+        /* ---- DOM refs ---- */
+        const grid          = document.getElementById('masonry-grid');
+        const photoCount    = document.getElementById('photo-count');
+        const searchInput   = document.getElementById('gallery-search-input');
+        const loadMoreBtn   = document.getElementById('load-more-btn');
+        const lightbox      = document.getElementById('gallery-lightbox');
+        const lightboxImg   = document.getElementById('lightbox-img');
+        const lightboxClose = document.getElementById('lightbox-close');
+        const lightboxPrev  = document.getElementById('lightbox-prev');
+        const lightboxNext  = document.getElementById('lightbox-next');
+        const lightboxCounter = document.getElementById('lightbox-counter');
+        const lightboxCaption = document.getElementById('lightbox-caption');
+        const lightboxSpinner = document.getElementById('lightbox-spinner');
+
+        /* ====================================================
+           FETCH IMAGES FROM GOOGLE DRIVE
+           ==================================================== */
+        async function fetchDriveImages(pageToken = null) {
+            if (state.isFetching) return;
+            state.isFetching = true;
+
+            const base = 'https://www.googleapis.com/drive/v3/files';
+            const params = new URLSearchParams({
+                key:      GALLERY_CONFIG.API_KEY,
+                q:        `'${GALLERY_CONFIG.FOLDER_ID}' in parents and mimeType contains 'image/' and trashed=false`,
+                fields:   'nextPageToken,files(id,name,mimeType,imageMediaMetadata)',
+                pageSize: GALLERY_CONFIG.PAGE_SIZE,
+                orderBy:  'createdTime desc',
+            });
+
+            if (pageToken) params.set('pageToken', pageToken);
+
+            try {
+                const res = await fetch(`${base}?${params}`);
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err?.error?.message || `HTTP ${res.status}`);
+                }
+
+                const data = await res.json();
+                state.nextPageToken = data.nextPageToken || null;
+
+                const newImages = (data.files || []).map(f => ({
+                    id:     f.id,
+                    name:   cleanName(f.name),
+                    width:  f.imageMediaMetadata?.width  || 800,
+                    height: f.imageMediaMetadata?.height || 600,
+                    thumbUrl: `https://drive.google.com/thumbnail?id=${f.id}&sz=${GALLERY_CONFIG.THUMB_SIZE}`,
+                    fullUrl:  `https://drive.google.com/thumbnail?id=${f.id}&sz=${GALLERY_CONFIG.FULL_SIZE}`,
+                }));
+
+                state.allImages = [...state.allImages, ...newImages];
+                applySearch(searchInput.value);
+
+                photoCount.textContent = state.allImages.length + (state.nextPageToken ? '+' : '');
+
+            } catch (err) {
+                console.error('Drive API error:', err);
+                showError(err.message);
+            } finally {
+                state.isFetching = false;
+            }
+        }
+
+        /* ====================================================
+           RENDER GALLERY
+           ==================================================== */
+        function renderPage(images, reset = false) {
+            if (reset) {
+                grid.innerHTML = '';
+                state.currentPage = 0;
+            }
+
+            const start = state.currentPage * state.perPage;
+            const slice = images.slice(start, start + state.perPage);
+
+            if (reset && slice.length === 0) {
+                showEmpty();
+                loadMoreBtn.style.display = 'none';
+                return;
+            }
+
+            // Remove any status messages
+            const statusEl = grid.querySelector('.gallery-status');
+            if (statusEl) statusEl.remove();
+
+            slice.forEach((img, localIdx) => {
+                const globalIdx = start + localIdx;
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                item.dataset.index = globalIdx;
+
+                // Aspect ratio padding trick for skeleton feel
+                const ratio = Math.round((img.height / img.width) * 100);
+
+                item.innerHTML = `
+                    <img
+                        src="${img.thumbUrl}"
+                        alt="${escapeHtml(img.name)}"
+                        loading="lazy"
+                        decoding="async"
+                        onerror="this.closest('.gallery-item').style.display='none'"
+                    >
+                    <div class="gallery-item-overlay">
+                        <span class="gallery-item-name">${escapeHtml(img.name)}</span>
+                    </div>
+                    <div class="gallery-item-zoom-icon">⤢</div>
+                `;
+
+                item.addEventListener('click', () => openLightbox(globalIdx));
+                grid.appendChild(item);
+            });
+
+            state.currentPage++;
+
+            // Show/hide load more
+            const hasMore = (state.currentPage * state.perPage) < images.length || state.nextPageToken;
+            loadMoreBtn.style.display = hasMore ? 'inline-block' : 'none';
+        }
+
+        /* ====================================================
+           SEARCH / FILTER
+           ==================================================== */
+        function applySearch(query) {
+            const q = query.trim().toLowerCase();
+            state.filteredImages = q
+                ? state.allImages.filter(img => img.name.toLowerCase().includes(q))
+                : [...state.allImages];
+
+            renderPage(state.filteredImages, true);
+        }
+
+        let searchTimer;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => applySearch(searchInput.value), 280);
+        });
+
+        /* ====================================================
+           LIGHTBOX
+           ==================================================== */
+        function openLightbox(index) {
+            state.lightboxIndex = index;
+            updateLightboxImage();
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            lightboxImg.src = '';
+            document.body.style.overflow = '';
+        }
+
+        function updateLightboxImage() {
+            const img = state.filteredImages[state.lightboxIndex];
+            if (!img) return;
+
+            // Show spinner, hide image
+            lightboxImg.classList.add('loading');
+            lightboxSpinner.classList.add('show');
+
+            const tempImg = new Image();
+            tempImg.onload = () => {
+                lightboxImg.src = img.fullUrl;
+                lightboxImg.alt = img.name;
+                lightboxImg.classList.remove('loading');
+                lightboxSpinner.classList.remove('show');
+            };
+            tempImg.onerror = () => {
+                // Fallback to thumb
+                lightboxImg.src = img.thumbUrl;
+                lightboxImg.alt = img.name;
+                lightboxImg.classList.remove('loading');
+                lightboxSpinner.classList.remove('show');
+            };
+            tempImg.src = img.fullUrl;
+
+            lightboxCaption.textContent  = img.name;
+            lightboxCounter.textContent  = `${state.lightboxIndex + 1} / ${state.filteredImages.length}`;
+
+            lightboxPrev.classList.toggle('disabled', state.lightboxIndex === 0);
+            lightboxNext.classList.toggle('disabled', state.lightboxIndex === state.filteredImages.length - 1);
+
+            // Preload adjacent images
+            preloadAdjacentImages(state.lightboxIndex);
+        }
+
+        function preloadAdjacentImages(idx) {
+            [idx - 1, idx + 1].forEach(i => {
+                const img = state.filteredImages[i];
+                if (img) { new Image().src = img.thumbUrl; }
+            });
+        }
+
+        lightboxClose.addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+
+        lightboxPrev.addEventListener('click', () => {
+            if (state.lightboxIndex > 0) {
+                state.lightboxIndex--;
+                updateLightboxImage();
+            }
+        });
+
+        lightboxNext.addEventListener('click', () => {
+            if (state.lightboxIndex < state.filteredImages.length - 1) {
+                state.lightboxIndex++;
+                updateLightboxImage();
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', e => {
+            if (!lightbox.classList.contains('active')) return;
+            if (e.key === 'Escape')     closeLightbox();
+            if (e.key === 'ArrowLeft')  { lightboxPrev.click(); }
+            if (e.key === 'ArrowRight') { lightboxNext.click(); }
+        });
+
+        // Swipe support (touch)
+        let touchStartX = 0;
+        lightbox.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+        lightbox.addEventListener('touchend',   e => {
+            const dx = e.changedTouches[0].clientX - touchStartX;
+            if (Math.abs(dx) > 50) {
+                if (dx < 0) lightboxNext.click();
+                else        lightboxPrev.click();
+            }
+        }, { passive: true });
+
+        /* ====================================================
+           VIEW TOGGLE (columns)
+           ==================================================== */
+        ['2','3','4'].forEach(n => {
+            document.getElementById(`btn-view-${n}`).addEventListener('click', function () {
+                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                grid.className = `masonry-grid view-grid-${n}`;
+            });
+        });
+
+        /* ====================================================
+           LOAD MORE
+           ==================================================== */
+        loadMoreBtn.addEventListener('click', async () => {
+            if ((state.currentPage * state.perPage) >= state.filteredImages.length && state.nextPageToken) {
+                // Fetch next API page first
+                loadMoreBtn.textContent = 'Loading…';
+                loadMoreBtn.disabled = true;
+                await fetchDriveImages(state.nextPageToken);
+                loadMoreBtn.textContent = 'Load More Photos';
+                loadMoreBtn.disabled = false;
+            } else {
+                renderPage(state.filteredImages, false);
+            }
+        });
+
+        /* ====================================================
+           STATUS HELPERS
+           ==================================================== */
+        function showError(message) {
+            const isKeyError = GALLERY_CONFIG.API_KEY === 'YOUR_GOOGLE_API_KEY';
+
+            grid.innerHTML = `
+                <div class="gallery-status">
+                    <span class="status-icon">${isKeyError ? '🔑' : '⚠️'}</span>
+                    ${isKeyError
+                        ? `<h3>API Key Not Configured</h3>
+                           <div class="api-key-notice">
+                               <h3>🛠️ Quick Setup</h3>
+                               <ol>
+                                   <li>Go to <a href="https://console.cloud.google.com/" target="_blank" style="color:var(--brand-primary)">Google Cloud Console</a></li>
+                                   <li>Enable <strong>Google Drive API</strong></li>
+                                   <li>Create an <strong>API Key</strong> under Credentials</li>
+                                   <li>Restrict it to: Drive API + your domain</li>
+                                   <li>Open <code>gallery.html</code> and replace <code>YOUR_GOOGLE_API_KEY</code></li>
+                               </ol>
+                           </div>`
+                        : `<h3>Failed to Load Gallery</h3>
+                           <p>${escapeHtml(message)}</p>
+                           <p>Please ensure the Google Drive folder is <strong>shared publicly</strong> and the API key has Drive API enabled.</p>
+                           <button class="btn-retry" onclick="initGallery()">🔄 Try Again</button>`
+                    }
+                </div>
+            `;
+        }
+
+        function showLoading() {
+            const heights = [220, 300, 180, 260, 320, 200, 280, 240, 310, 190, 270, 230];
+            grid.innerHTML = heights.map(h => `
+                <div class="skeleton-item">
+                    <div class="skeleton-img" style="height:${h}px"></div>
+                </div>
+            `).join('');
+        }
+
+        function showEmpty() {
+            grid.innerHTML = `
+                <div class="gallery-status">
+                    <span class="status-icon">🌿</span>
+                    <h3>No Photos Found</h3>
+                    <p>No images match your search. Try a different keyword or clear the search field.</p>
+                </div>
+            `;
+        }
+
+        /* ====================================================
+           UTILITY HELPERS
+           ==================================================== */
+        function cleanName(filename) {
+            return filename.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        /* ====================================================
+           INIT
+           ==================================================== */
+        async function initGallery() {
+            showLoading();
+            state.allImages      = [];
+            state.filteredImages = [];
+            state.currentPage    = 0;
+            state.nextPageToken  = null;
+            photoCount.textContent = '—';
+            await fetchDriveImages();
+        }
+
+        // Start
+        initGallery();
+    </script>
+</body>
+
+</html>
