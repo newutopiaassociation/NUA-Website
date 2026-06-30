@@ -7,18 +7,18 @@
     <title>NUA Photo Gallery - New Utopia Association</title>
     <meta name="description"
         content="Browse the NUA community photo gallery — capturing moments, events, and life at New Utopia.">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap"
         rel="stylesheet">
-    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
     <!-- PWA Meta Tags -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="../manifest.json">
     <meta name="theme-color" content="#0a1f08">
-    <link rel="apple-touch-icon" href="assets/logo.png">
+    <link rel="apple-touch-icon" href="../assets/logo.png">
 
     <style>
         /* =============================================
@@ -738,19 +738,19 @@
     <header id="main-header">
         <div class="container header-container">
             <div class="logo">
-                <a href="index.html">
-                    <img src="assets/logo.png" alt="NUA Logo" id="header-logo">
+                <a href="../index.html">
+                    <img src="../assets/logo.png" alt="NUA Logo" id="header-logo">
                 </a>
             </div>
             <nav>
                 <ul class="nav-links">
-                    <li><a href="index.html#about" class="glow-on-hover">About NUA</a></li>
-                    <li><a href="index.html#principles" class="glow-on-hover">Guiding Principles</a></li>
-                    <li><a href="index.html#registration" class="glow-on-hover">Member Registration</a></li>
-                    <li><a href="mc-members.html" class="glow-on-hover">Member Resources</a></li>
+                    <li><a href="../index.html#about" class="glow-on-hover">About NUA</a></li>
+                    <li><a href="../index.html#principles" class="glow-on-hover">Guiding Principles</a></li>
+                    <li><a href="../index.html#registration" class="glow-on-hover">Member Registration</a></li>
+                    <li><a href="../mc-members.html" class="glow-on-hover">Member Resources</a></li>
                     <li><a href="gallery.html" class="glow-on-hover active-page">Photo Gallery</a></li>
-                    <li><a href="index.html#contact" class="glow-on-hover">Contact NUA MC</a></li>
-                    <li><a href="index.html#newsletters" class="glow-on-hover">NUA Newsletters</a></li>
+                    <li><a href="../index.html#contact" class="glow-on-hover">Contact NUA MC</a></li>
+                    <li><a href="../index.html#newsletters" class="glow-on-hover">NUA Newsletters</a></li>
                     <li class="mobile-only-controls">
                         <div class="header-controls">
                             <button id="theme-toggle-mobile" class="control-btn" title="Toggle Day/Night Mode">🌙</button>
@@ -845,6 +845,40 @@
     </div>
 
     <!-- ===================== FOOTER ===================== -->
+            <section id="quicklinks" class="section bg-light">
+            <div class="container">
+                <div class="quicklinks-grid">
+                    <div class="quicklinks-col">
+                        <h3>Useful Links</h3>
+                        <ul class="quick-links-list">
+                            <li><a href="kya.html">🏛️ KYA (Know Your Association)</a></li>
+                            <li><a href="gallery.html">📸 NUA Photo Gallery</a></li>
+                            <li><a href="blogs.html">✍️ MC Member Blogs</a></li>
+                            <li><a href="nua-journey.html">⏳ NUA Journey Timeline</a></li>
+                        </ul>
+                    </div>
+                    <div class="quicklinks-col">
+                        <h3>Contact Us</h3>
+                        <p><strong>NUA MC Email ID:</strong><br>
+                            <a href="mailto:nua-managing-committee@googlegroups.com">nua-managing-committee@googlegroups.com</a>
+                        </p>
+                    </div>
+                    <div class="quicklinks-col">
+                        <h3>Site Navigation</h3>
+                        <ul class="quick-links-list">
+                            <li><a href="../index.html#about">About NUA</a></li>
+                            <li><a href="../index.html#principles">Guiding Principles</a></li>
+                            <li><a href="../index.html#registration">Member Registration</a></li>
+                            <li><a href="../mc-members.html">MC Resources</a></li>
+                            <li><a href="gallery.html">📸 Photo Gallery</a></li>
+                            <li><a href="../index.html#contact">Contact NUA MC</a></li>
+                            <li><a href="../index.html#newsletters">NUA Newsletters</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     <footer>
         <div class="container text-center">
             <p>&copy; 2026 New Utopia Association (NUA). All rights reserved.</p>
@@ -860,7 +894,7 @@
     </button>
 
     <!-- ===================== SCRIPTS ===================== -->
-    <script src="script.js"></script>
+    <script src="../script.js"></script>
     <script>
         /* ===================================================
            NUA PHOTO GALLERY — Google Drive API v3 Integration
@@ -1089,7 +1123,6 @@
                         alt="${escapeHtml(img.name)}"
                         loading="lazy"
                         decoding="async"
-                        onerror="this.closest('.gallery-item').style.display='none'"
                     >
                     <div class="gallery-item-overlay">
                         <span class="gallery-item-name">${escapeHtml(img.name)}</span>

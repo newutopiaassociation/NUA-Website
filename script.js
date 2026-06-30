@@ -66,6 +66,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Google Analytics: Member Resources Click ---
+    const memberResourcesLink = document.getElementById('nav-member-resources');
+    if (memberResourcesLink) {
+        memberResourcesLink.addEventListener('click', () => {
+            if (typeof gtag === 'function') {
+                gtag('event', 'nav_click', {
+                    event_category: 'Navigation',
+                    event_label: 'Member Resources',
+                    value: 1
+                });
+            }
+        });
+    }
+
     // --- Contact Form Submission ---
     const contactForm = document.getElementById('contact-form');
 

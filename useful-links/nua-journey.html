@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NUA Journey - Transparency and Accountability</title>
+    <link rel="stylesheet" href="../style.css">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-top: 100px; /* Offset for fixed header */
+        }
+        
+        body.moonlit-theme {
+            --timeline-blue: #90caf9;
+            --timeline-bg: #0A1F08;
+            --card-bg: #0F250E;
+            --text-color: #E0EADD;
+            --border-light: rgba(255,255,255,0.1);
+        }
+        
+        body:not(.moonlit-theme) {
+            --timeline-blue: #1a4f8b;
+            --timeline-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --border-light: #eee;
+        }
+
+        .journey-header {
+            text-align: center;
+            padding: 40px 20px 20px;
+        }
+
+        .journey-header h1 {
+            color: var(--timeline-blue); /* Blue header */
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .journey-header p {
+            font-size: 1.2rem;
+            color: var(--text-color); opacity: 0.8;
+            margin-top: 0;
+        }
+
+        .timeline-container {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 40px;
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .timeline-wrapper {
+            display: flex;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding-bottom: 50px;
+            padding-top: 20px;
+            scrollbar-width: none; /* Firefox */
+        }
+        .timeline-wrapper::-webkit-scrollbar {
+            display: none; /* Chrome, Safari */
+        }
+
+        .timeline-line {
+            position: absolute;
+            top: 60px; /* Center with icons */
+            left: 0;
+            right: 0;
+            height: 8px;
+            background-color: var(--timeline-blue);
+            z-index: 1;
+        }
+
+        .milestone {
+            position: relative;
+            flex: 0 0 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+            cursor: pointer;
+            padding: 0 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .milestone:hover {
+            transform: translateY(-5px);
+        }
+
+        .icon-container {
+            width: 80px;
+            height: 80px;
+            background-color: var(--card-bg);
+            border: 4px solid var(--timeline-blue);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 32px;
+            color: var(--timeline-blue);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .milestone.completed .icon-container {
+            border-color: var(--timeline-blue); /* Keep outer border blue to match image */
+            background-color: #2e7d32;
+            color: white;
+        }
+
+        .milestone-date {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--timeline-blue);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .milestone.completed .milestone-date {
+            color: #2e7d32;
+        }
+
+        .milestone-content {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-top: 3px solid var(--border-light);
+            text-align: center;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            opacity: 0.9;
+            transition: all 0.3s ease;
+            height: 120px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .milestone.expanded .milestone-content {
+            height: auto;
+            min-height: 120px;
+            opacity: 1;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-top: 3px solid #2e7d32;
+            padding-bottom: 20px;
+        }
+
+        .milestone-content p {
+            margin: 5px 0;
+        }
+
+        .text-green { color: #2e7d32; font-weight: 600; }
+        .text-orange { color: #d84315; font-weight: 600; }
+        .text-blue { color: var(--timeline-blue); font-weight: 600; }
+        .text-bold { font-weight: 600; }
+
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background: var(--card-bg);
+            border: 2px solid var(--timeline-blue);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+            color: var(--timeline-blue);
+            font-size: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+
+        .nav-arrow:hover {
+            background: var(--timeline-blue);
+            color: white;
+        }
+
+        .nav-left { left: 0; }
+        .nav-right { right: 0; }
+
+        .bottom-bar {
+            background-color: #2e7d32;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: auto;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .milestone {
+                flex: 0 0 200px;
+            }
+            .journey-header h1 {
+                font-size: 2rem;
+            }
+            .timeline-container {
+                padding: 0 30px;
+            }
+        }
+    </style>
+</head>
+<body class="moonlit-theme">
+        <header id="main-header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="../index.html">
+                    <img src="../assets/logo.png" alt="NUA Logo" id="header-logo">
+                </a>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="../index.html#about" class="glow-on-hover">About NUA</a></li>
+                    <li><a href="../index.html#principles" class="glow-on-hover">Guiding Principles</a></li>
+                    <li><a href="../index.html#registration" class="glow-on-hover">Member Registration</a></li>
+                    <li><a href="../mc-members.html" id="nav-member-resources" class="glow-on-hover">Member Resources</a></li>
+                    <li><a href="../index.html#contact" class="glow-on-hover">Contact NUA MC</a></li>
+                    <li><a href="../index.html#newsletters" class="glow-on-hover">NUA Newsletters</a></li>
+
+                    <li class="mobile-only-controls">
+                        <div class="header-controls">
+                            <button id="theme-toggle-mobile" class="control-btn" title="Toggle Day/Night Mode">🌙</button>
+                            <button id="sound-toggle-mobile" class="control-btn" title="Toggle Ambient Sound">🔇</button>
+                            <button class="control-btn refresh-app-btn" title="Refresh App" onclick="refreshApp()">🔄</button>
+                        </div>
+                    </li>
+                </ul>
+                <div class="header-controls desktop-only-controls">
+                    <button id="theme-toggle" class="control-btn" title="Toggle Day/Night Mode">🌙</button>
+                    <button id="sound-toggle" class="control-btn" title="Toggle Ambient Sound">🔇</button>
+                    <button class="control-btn refresh-app-btn" title="Refresh App" onclick="refreshApp()">🔄</button>
+                </div>
+                <div class="menu-toggle" id="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="journey-header">
+        <h1>NUA Journey</h1>
+        <p>Transparency and Accountability in Action</p>
+    </div>
+
+    <div class="timeline-container">
+        <div class="nav-arrow nav-left" id="scrollLeft"><i class="fas fa-chevron-left"></i></div>
+        
+        <div class="timeline-wrapper" id="timelineWrapper">
+            <div class="timeline-line"></div>
+            
+            <!-- Milestone 1 -->
+            <div class="milestone" onclick="this.classList.toggle('expanded')">
+                <div class="icon-container"><i class="fas fa-calendar-alt"></i></div>
+                <div class="milestone-date">AUG 2025</div>
+                <div class="milestone-content">
+                    <p>Resignation from URA</p>
+                    <p>Formation of NUA</p>
+                </div>
+            </div>
+
+            <!-- Milestone 2 -->
+            <div class="milestone" onclick="this.classList.toggle('expanded')">
+                <div class="icon-container"><i class="fas fa-users"></i></div>
+                <div class="milestone-date">SEP 2025</div>
+                <div class="milestone-content">
+                    <p>Interim Committee Selection</p>
+                    <p class="text-bold">By Laws Readiness</p>
+                </div>
+            </div>
+
+            <!-- Milestone 3 -->
+            <div class="milestone completed" onclick="this.classList.toggle('expanded')">
+                <div class="icon-container"><i class="fas fa-check"></i></div>
+                <div class="milestone-date">DEC 2025</div>
+                <div class="milestone-content">
+                    <p class="text-green">Registration<br>Completion</p>
+                </div>
+            </div>
+
+            <!-- Milestone 4 -->
+            <div class="milestone" onclick="this.classList.toggle('expanded')">
+                <div class="icon-container"><i class="fas fa-university"></i></div>
+                <div class="milestone-date">JAN 2026</div>
+                <div class="milestone-content">
+                    <p>Received PAN</p>
+                    <p>Banking Formalities</p>
+                </div>
+            </div>
+
+            <!-- Milestone 5 -->
+            <div class="milestone" onclick="this.classList.toggle('expanded')">
+                <div class="icon-container"><i class="fas fa-handshake"></i></div>
+                <div class="milestone-date">FEB 2026</div>
+                <div class="milestone-content">
+                    <p><span class="text-orange">Caveat 1</span> Filing</p>
+                    <p>Registrar Appeal 1</p>
+                    <p>NUA Concise Bye-Laws</p>
+                    <p>NUA vs Past Experience</p>
+                </div>
+            </div>
+
+            <!-- Milestone 6 -->
+            <div class="milestone" onclick="this.classList.toggle('expanded')">
+                <div class="icon-container"><i class="fas fa-handshake"></i></div>
+                <div class="milestone-date">MAR 2026</div>
+                <div class="milestone-content">
+                    <p class="text-blue">Meeting with URA Owners</p>
+                    <p class="text-blue">URA MC Collaboration Request</p>
+                </div>
+            </div>
+
+            <!-- Milestone 7 -->
+            <div class="milestone" onclick="this.classList.toggle('expanded')">
+                <div class="icon-container"><i class="fas fa-handshake"></i></div>
+                <div class="milestone-date">APR 2026</div>
+                <div class="milestone-content">
+                    <p class="text-orange">Registrar Appeal 2</p>
+                    <p>Formal Letter to Stop Reminders sent to URA MC</p>
+                </div>
+            </div>
+
+            <!-- Milestone 8 -->
+            <div class="milestone" onclick="this.classList.toggle('expanded')">
+                <div class="icon-container"><i class="fas fa-handshake"></i></div>
+                <div class="milestone-date">JUN 2026</div>
+                <div class="milestone-content">
+                    <p><span class="text-orange">Caveat 2</span> Filing</p>
+                    <p>Plots Cleaning & Number Painting</p>
+					<p>1st AGBM Meting held</p>
+                </div>
+            </div>
+            
+            <!-- Padding at end -->
+            <div style="min-width: 50px;"></div>
+        </div>
+        
+        <div class="nav-arrow nav-right" id="scrollRight"><i class="fas fa-chevron-right"></i></div>
+    </div>
+
+    <!-- Quicklinks Section -->
+    <section id="quicklinks" class="section bg-light" style="margin-top: auto; padding: 60px 0; background-color: var(--bg-secondary); border-top: 1px solid rgba(45, 90, 39, 0.1);">
+        <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+            <div class="quicklinks-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px;">
+                <div class="quicklinks-col">
+                    <h3 style="font-size: 1.25rem; margin-bottom: 20px; color: var(--brand-primary); font-family: 'Outfit';">Useful Links</h3>
+                    <ul class="quick-links-list" style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 10px;"><a href="kya.html" style="color: var(--text-primary); text-decoration: none;">🏛️ KYA (Know Your Association)</a></li>
+                        <li style="margin-bottom: 10px;"><a href="gallery.html" style="color: var(--text-primary); text-decoration: none;">📸 NUA Photo Gallery</a></li>
+                        <li style="margin-bottom: 10px;"><a href="blogs.html" style="color: var(--text-primary); text-decoration: none;">✍️ MC Member Blogs</a></li>
+                        <li style="margin-bottom: 10px;"><a href="nua-journey.html" style="color: var(--text-primary); text-decoration: none;">⏳ NUA Journey Timeline</a></li>
+                    </ul>
+                </div>
+                <div class="quicklinks-col">
+                    <h3 style="font-size: 1.25rem; margin-bottom: 20px; color: var(--brand-primary); font-family: 'Outfit';">Contact Us</h3>
+                    <p style="color: var(--text-primary);"><strong>NUA MC Email ID:</strong><br>
+                        <a href="mailto:nua-managing-committee@googlegroups.com" style="color: var(--brand-primary); text-decoration: none;">nua-managing-committee@googlegroups.com</a>
+                    </p>
+                </div>
+                <div class="quicklinks-col">
+                    <h3 style="font-size: 1.25rem; margin-bottom: 20px; color: var(--brand-primary); font-family: 'Outfit';">Site Navigation</h3>
+                    <ul class="quick-links-list" style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 10px;"><a href="../index.html#about" style="color: var(--text-primary); text-decoration: none;">About NUA</a></li>
+                        <li style="margin-bottom: 10px;"><a href="../index.html#principles" style="color: var(--text-primary); text-decoration: none;">Guiding Principles</a></li>
+                        <li style="margin-bottom: 10px;"><a href="../index.html#registration" style="color: var(--text-primary); text-decoration: none;">Member Registration</a></li>
+                        <li style="margin-bottom: 10px;"><a href="../mc-members.html" style="color: var(--text-primary); text-decoration: none;">MC Resources</a></li>
+                        <li style="margin-bottom: 10px;"><a href="../index.html#contact" style="color: var(--text-primary); text-decoration: none;">Contact NUA MC</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer style="background-color: var(--bg-dark, #1B3F16); color: var(--text-inverse, #fff); padding: 30px 0; text-align: center;">
+        <div class="container text-center">
+            <p>&copy; 2026 New Utopia Association (NUA). All rights reserved.</p>
+            <p class="designer-credit" style="font-size: 0.85rem; opacity: 0.7; margin-top: 5px;">Designed By: R&R Consulting</p>
+        </div>
+    </footer>
+
+
+    <div class="bottom-bar">
+        NUA Web Development & Automation
+    </div>
+
+    <script>
+        const wrapper = document.getElementById('timelineWrapper');
+        const scrollLeftBtn = document.getElementById('scrollLeft');
+        const scrollRightBtn = document.getElementById('scrollRight');
+
+        scrollLeftBtn.addEventListener('click', () => {
+            wrapper.scrollBy({ left: -300, behavior: 'smooth' });
+        });
+
+        scrollRightBtn.addEventListener('click', () => {
+            wrapper.scrollBy({ left: 300, behavior: 'smooth' });
+        });
+        
+        // Hide arrows if not scrollable
+        const checkScroll = () => {
+            if (wrapper.scrollWidth <= wrapper.clientWidth) {
+                scrollLeftBtn.style.display = 'none';
+                scrollRightBtn.style.display = 'none';
+            } else {
+                scrollLeftBtn.style.display = 'flex';
+                scrollRightBtn.style.display = 'flex';
+            }
+        };
+        
+        window.addEventListener('resize', checkScroll);
+        // Initial check needs a slight delay to ensure elements are rendered
+        setTimeout(checkScroll, 100);
+        
+        // Update arrows on scroll
+        wrapper.addEventListener('scroll', () => {
+            if (wrapper.scrollLeft <= 0) {
+                scrollLeftBtn.style.opacity = '0.5';
+                scrollLeftBtn.style.cursor = 'default';
+            } else {
+                scrollLeftBtn.style.opacity = '1';
+                scrollLeftBtn.style.cursor = 'pointer';
+            }
+            
+            if (wrapper.scrollLeft + wrapper.clientWidth >= wrapper.scrollWidth - 1) {
+                scrollRightBtn.style.opacity = '0.5';
+                scrollRightBtn.style.cursor = 'default';
+            } else {
+                scrollRightBtn.style.opacity = '1';
+                scrollRightBtn.style.cursor = 'pointer';
+            }
+        });
+    </script>
+    <script src="../script.js"></script>
+</body>
+</html>

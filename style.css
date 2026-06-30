@@ -2808,4 +2808,39 @@ body.dashboard-fullscreen .mc-content {
     body.moonlit-theme .table-responsive td {
         border-bottom-color: rgba(255,255,255,0.05);
     }
+/* Resources Menu in Navigation bar */
+/* Dropdown base */
+	.nav-links .dropdown {
+	  position: relative;
+	}
+
+	.nav-links .dropdown-menu {
+	  display: none;              /* hide by default */
+	  position: absolute;
+	  top: 100%;                  /* place below parent */
+	  left: 0;
+	  background-color: #064e3b;  /* match your dark green theme */
+	  list-style: none;
+	  margin: 0;
+	  padding: 0;
+	  min-width: 180px;
+	  z-index: 999;
+	}
+
+	/* Dropdown items */
+	.nav-links .dropdown-menu li a {
+	  display: block;
+	  padding: 10px 15px;
+	  color: #fff;
+	  text-decoration: none;
+	}
+
+	.nav-links .dropdown-menu li a:hover {
+	  background-color: #046c4e;  /* slightly lighter hover */
+	}
+
+	/* Show dropdown on hover (desktop) */
+	.nav-links .dropdown:hover .dropdown-menu {
+	  display: block;
+	}
 }

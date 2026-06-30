@@ -8,7 +8,7 @@
     <meta name="description" content="Know Your Association - Important resources and tools for NUA members.">
 
     <!-- Link to the main stylesheet to sync themes -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,7 +16,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap"
         rel="stylesheet">
-    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
 
     <style>
         /* Apply top padding so main content is not hidden behind the fixed header */
@@ -206,9 +206,9 @@
         }
     </style>
     <!-- PWA Meta Tags -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="../manifest.json">
     <meta name="theme-color" content="#0a1f08">
-    <link rel="apple-touch-icon" href="assets/logo.png">
+    <link rel="apple-touch-icon" href="../assets/logo.png">
 </head>
 
 <body class="moonlit-theme"> <!-- Default to dark/moonlit theme, same as index.html -->
@@ -219,8 +219,8 @@
         <div class="container header-container"
             style="display: flex; justify-content: space-between; align-items: center;">
             <div class="logo">
-                <a href="index.html">
-                    <img src="assets/logo.png" alt="NUA Logo" id="header-logo"
+                <a href="../index.html">
+                    <img src="../assets/logo.png" alt="NUA Logo" id="header-logo"
                         style="height: 100px; transition: var(--transition-smooth);">
                 </a>
             </div>
@@ -228,25 +228,25 @@
                 <!-- Replicated Menu Links -->
                 <ul class="nav-links"
                     style="display: flex; list-style: none; align-items: center; padding: 0; margin: 0;">
-                    <li style="margin-left: 30px;"><a href="index.html#about" class="glow-on-hover"
+                    <li style="margin-left: 30px;"><a href="../index.html#about" class="glow-on-hover"
                             style="text-decoration: none; color: var(--text-primary); font-weight: 600; font-size: 0.95rem;">About
                             NUA</a></li>
-                    <li style="margin-left: 30px;"><a href="index.html#principles" class="glow-on-hover"
+                    <li style="margin-left: 30px;"><a href="../index.html#principles" class="glow-on-hover"
                             style="text-decoration: none; color: var(--text-primary); font-weight: 600; font-size: 0.95rem;">Guiding
                             Principles</a></li>
-                    <li style="margin-left: 30px;"><a href="index.html#registration" class="glow-on-hover"
+                    <li style="margin-left: 30px;"><a href="../index.html#registration" class="glow-on-hover"
                             style="text-decoration: none; color: var(--text-primary); font-weight: 600; font-size: 0.95rem;">Member
                             Registration</a></li>
-                    <!-- <li style="margin-left: 30px;"><a href="members-resources.html" class="glow-on-hover"
+                    <!-- <li style="margin-left: 30px;"><a href="../members-resources.html" class="glow-on-hover"
                             style="text-decoration: none; color: var(--text-primary); font-weight: 600; font-size: 0.95rem;">NUA Docs</a></li> -->
                     <!-- <li style="margin-left: 30px;"><a href="nua-members.html" class="glow-on-hover"
                             style="text-decoration: none; color: var(--text-primary); font-weight: 600; font-size: 0.95rem;">NUA Resources</a></li> -->
-					<li style="margin-left: 30px;"><a href="mc-members.html" class="glow-on-hover"
+					<li style="margin-left: 30px;"><a href="../mc-members.html" class="glow-on-hover"
                             style="text-decoration: none; color: var(--text-primary); font-weight: 600; font-size: 0.95rem;">Member Resources</a></li>
-                    <li style="margin-left: 30px;"><a href="index.html#contact" class="glow-on-hover"
+                    <li style="margin-left: 30px;"><a href="../index.html#contact" class="glow-on-hover"
                             style="text-decoration: none; color: var(--text-primary); font-weight: 600; font-size: 0.95rem;">Contact
                             NUA MC</a></li>
-                    <li style="margin-left: 30px;"><a href="index.html#newsletters" class="glow-on-hover"
+                    <li style="margin-left: 30px;"><a href="../index.html#newsletters" class="glow-on-hover"
                             style="text-decoration: none; color: var(--text-primary); font-weight: 600; font-size: 0.95rem;">NUA
                             Newsletters</a></li>
 
@@ -256,6 +256,7 @@
                                 style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">🌙</button>
                             <button id="sound-toggle-mobile" class="control-btn" title="Toggle Ambient Sound"
                                 style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">🔇</button>
+							<button class="control-btn refresh-app-btn" title="Refresh App" onclick="refreshApp()">🔄</button>
                         </div>
                     </li>
                 </ul>
@@ -264,6 +265,7 @@
                         style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">🌙</button>
                     <button id="sound-toggle" class="control-btn" title="Toggle Ambient Sound"
                         style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">🔇</button>
+					<button class="control-btn refresh-app-btn" title="Refresh App" onclick="refreshApp()">🔄</button>
                 </div>
                 <div class="menu-toggle" id="mobile-menu"
                     style="display: none; flex-direction: column; cursor: pointer; margin-left: 20px;">
@@ -363,7 +365,7 @@
                         </ul>
                     </div>
                     <!-- Added image placeholder as requested. Informing user to save their image here -->
-                    <img src="assets/kya_poster.jpg" alt="KYA Poster" class="placeholder-image"
+                    <img src="../assets/kya_poster.jpg" alt="KYA Poster" class="placeholder-image"
                         onerror="this.src='https://via.placeholder.com/800x1000?text=Please+Save+Your+Image+as+assets/kya_poster.jpg'">
                 </div>
 
@@ -382,7 +384,7 @@
         <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
             <div class="quicklinks-grid"
                 style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px;">
-                <div class="quicklinks-col">
+                <!-- <div class="quicklinks-col">
                     <h3
                         style="font-size: 1.25rem; margin-bottom: 20px; color: var(--brand-primary); font-family: 'Outfit';">
                         Useful Links</h3>
@@ -393,7 +395,16 @@
                         <li style="margin-bottom: 10px;"><a href="byelaws.html"
                                 style="color: var(--text-primary); text-decoration: none;">NUA Bye-laws</a></li>
                     </ul>
-                </div>
+                </div> -->
+				<div class="quicklinks-col">
+                        <h3>Useful Links</h3>
+                        <ul class="quick-links-list">
+                            <li><a href="kya.html">🏛️ KYA (Know Your Association)</a></li>
+                            <li><a href="gallery.html">📸 NUA Photo Gallery</a></li>
+                            <li><a href="blogs.html">✍️ MC Member Blogs</a></li>
+                            <li><a href="nua-journey.html">⏳ NUA Journey Timeline</a></li>
+                        </ul>
+                    </div>
                 <div class="quicklinks-col">
                     <h3
                         style="font-size: 1.25rem; margin-bottom: 20px; color: var(--brand-primary); font-family: 'Outfit';">
@@ -408,19 +419,19 @@
                         style="font-size: 1.25rem; margin-bottom: 20px; color: var(--brand-primary); font-family: 'Outfit';">
                         Site Navigation</h3>
                     <ul class="quick-links-list" style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 10px;"><a href="index.html#about"
+                        <li style="margin-bottom: 10px;"><a href="../index.html#about"
                                 style="color: var(--text-primary); text-decoration: none;">About NUA</a></li>
-                        <li style="margin-bottom: 10px;"><a href="index.html#principles"
+                        <li style="margin-bottom: 10px;"><a href="../index.html#principles"
                                 style="color: var(--text-primary); text-decoration: none;">Guiding Principles</a></li>
-                        <li style="margin-bottom: 10px;"><a href="index.html#registration"
+                        <li style="margin-bottom: 10px;"><a href="../index.html#registration"
                                 style="color: var(--text-primary); text-decoration: none;">Member Registration</a></li>
-                        <li style="margin-bottom: 10px;"><a href="members-resources.html"
+                        <li style="margin-bottom: 10px;"><a href="../members-resources.html"
                                 style="color: var(--text-primary); text-decoration: none;">NUA Docs</a></li>
-                        <li style="margin-bottom: 10px;"><a href="mc-members.html"
+                        <li style="margin-bottom: 10px;"><a href="../mc-members.html"
                                 style="color: var(--text-primary); text-decoration: none;">MC Resources</a></li>
-                        <li style="margin-bottom: 10px;"><a href="index.html#contact"
+                        <li style="margin-bottom: 10px;"><a href="../index.html#contact"
                                 style="color: var(--text-primary); text-decoration: none;">Contact NUA MC</a></li>
-                        <li style="margin-bottom: 10px;"><a href="index.html#newsletters"
+                        <li style="margin-bottom: 10px;"><a href="../index.html#newsletters"
                                 style="color: var(--text-primary); text-decoration: none;">NUA Newsletters</a></li>
                     </ul>
                 </div>
@@ -447,12 +458,12 @@
     </button>
 
     <audio id="ambient-sound" loop>
-        <source src="assets/birds-chirping.mp3" type="audio/mpeg">
+        <source src="../assets/birds-chirping.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
 
     <!-- Use same scripts as the rest of the application -->
-    <script src="script.js"></script>
+    <script src="../script.js"></script>
     <script>
         // Tool-specific Viewer Logic
         function showDoc(url) {

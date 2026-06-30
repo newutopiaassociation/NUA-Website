@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z813Y7500E"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-Z813Y7500E');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MC Blog - New Utopia Association</title>
+    <meta name="description" content="Read the latest blog posts and articles from the NUA Managing Committee members.">
+    
+    <!-- Link to the main stylesheet to sync themes -->
+    <link rel="stylesheet" href="../style.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+
+    <style>
+        /* Apply top padding so main content is not hidden behind the fixed header */
+        main {
+            padding-top: 120px;
+            padding-bottom: 60px;
+            min-height: calc(100vh - 150px);
+        }
+
+        .blog-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .blog-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .blog-header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            color: var(--primary-color, #2e7d32);
+            margin-bottom: 15px;
+        }
+
+        .moonlit-theme .blog-header h1 {
+            color: var(--accent-light, #a5d6a7);
+        }
+
+        .blog-header p {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            color: var(--text-color);
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .blog-card {
+            background: var(--card-bg, #ffffff);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid var(--border-color, rgba(0,0,0,0.05));
+        }
+
+        .moonlit-theme .blog-card {
+            background: var(--glass-bg, rgba(255, 255, 255, 0.05));
+            border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .blog-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .moonlit-theme .blog-card:hover {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            border-color: var(--accent-light, #a5d6a7);
+        }
+
+        .blog-image {
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary-color, #2e7d32), var(--secondary-color, #1b5e20));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            position: relative;
+        }
+
+        .blog-image::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            opacity: 0.5;
+        }
+
+        .blog-content {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .blog-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-bottom: 12px;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .blog-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        .moonlit-theme .blog-title {
+            color: #ffffff;
+        }
+
+        .blog-excerpt {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-bottom: 25px;
+            flex-grow: 1;
+        }
+
+        .blog-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color, rgba(0,0,0,0.1));
+        }
+
+        .moonlit-theme .blog-footer {
+            border-top-color: rgba(255,255,255,0.1);
+        }
+
+        .author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .author-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--accent-color, #ff9800);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .author-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .read-more {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary-color, #2e7d32);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .moonlit-theme .read-more {
+            color: var(--accent-light, #a5d6a7);
+        }
+
+        .read-more svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.2s ease;
+        }
+
+        .blog-card:hover .read-more svg {
+            transform: translateX(3px);
+        }
+
+        @media (max-width: 768px) {
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body class="moonlit-theme">
+
+    <header id="main-header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="../index.html#hero">
+                    <img src="../assets/logo.png" alt="NUA Logo" id="header-logo">
+                </a>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="../index.html#about" class="glow-on-hover">About NUA</a></li>
+                    <li><a href="../index.html#principles" class="glow-on-hover">Guiding Principles</a></li>
+                    <li><a href="../index.html#registration" class="glow-on-hover">Member Registration</a></li>
+                    <li><a href="../mc-members.html" id="nav-member-resources" class="glow-on-hover">Member Resources</a></li>
+                    <li><a href="../index.html#contact" class="glow-on-hover">Contact NUA MC</a></li>
+                    <li><a href="../index.html#newsletters" class="glow-on-hover">NUA Newsletters</a></li>
+                    <li class="mobile-only-controls">
+                        <div class="header-controls">
+                            <button id="theme-toggle-mobile" class="control-btn" title="Toggle Day/Night Mode">🌙</button>
+                            <button id="sound-toggle-mobile" class="control-btn" title="Toggle Ambient Sound">🔇</button>
+                            <button class="control-btn refresh-app-btn" title="Refresh App" onclick="refreshApp()">🔄</button>
+                        </div>
+                    </li>
+                </ul>
+                <div class="header-controls desktop-only-controls">
+                    <button id="theme-toggle" class="control-btn" title="Toggle Day/Night Mode">🌙</button>
+                    <button id="sound-toggle" class="control-btn" title="Toggle Ambient Sound">🔇</button>
+                    <button class="control-btn refresh-app-btn" title="Refresh App" onclick="refreshApp()">🔄</button>
+                </div>
+                <div class="menu-toggle" id="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="blog-container">
+            <div class="blog-header">
+                <h1 class="animate-slide-up text-glow">MC Member Blog</h1>
+                <p class="animate-slide-up">Insights, updates, and stories from the Managing Committee regarding urban communities.</p>
+            </div>
+
+            <div class="blog-grid animate-fade-in">
+                <!-- Blog Post 1 -->
+                <a href="https://medium.com/@ecirams/behind-the-gates-the-real-story-of-urban-communities-c128b991c420" target="_blank" rel="noopener noreferrer" class="blog-card">
+                    <div class="blog-image">
+                        🏢
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span>Medium Article</span>
+                            <span>Urban Communities</span>
+                        </div>
+                        <h2 class="blog-title">Behind the Gates: The Real Story of Urban Communities</h2>
+                        <p class="blog-excerpt">Explore the realities, challenges, and stories of living in modern urban communities and what goes on behind the gates.</p>
+                        <div class="blog-footer">
+                            <div class="author">
+                                <div class="author-avatar">E</div>
+                                <span class="author-name">ecirams</span>
+                            </div>
+                            <span class="read-more">
+                                Read on Medium
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Blog Post 2 -->
+                <a href="https://medium.com/@ecirams/one-message-many-voices-clarifying-communication-channels-in-urban-communities-e7918cfd906d" target="_blank" rel="noopener noreferrer" class="blog-card">
+                    <div class="blog-image" style="background: linear-gradient(135deg, #1976d2, #0d47a1);">
+                        📢
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span>Medium Article</span>
+                            <span>Communication</span>
+                        </div>
+                        <h2 class="blog-title">One Message Many Voices: Clarifying Communication Channels in Urban Communities</h2>
+                        <p class="blog-excerpt">A deep dive into how communication flows in urban setups and the importance of clear, unified messaging among residents and management.</p>
+                        <div class="blog-footer">
+                            <div class="author">
+                                <div class="author-avatar">E</div>
+                                <span class="author-name">ecirams</span>
+                            </div>
+                            <span class="read-more">
+                                Read on Medium
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </main>
+
+            <section id="quicklinks" class="section bg-light">
+            <div class="container">
+                <div class="quicklinks-grid">
+                    <div class="quicklinks-col">
+                        <h3>Useful Links</h3>
+                        <ul class="quick-links-list">
+                            <li><a href="kya.html">🏛️ KYA (Know Your Association)</a></li>
+                            <li><a href="gallery.html">📸 NUA Photo Gallery</a></li>
+                            <li><a href="blogs.html">✍️ MC Member Blogs</a></li>
+                            <li><a href="nua-journey.html">⏳ NUA Journey Timeline</a></li>
+                        </ul>
+                    </div>
+                    <div class="quicklinks-col">
+                        <h3>Contact Us</h3>
+                        <p><strong>NUA MC Email ID:</strong><br>
+                            <a href="mailto:nua-managing-committee@googlegroups.com">nua-managing-committee@googlegroups.com</a>
+                        </p>
+                    </div>
+                    <div class="quicklinks-col">
+                        <h3>Site Navigation</h3>
+                        <ul class="quick-links-list">
+                            <li><a href="../index.html#about">About NUA</a></li>
+                            <li><a href="../index.html#principles">Guiding Principles</a></li>
+                            <li><a href="../index.html#registration">Member Registration</a></li>
+                            <li><a href="../mc-members.html">MC Resources</a></li>
+                            <li><a href="gallery.html">📸 Photo Gallery</a></li>
+                            <li><a href="../index.html#contact">Contact NUA MC</a></li>
+                            <li><a href="../index.html#newsletters">NUA Newsletters</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    <footer>
+        <div class="container text-center">
+            <p>&copy; 2026 New Utopia Association (NUA). All rights reserved.</p>
+            <p class="designer-credit">Designed By: R&R Consulting</p>
+        </div>
+    </footer>
+
+    <button id="back-to-top" title="Go to top">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5V19M12 5L6 11M12 5L18 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+        </svg>
+    </button>
+
+    <audio id="ambient-sound" loop>
+        <source src="../assets/birds-chirping.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        const audio = document.getElementById("ambient-sound");
+        const toggle = document.getElementById("sound-toggle");
+        const toggleMobile = document.getElementById("sound-toggle-mobile");
+
+        function handleSoundToggle() {
+            if (audio.paused) {
+                audio.play().catch(err => console.log("Playback blocked:", err));
+                if(toggle) toggle.textContent = "Sound ON";
+                if(toggleMobile) toggleMobile.textContent = "Sound ON";
+            } else {
+                audio.pause();
+                if(toggle) toggle.textContent = "Sound OFF";
+                if(toggleMobile) toggleMobile.textContent = "Sound OFF";
+            }
+        }
+
+        if(toggle) toggle.addEventListener("click", handleSoundToggle);
+        if(toggleMobile) toggleMobile.addEventListener("click", handleSoundToggle);
+    </script>
+    <script src="../script.js"></script>
+</body>
+</html>
